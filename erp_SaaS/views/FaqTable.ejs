@@ -1,0 +1,613 @@
+<%- include('../partials/admin/header.ejs')%>
+
+<style>
+    :root {
+        --primary: #f59e0b;
+        --primary-dark: #d97706;
+        --primary-light: #fef3c7;
+        --success: #10b981;
+        --success-light: #d1fae5;
+        --danger: #ef4444;
+        --danger-light: #fee2e2;
+        --warning: #f59e0b;
+        --warning-light: #fef3c7;
+        --dark: #1e293b;
+        --gray: #64748b;
+        --light-gray: #f1f5f9;
+        --border: #e2e8f0;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #f8fafc;
+    }
+
+    /* Main Content Section */
+    .content-wrapper {
+        padding: 30px;
+        background: #f8fafc;
+        min-height: 100vh;
+    }
+
+    /* Page Header */
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+    .page-title {
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 28px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-title i {
+        color: var(--primary);
+        background: white;
+        padding: 12px;
+        border-radius: 14px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+
+    .page-subtitle {
+        color: var(--gray);
+        font-size: 14px;
+        margin: 8px 0 0 60px;
+    }
+
+    /* Add Button */
+    .btn-add {
+        background: linear-gradient(135deg, var(--primary), #fbbf24);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 8px 15px rgba(245, 158, 11, 0.2);
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 20px rgba(245, 158, 11, 0.3);
+        color: white;
+    }
+
+    .btn-add i {
+        font-size: 18px;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), #fbbf24);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+    }
+
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+
+    .stat-icon.total { background: #eff6ff; color: #3b82f6; }
+    .stat-icon.active { background: #ecfdf5; color: var(--success); }
+    .stat-icon.pending { background: #fef3c7; color: var(--warning); }
+
+    .stat-content h3 {
+        color: var(--gray);
+        font-size: 14px;
+        font-weight: 500;
+        margin: 0 0 5px 0;
+        letter-spacing: 0.3px;
+    }
+
+    .stat-content .stat-number {
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 32px;
+        line-height: 1;
+        margin: 0;
+    }
+
+    /* Table Card */
+    .table-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        border: 1px solid var(--border);
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--border);
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .table-header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-header-left i {
+        color: var(--primary);
+        font-size: 20px;
+    }
+
+    .table-header-left span {
+        font-weight: 600;
+        color: #0f172a;
+        font-size: 16px;
+    }
+
+    .table-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--light-gray);
+        padding: 8px 15px;
+        border-radius: 12px;
+    }
+
+    .table-search i {
+        color: var(--gray);
+        font-size: 14px;
+    }
+
+    .table-search input {
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 14px;
+        width: 200px;
+    }
+
+    .table-search input::placeholder {
+        color: #94a3b8;
+    }
+
+    /* Table Styles */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table th {
+        background: #f8fafc;
+        padding: 16px 20px;
+        text-align: left;
+        color: var(--gray);
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--border);
+        white-space: nowrap;
+    }
+
+    .table td {
+        padding: 16px 20px;
+        color: #334155;
+        font-size: 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+    }
+
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background: #fafbff !important;
+    }
+
+    /* Serial Number */
+    .serial-number {
+        font-weight: 600;
+        color: var(--primary);
+        background: var(--primary-light);
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+    /* Title Cell */
+    .title-cell {
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    /* Description Cell */
+    .desc-cell {
+        max-width: 300px;
+        color: #475569;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Status Badge */
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .status-badge.pending {
+        background: var(--warning-light);
+        color: #92400e;
+    }
+
+    .status-badge.active {
+        background: var(--success-light);
+        color: #166534;
+    }
+
+    .status-badge i {
+        font-size: 11px;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: white;
+        font-size: 14px;
+    }
+
+    .btn-action.edit {
+        background: var(--primary);
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+    }
+
+    .btn-action.edit:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-action.delete {
+        background: var(--danger);
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-action.delete:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+    .empty-state i {
+        font-size: 70px;
+        color: #cbd5e1;
+        margin-bottom: 15px;
+    }
+
+    .empty-state h5 {
+        color: #0f172a;
+        font-weight: 600;
+        margin: 0 0 8px;
+    }
+
+    .empty-state p {
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .content-wrapper {
+            padding: 20px;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .page-subtitle {
+            margin-left: 0;
+        }
+
+        .btn-add {
+            padding: 10px 20px;
+        }
+
+        .table th, .table td {
+            padding: 12px 15px;
+        }
+    }
+</style>
+
+<!-- Main Content -->
+<section class="content-wrapper">
+    <!-- Page Header with Actions -->
+    <div class="d-flex justify-content-between align-items-center page-header">
+        <div>
+            <h1 class="page-title">
+                <i class="bi bi-question-circle"></i>
+                FAQ Management
+            </h1>
+            <p class="page-subtitle">
+                <i class="bi bi-dot"></i> Manage frequently asked questions here
+            </p>
+        </div>
+        <a href="/faqform" class="btn-add">
+            <i class="bi bi-plus-circle"></i>
+            Create New FAQ
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <!-- Total FAQs -->
+        <div class="stat-card">
+            <div class="stat-icon total">
+                <i class="bi bi-question-circle"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Total FAQs</h3>
+                <div class="stat-number"><%= faqdata.length %></div>
+            </div>
+        </div>
+
+        <!-- Active FAQs -->
+        <div class="stat-card">
+            <div class="stat-icon active">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Active</h3>
+                <div class="stat-number">
+                    <%= faqdata.filter(d => d.status === 'Active').length %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending FAQs -->
+        <div class="stat-card">
+            <div class="stat-icon pending">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Pending</h3>
+                <div class="stat-number">
+                    <%= faqdata.filter(d => d.status === 'Pending').length %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Table Card -->
+    <div class="table-card">
+        <!-- Table Header with Search -->
+        <div class="table-header">
+            <div class="table-header-left">
+                <i class="bi bi-table"></i>
+                <span>All FAQs</span>
+            </div>
+            <div class="table-search">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Search FAQs..." id="searchInput">
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">#</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th style="width: 120px;">Status</th>
+                        <th style="width: 120px; text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <% if(faqdata && faqdata.length > 0) { %>
+                        <% faqdata.forEach((val, k) => { %>
+                            <tr>
+                                <td>
+                                    <div class="serial-number"><%= k+1 %></div>
+                                </td>
+                                <td>
+                                    <span class="title-cell"><%= val.title %></span>
+                                </td>
+                                <td>
+                                    <div class="desc-cell" title="<%= val.desc %>">
+                                        <%= val.desc %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="/faqstatus/<%= val.id %>/<%= val.status %>" style="text-decoration: none;">
+                                        <% if(val.status == "Pending") { %>
+                                            <span class="status-badge pending">
+                                                <i class="bi bi-clock"></i>
+                                                Pending
+                                            </span>
+                                        <% } else { %>
+                                            <span class="status-badge active">
+                                                <i class="bi bi-check-circle"></i>
+                                                Active
+                                            </span>
+                                        <% } %>
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <!-- Edit Button -->
+                                        <a href="/faqedit/<%= val.id %>" style="text-decoration: none;">
+                                            <button class="btn-action edit" title="Edit FAQ">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                        </a>
+                                        
+                                        <!-- Delete Button with Confirmation -->
+                                        <a href="/faqdelete/<%= val.id %>" 
+                                           onclick="return confirm('Are you sure you want to delete this FAQ?')" 
+                                           style="text-decoration: none;">
+                                            <button class="btn-action delete" title="Delete FAQ">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="bi bi-inbox"></i>
+                                    <h5>No FAQs Found</h5>
+                                    <p>Click "Create New FAQ" to add your first FAQ</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Table Footer with Pagination (if needed) -->
+        <% if(faqdata && faqdata.length > 0) { %>
+        <div style="padding: 15px 25px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end;">
+            <span style="color: var(--gray); font-size: 13px;">
+                Showing <strong>1-<%= faqdata.length %></strong> of <strong><%= faqdata.length %></strong> entries
+            </span>
+        </div>
+        <% } %>
+    </div>
+</section>
+
+<!-- Search Functionality -->
+<script>
+    document.getElementById('searchInput')?.addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#tableBody tr');
+        
+        rows.forEach(row => {
+            const title = row.querySelector('.title-cell')?.textContent.toLowerCase() || '';
+            const desc = row.querySelector('.desc-cell')?.textContent.toLowerCase() || '';
+            
+            if(title.includes(searchValue) || desc.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // Smooth hover effects for status links
+    document.querySelectorAll('.status-badge').forEach(badge => {
+        badge.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+            this.style.transition = 'transform 0.2s ease';
+        });
+        badge.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

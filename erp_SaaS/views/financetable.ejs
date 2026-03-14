@@ -1,0 +1,50 @@
+<%- include('../partials/admin/header.ejs')%>
+
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <%- include('../partials/admin/left.ejs')%>
+                <div class="col-md-9">
+                    <h1>Finance Table</h1>
+                    <a href="/financeform"><button class="btn btn-dark">Add Finance</button></a>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>SR. No.</th>
+                            <th>Title</th>
+                            <th>Description1</th>
+                            <th>Description2</th>
+                           <th>Description3</th>
+                            <th>Description4</th>
+                            <th>Status</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                        <%financedata.forEach((val,k)=>{ %>
+                              <tr>
+                            <td><%=k+1%></td>
+                            <td><%=val.title%></td>
+                            <td><%=val.desc1%></td>
+                            <td><%=val.desc2%></td>
+                            <td><%=val.desc3%></td>
+
+                            <td><%=val.desc4%></td>
+
+                            <%if(val.status=="Pending"){%>
+                            <td><a href="/financestatus/<%=val.id%>/<%=val.status%>"><button class="btn btn-primary"><%=val.status%></button></a></td>
+                            <%}else{%>
+                            <td><a href="/financestatus/<%=val.id%>/<%=val.status%>"><button class="btn btn-success"><%=val.status%></button></a></td>
+
+                            <%}%>
+                            <td><a href="/financeedit/<%=val.id%>"><button>Edit</button></a></td>
+                            <td><a href="/financedelete/<%=val.id%>"><button>Delete</button></a></td>
+                        </tr>
+                       <% })%>
+                      
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</body>
+</html>

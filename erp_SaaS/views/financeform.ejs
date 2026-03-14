@@ -1,0 +1,28 @@
+<%- include('../partials/admin/header.ejs')%>
+
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <%- include('../partials/admin/left.ejs')%>
+                <div class="col-md-9">
+                    <h1>Finance Form</h1>
+                    <form method="post">
+                        <label>Title</label>
+                        <input type="text" class="form-control" name="title"/>
+                        <label>Description1</label>
+                        <input type="text" class="form-control" name="desc1"/>
+                        <label>Description2</label>
+                        <input type="text" class="form-control" name="desc2"/>
+                        <label>Description3</label>
+                        <input type="text" class="form-control" name="desc3"/>
+                        <label>Description4</label>
+                        <input type="text" class="form-control" name="desc4"/>
+                       
+                        <button class="form-control btn btn-primary mt-2">+ Add Finance</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

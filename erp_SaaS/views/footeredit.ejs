@@ -1,0 +1,51 @@
+<%- include('../partials/admin/header.ejs')%>
+
+<section>
+<div class="container-fluid">
+<div class="row">
+
+<%- include('../partials/admin/left.ejs')%>
+
+<div class="col-md-9">
+
+<h1>Edit Footer</h1>
+
+<form method="post" enctype="multipart/form-data">
+
+<label>Title</label>
+<input type="text" class="form-control" name="title" value="<%=Record.title%>"/>
+OTP logout session 
+<label>Description</label>
+<input type="text" class="form-control" name="desc" value="<%=Record.desc%>"/>
+
+<label class="mt-3">Current Image</label><br>
+<img src="/upload/<%=Record.img%>" width="120" class="mb-3">
+<label>Change Image</label>
+<input type="file" name="img" class="form-control">
+
+<label class="mt-3">Instagram</label>
+<input type="text" name="instagram" class="form-control" value="<%=Record.instagramUrl%>">
+
+<label>Facebook</label>
+<input type="text" name="facebook" class="form-control" value="<%=Record.facebook%>">
+
+<label>Youtube</label>
+<input type="text" name="youtube" class="form-control" value="<%=Record.youtubeUrl%>">
+
+<label>Linkedin</label>
+<input type="text" name="linkedin" class="form-control" value="<%=Record.LinUrl%>">
+
+<button class="form-control btn btn-success mt-3">
+Update Footer
+</button>
+
+</form>
+
+</div>
+
+</div>
+</div>
+</section>
+
+</body>
+</html>

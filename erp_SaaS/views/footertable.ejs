@@ -1,0 +1,122 @@
+<%- include('../partials/admin/header.ejs')%>
+
+<section>
+<div class="container-fluid">
+<div class="row">
+
+<%- include('../partials/admin/left.ejs')%>
+
+<div class="col-md-9">
+
+<h1 class="mb-3">Footer Table</h1>
+
+<a href="/footerform">
+<button class="btn btn-dark mb-3">+ Add Footer</button>
+</a>
+
+<table class="table table-bordered table-hover">
+
+<tr>
+<th>SR. No.</th>
+<th>Title</th>
+<th>Description</th>
+<th>Image</th>
+<th>Instagram</th>
+<th>Facebook</th>
+<th>Youtube</th>
+<th>Linkedin</th>
+<th>Status</th>
+<th>Edit</th>
+<th>Delete</th>
+</tr>
+
+<% footerdata.forEach((val,k)=>{ %>
+
+<tr>
+
+<td><%= k+1 %></td>
+
+<td><%= val.title %></td>
+
+<td><%= val.desc %></td>
+
+<td>
+<img src="/upload/<%= val.img %>" width="80">
+</td>
+
+<td>
+<a href="<%= val.instagramUrl %>" target="_blank">
+<%= val.instagramUrl %>
+</a>
+</td>
+
+<td>
+<a href="<%= val.facebook %>" target="_blank">
+<%= val.facebook %>
+</a>
+</td>
+
+<td>
+<a href="<%= val.youtubeUrl %>" target="_blank">
+<%= val.youtubeUrl %>
+</a>
+</td>
+
+<td>
+<a href="<%= val.LinUrl %>" target="_blank">
+<%= val.LinUrl %>
+</a>
+</td>
+
+<td>
+
+<a href="/footerstatus/<%= val._id %>/<%= val.status %>">
+
+<% if(val.status=="Active"){ %>
+
+<button class="btn btn-success">
+<%= val.status %>
+</button>
+
+<% } else { %>
+
+<button class="btn btn-warning">
+<%= val.status %>
+</button>
+
+<% } %>
+
+</a>
+
+</td>
+
+<td>
+<a href="/footeredit/<%= val._id %>">
+<button class="btn btn-primary">
+Edit
+</button>
+</a>
+</td>
+
+<td>
+<a href="/footerdelete/<%= val._id %>" onclick="return confirm('Delete this record?')">
+<button class="btn btn-danger">
+Delete
+</button>
+</a>
+</td>
+
+</tr>
+
+<% }) %>
+
+</table>
+
+</div>
+
+</div>
+</div>
+</section>
+
+</body>
+</html>

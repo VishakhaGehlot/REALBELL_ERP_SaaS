@@ -1,0 +1,48 @@
+<%- include('../partials/admin/header.ejs')%>
+
+<section>
+<div class="container-fluid">
+<div class="row">
+
+<%- include('../partials/admin/left.ejs')%>
+
+<div class="col-md-9">
+
+<h1>Footer Form</h1>
+
+<form method="post" enctype="multipart/form-data">
+
+<label>Title</label>
+<input type="text" class="form-control" name="title"/>
+
+<label>Description</label>
+<input type="text" class="form-control" name="desc"/>
+
+<label>Image</label>
+<input type="file" name="img" class="form-control mt-3">
+
+<label>Instagram</label>
+<input type="text" name="instagram" class="form-control">
+
+<label>Facebook</label>
+<input type="text" name="facebook" class="form-control">
+
+<label>Youtube</label>
+<input type="text" name="youtube" class="form-control">
+
+<label>Linkedin</label>
+<input type="text" name="linkedin" class="form-control">
+
+<button class="form-control btn btn-primary mt-3">
++ Add Footer
+</button>
+
+</form>
+
+</div>
+</div>
+</div>
+</section>
+
+</body>
+</html>

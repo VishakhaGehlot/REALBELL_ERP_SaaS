@@ -1,0 +1,52 @@
+<%- include('../partials/admin/header.ejs')%>
+
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <%- include('../partials/admin/left.ejs')%>
+                    <div class="col-md-9">
+                        <h1>Query Table</h1>
+                        <table class="table table-hover">
+                            <tr>
+                                <th>SR. No.</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Subject</th>
+                                <th>Reply</th>
+                                <th>Delete</th>
+                            </tr>
+                            <%querydata.forEach((val,k)=>{ %>
+                                <tr>
+                                    <td>
+                                        <%= k+1 %>
+                                    </td>
+                                    <td>
+                                        <%= val.firstName %>
+                                    </td>
+                                    <td>
+                                        <%= val.lastName %>
+                                    </td>
+                                    <td>
+                                        <%= val.email %>
+                                    </td>
+                                    <td>
+                                        <%= val.phone %>
+                                    </td>
+                                    <td>
+                                        <%= val.message %>
+                                    </td>
+                                    <td><a href="/queryreplyform/<%=val.email%>/<%=val.message%>"><button>Reply</button></a></td>
+                                    <td><button>Delete</button></td>
+                                </tr>
+                                <% }) %>
+                        </table>
+                    </div>
+
+            </div>
+        </div>
+    </section>
+    </body>
+
+    </html>

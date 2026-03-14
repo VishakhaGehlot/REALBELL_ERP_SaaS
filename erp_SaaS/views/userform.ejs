@@ -1,0 +1,33 @@
+<%- include('../partials/admin/header.ejs')%>
+
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <%- include('../partials/admin/left.ejs')%>
+                    <div class="col-md-9">
+                        <h1>User Management Form</h1>
+                        <form method="post">
+                             <label>firstName</label>
+                            <input type="text" class="form-control" name="firstName" />
+                             <label>lastName</label>
+                            <input type="text" class="form-control" name="lastName" />
+                            <label>email</label>
+                            <input type="text" class="form-control" name="email" />
+                              <label>Password</label>
+                            <input type="text" class="form-control" name="password" />
+                            <label>Role</label>
+                            <select name="role" class="form-control">
+                                <option value="User">User</option>
+                                <option value="Admin">Admin</option>
+                                <option value="SuperAdmin">SuperAdmin</option>
+                                <option value="teacher">Teacher</option>
+                            </select>
+                            <button class="form-control btn btn-primary mt-2">update role</button>
+                        </form>
+                    </div>
+            </div>
+        </div>
+    </section>
+    </body>
+
+    </html>

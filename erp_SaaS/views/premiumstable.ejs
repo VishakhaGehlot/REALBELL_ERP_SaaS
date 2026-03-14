@@ -1,0 +1,37 @@
+<%- include('../partials/admin/header.ejs')%>
+
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <%- include('../partials/admin/left.ejs')%>
+                <div class="col-md-9">
+                    <h1>resources table</h1>
+                    <a href="/premiumsform"><button class="btn btn-dark">Add any resource</button></a>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>SR. No.</th>
+                            <th>Title</th>
+                            <th>Image</th>
+                            <th>Status</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                        <%premiumsdata.forEach((val,k)=>{%>
+                            <tr>
+                        <td><%=k+1%></td>
+                        <td><%=val.title%></td>
+                        <td><img src="/upload/<%=val.img%>" alt="" width="100px"></td>
+                        <td ><a href="/premiumsstatus/<%=val.id%>/<%=val.status%>"><button class="btn btn-success"><%=val.status%></button></a></td>
+                       <td><a href="/premiumsedit/<%=val.id%>"><button class="btn btn-success">Edit</button></a></td>
+                        <td><a href="/premiumsdelete/<%=val.id%>"><button class="btn btn-danger">Delete</button></a></td>
+                       </tr>
+                       <% })%>
+                      
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</body>
+</html>

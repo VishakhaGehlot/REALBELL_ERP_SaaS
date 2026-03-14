@@ -1,0 +1,19 @@
+#login{
+    display: flex;
+    align-items: center;
+    height: 440px;
+}
+#p{
+    align-items: center;
+}
+#login .para{
+    float: right;
+}
+
+#header{
+    background: blue;
+    padding: 20px 1px;
+}
+#header .btn{
+    float: right;
+}

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | REAL ERP SaaS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --navy:      #1a2b4a;
+            --navy-dark: #0f1c33;
+            --gold:      #d4a017;
+            --gold-light:#f0c040;
+        }
+        body { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; margin:0; }
+
+        /* TICKER */
+        .announcement-bar { background: linear-gradient(to right, #0f1c33, #1a2b4a); display: flex; align-items: center; height: 40px; overflow: hidden; border-bottom: 2px solid #d4a017; }
+        .announcement-label { background: #d4a017; color: #0f1c33; font-weight: 800; font-size: 12px; padding: 0 16px; height: 100%; display: flex; align-items: center; white-space: nowrap; flex-shrink: 0; }
+        .ticker-wrapper { flex: 1; overflow: hidden; position: relative; }
+        .ticker-wrapper::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px; background: linear-gradient(to right, #0f1c33, transparent); z-index: 1; }
+        .ticker-track { display: inline-flex; white-space: nowrap; animation: ticker-move 40s linear infinite; padding-left: 100%; }
+        .ticker-item { font-size: 13px; color: #e2e8f0; margin-right: 20px; display: inline-flex; align-items: center; gap: 7px; }
+        .ticker-sep { color: #d4a017; margin: 0 20px; font-size: 10px; }
+        @keyframes ticker-move { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* TOP BAR */
+        .top-bar { background: var(--navy-dark); }
+
+        /* NAVBAR */
+        .navbar { border-bottom: 2px solid var(--gold); }
+        .navbar .nav-link:hover { color: var(--gold) !important; }
+        .btn-login { background-color: var(--navy) !important; border-radius: 10px; color: white !important; transition: 0.3s; }
+        .btn-login:hover { background-color: var(--gold) !important; color: var(--navy) !important; }
+        .badge-cart { background: var(--gold) !important; color: var(--navy) !important; }
+
+        /* CONTACT PAGE */
+        .contact-page { padding: 60px 0 80px; }
+        .section-heading .gold { color: var(--gold); border-bottom: 3px solid var(--gold-light); padding-bottom: 5px; }
+        .section-heading .dark { color: var(--navy-dark); }
+
+        .contact-left {
+            background: linear-gradient(to bottom right, var(--navy-dark), var(--navy));
+            color: white;
+            padding: 45px 40px;
+            border-radius: 16px 0 0 16px;
+        }
+        .contact-left h6 { color: var(--gold-light); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .contact-left p { color: #cbd5e1; font-size: 14px; margin-bottom: 0; }
+        .contact-left a { color: var(--gold-light); text-decoration: none; }
+
+        .contact-form .form-control {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 14px;
+            background: #fff;
+            transition: border-color 0.2s;
+            height: 46px;
+        }
+        .contact-form textarea.form-control { height: 140px; resize: vertical; }
+        .contact-form .form-control:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,160,23,0.12); }
+        .contact-form label { font-size: 13px; font-weight: 600; color: var(--navy-dark); margin-bottom: 5px; }
+        .required-star { color: #e53e3e; }
+        .contact-btn { background: var(--gold); color: var(--navy-dark); font-weight: 700; font-size: 15px; border: none; border-radius: 8px; padding: 12px 40px; transition: 0.3s; cursor: pointer; }
+        .contact-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+        /* FOOTER */
+        .footer-link { color: #64748b; text-decoration: none; font-size: 14px; display: block; text-align: left; transition: 0.2s; padding: 2px 0; }
+        .footer-link:hover { color: #d4a017; padding-left: 6px; }
+        .footer-social { transition: transform 0.2s; display:inline-flex; }
+        .footer-social:hover { transform: translateY(-3px); }
+        .footer-heading { color: #0f1c33; font-weight: 800; font-size: 16px; margin-bottom: 0; text-align: left; }
+        .footer-gold-line { width: 40px; height: 3px; background: #d4a017; border-radius: 2px; margin-top: 8px; margin-bottom: 22px; }
+    </style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT TICKER -->
+<div class="announcement-bar">
+    <div class="announcement-label">🔔 ANNOUNCEMENT</div>
+    <div class="ticker-wrapper">
+        <div class="ticker-track">
+            <span class="ticker-item">🚀 <strong>REALERP v2.0 Is Here!</strong> &nbsp; New modules added — POS, Payroll & Advanced Reports.</span>
+            <span class="ticker-sep">❖</span>
+            <span class="ticker-item">🎉 <strong>Limited Time Offer — 30% Off!</strong> &nbsp; Use code REALERP30 at checkout.</span>
+            <span class="ticker-sep">❖</span>
+            <span class="ticker-item">💬 <strong>24/7 Support Available</strong> &nbsp; Our expert team is available round the clock.</span>
+            <span class="ticker-sep">❖</span>
+        </div>
+    </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="top-bar text-white py-2 px-5 d-flex justify-content-between align-items-center">
+    <div class="fw-semibold">
+        <span style="color:#f0c040; font-size:15px;">REALBELL</span>
+        <span style="color:white; font-size:15px;"> TECHNOLOGIES</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <span style="color:#94a3b8; font-size:13px;">Enterprise ERP Solutions</span>
+        <a href="/register" class="btn btn-sm px-3 fw-bold" style="background:var(--gold); color:var(--navy-dark); border:none;">Get Started</a>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white px-5 shadow-sm">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <img src="/images/companylogo.jpg" alt="logo" style="height:55px; width:auto; object-fit:contain; max-width:80px;">
+        <div style="line-height:1.2;">
+            <span style="font-size:18px; font-weight:800; color:var(--gold);">REAL</span><span style="font-size:18px; font-weight:800; color:var(--navy-dark);">ERP</span>
+            <div style="font-size:10px; color:#94a3b8; letter-spacing:1.5px;">SAAS PLATFORM</div>
+        </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContact">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navContact">
+        <ul class="navbar-nav mx-auto fw-semibold align-items-center gap-3">
+            <li class="nav-item"><a class="nav-link text-dark" href="/">Home</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" href="#">Products</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" href="#">Add-Ons</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" href="#">Bulk Discount</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" href="#">Development</a></li>
+            <li class="nav-item"><a class="nav-link fw-bold" style="color:var(--gold);" href="/contact">Contact Us</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-4">
+            <div class="position-relative">
+                <i class="bi bi-cart3 fs-5 text-dark"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill badge-cart">0</span>
+            </div>
+            <a href="/login" class="btn btn-login px-4">Login</a>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTACT SECTION -->
+<section class="contact-page">
+    <div class="container">
+
+        <!-- Heading -->
+        <div class="text-center mb-5 section-heading">
+            <h1 style="font-weight:700; font-size:38px;">
+                <span class="gold">Contact</span>
+                <span class="dark"> Us</span>
+            </h1>
+            <p class="text-muted mt-2" style="font-size:15px;">Have questions? We would love to hear from you.</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="row shadow-lg rounded-4 overflow-hidden mx-auto" style="max-width:1000px;">
+
+            <!-- LEFT panel -->
+            <div class="col-md-4 contact-left d-flex flex-column justify-content-between">
+                <div>
+                    <h3 class="fw-bold mb-3" style="color:white; font-size:26px;">Let's Talk</h3>
+                    <p style="color:#94a3b8; font-size:14px; line-height:1.7; margin-bottom:28px;">
+                        Fill out the form and our team will get back to you within 24 hours.
+                    </p>
+                    <div class="mb-4">
+                        <h6>Email</h6>
+                        <p><a href="mailto:vishakhagehlot1@gmail.com" style="color:var(--gold-light);">vishakhagehlot1@gmail.com</a></p>
+                    </div>
+                    <div class="mb-4">
+                        <h6>Phone</h6>
+                        <p>+91 8005778286</p>
+                    </div>
+                    <div class="mb-2">
+                        <h6>Address</h6>
+                        <p>Jaipur, Rajasthan, India</p>
+                    </div>
+                </div>
+                <!-- SVG illustration -->
+                <div class="text-center mt-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" style="width:100%; max-width:220px; opacity:0.75;">
+                        <circle cx="200" cy="60" r="35" fill="#d4a017" opacity="0.8"/>
+                        <rect x="165" y="90" width="70" height="90" rx="15" fill="#1e3a5f"/>
+                        <rect x="130" y="95" width="40" height="12" rx="6" fill="#d4a017" opacity="0.7"/>
+                        <rect x="230" y="95" width="40" height="12" rx="6" fill="#d4a017" opacity="0.7"/>
+                        <rect x="155" y="175" width="25" height="60" rx="8" fill="#1e3a5f"/>
+                        <rect x="220" y="175" width="25" height="60" rx="8" fill="#1e3a5f"/>
+                        <rect x="80" y="230" width="240" height="12" rx="6" fill="#d4a017" opacity="0.6"/>
+                        <rect x="140" y="175" width="120" height="55" rx="5" fill="#0f1c33"/>
+                        <rect x="145" y="180" width="110" height="45" rx="3" fill="#243354"/>
+                        <rect x="120" y="228" width="160" height="6" rx="3" fill="#0f1c33"/>
+                        <circle cx="320" cy="100" r="22" fill="#d4a017" opacity="0.85"/>
+                        <rect x="308" y="91" width="24" height="18" rx="3" fill="white"/>
+                        <polyline points="308,91 320,102 332,91" fill="none" stroke="#d4a017" stroke-width="2"/>
+                        <rect x="55" y="120" width="60" height="40" rx="10" fill="#d4a017" opacity="0.7"/>
+                        <polygon points="80,160 75,175 95,160" fill="#d4a017" opacity="0.7"/>
+                        <circle cx="75" cy="140" r="4" fill="white"/>
+                        <circle cx="85" cy="140" r="4" fill="white"/>
+                        <circle cx="95" cy="140" r="4" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- RIGHT form panel -->
+            <div class="col-md-8 bg-white p-5">
+                <% if (typeof success !== 'undefined') { %>
+                <div class="alert alert-success"><%= success %></div>
+                <% } %>
+
+                <form method="post" action="/contact" class="contact-form">
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label>First Name <span class="required-star">*</span></label>
+                            <input type="text" class="form-control" name="fname" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Last Name</label>
+                            <input type="text" class="form-control" name="lname">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label>Email <span class="required-star">*</span></label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Phone</label>
+                            <input type="text" class="form-control" name="phone">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label>Message</label>
+                        <textarea class="form-control" name="moreDesc" rows="5"></textarea>
+                    </div>
+                    <button type="submit" class="contact-btn">Send Message</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:#f1f5f9;">
+    <div style="padding: 50px 0 40px 0;">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img src="/images/companylogo.jpg" alt="logo" style="height:60px; width:auto; object-fit:contain;">
+                        <div style="line-height:1.3;">
+                            <div><span style="font-size:24px; font-weight:900; color:#d4a017;">REAL</span><span style="font-size:24px; font-weight:900; color:#0f1c33;">ERP</span></div>
+                            <div style="font-size:10px; color:#94a3b8; letter-spacing:2px; font-weight:600;">SAAS PLATFORM</div>
+                        </div>
+                    </div>
+                    <p style="color:#64748b; font-size:14px; line-height:1.9; margin-bottom:24px;">We build modern ERP tools to help you manage and grow your business efficiently.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="btn fw-bold px-4 py-2" style="background:#d4a017; color:#0f1c33; border-radius:8px; font-size:14px;">Support</a>
+                        <a href="/contact" class="btn fw-bold px-4 py-2" style="background:#0f1c33; color:white; border-radius:8px; font-size:14px;">Contact Us</a>
+                    </div>
+                </div>
+                <div class="col-md-2 offset-md-1">
+                    <h5 class="footer-heading">Quick Links:</h5>
+                    <div class="footer-gold-line"></div>
+                    <ul style="list-style:none; padding:0; margin:0;">
+                        <li class="mb-2"><a href="/" class="footer-link">Home</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">About Us</a></li>
+                        <li class="mb-2"><a href="/contact" class="footer-link">Contact Us</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Get Support</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h5 class="footer-heading">Support:</h5>
+                    <div class="footer-gold-line"></div>
+                    <ul style="list-style:none; padding:0; margin:0;">
+                        <li class="mb-2"><a href="#" class="footer-link">Terms & Conditions</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Refund Policy</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Cookie Policy</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="footer-heading">Follow Us:</h5>
+                    <div class="footer-gold-line"></div>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="footer-social" style="width:44px;height:44px;border-radius:50%;background:#1877f2;display:flex;align-items:center;justify-content:center;text-decoration:none;">
+                            <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        </a>
+                        <a href="#" class="footer-social" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;text-decoration:none;">
+                            <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+                        </a>
+                        <a href="#" class="footer-social" style="width:44px;height:44px;border-radius:50%;background:#0077b5;display:flex;align-items:center;justify-content:center;text-decoration:none;">
+                            <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                        </a>
+                        <a href="#" class="footer-social" style="width:44px;height:44px;border-radius:50%;background:#ff0000;display:flex;align-items:center;justify-content:center;text-decoration:none;">
+                            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="white" d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon fill="#ff0000" points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="background:#0f1c33; padding:18px 0;">
+        <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <p style="margin:0; color:#94a3b8; font-size:13px;">© 2026 <span style="color:#f0c040; font-weight:700;">REALBELL TECHNOLOGIES</span>. All Rights Reserved.</p>
+            <div class="d-flex gap-4">
+                <a href="#" style="color:#64748b; font-size:12px; text-decoration:none;">Privacy Policy</a>
+                <a href="#" style="color:#64748b; font-size:12px; text-decoration:none;">Terms of Use</a>
+                <a href="#" style="color:#64748b; font-size:12px; text-decoration:none;">Sitemap</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

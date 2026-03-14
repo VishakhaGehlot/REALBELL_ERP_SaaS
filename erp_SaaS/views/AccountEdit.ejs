@@ -1,0 +1,23 @@
+<%- include('../partials/admin/header.ejs')%>
+
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <%- include('../partials/admin/left.ejs')%>
+                <div class="col-md-9">
+                    <h1>Account Form</h1>
+                    <form method="post" enctype="multipart/form-data">
+                        <label>Title</label>
+                        <input type="text" class="form-control" name="title" value="<%=Record.title%>"/>
+                        <label>Description</label>
+                        <input type="text" class="form-control" name="desc" value="<%=Record.desc%>"/>
+                        <label for="">Image</label>
+                        <input type="file" name="img" id="" class="form-control mt-3" value="<%=Record.img%>">
+                        <button class="form-control btn btn-primary mt-2">+ Add Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

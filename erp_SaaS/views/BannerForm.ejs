@@ -1,0 +1,24 @@
+<%- include('../partials/admin/header.ejs')%>
+
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <%- include('../partials/admin/left.ejs')%>
+                <div class="col-md-9">
+                    <h1>Banner Form</h1>
+                    <form method="post">
+                        <label>Title</label>
+                        <input type="text" class="form-control" name="title"/>
+                        <label>Description</label>
+                        <input type="text" class="form-control" name="desc"/>
+                        <label>More Description</label>
+                        <textarea class="form-control" name="mdesc"></textarea>
+                        
+                        <button class="form-control btn btn-primary mt-2">+ Add Banner</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
