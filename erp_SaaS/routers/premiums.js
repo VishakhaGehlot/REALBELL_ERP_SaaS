@@ -8,7 +8,8 @@ router.get('/premiumstable',async(req,res)=>{
     res.render("premiumstable.ejs",{premiumsdata, loginname})
 })
 router.get('/premiumsform',(req,res)=>{
-    res.render("premiumsform.ejs")
+    const loginname=req.session.email
+    res.render("premiumsform.ejs",{loginname})
 })
 router.post('/premiumsform',upload.single('img'),async(req,res)=>{
 const {title}=req.body

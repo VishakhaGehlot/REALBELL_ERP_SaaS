@@ -9,7 +9,8 @@ router.get('/financetable',async(req,res)=>{
 
 
 router.get('/financeform',(req,res)=>{
-    res.render("financeform.ejs")
+    const loginname=req.session.email
+    res.render("financeform.ejs",{loginname})
 })
 
 router.post('/financeform',async(req,res)=>{

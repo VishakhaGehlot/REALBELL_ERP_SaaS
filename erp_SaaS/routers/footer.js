@@ -9,7 +9,8 @@ router.get('/footertable', async (req, res) => {
 })
 
 router.get('/footerform', (req, res) => {
-    res.render("footerform.ejs")
+    const loginname=req.session.email
+    res.render("footerform.ejs",{loginname})
 })
 
 router.post('/footerform', upload.single('img'), async (req, res) => {

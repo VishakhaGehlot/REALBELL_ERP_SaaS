@@ -8,7 +8,8 @@ router.get("/faqtable",async(req,res)=>{
     res.render("FaqTable.ejs",{faqdata,loginname})
 })
 router.get("/faqform",(req,res)=>{
-    res.render("FaqForm.ejs")
+    const loginname=req.session.email
+    res.render("FaqForm.ejs",{loginname})
 })
 
 router.post("/faqform",async(req,res)=>{

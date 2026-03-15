@@ -21,7 +21,8 @@ router.get('/querytable',async(req,res)=>{
 router.get('/queryreplyform/:email/:message',(req,res)=>{
     const email=req.params.email
     const message=req.params.message
-    res.render("queryform.ejs",{email,message})
+    const loginname=req.session.email
+    res.render("queryform.ejs",{email,message,loginname})
 })
 router.post('/queryreplyform/:email/:message',async(req,res)=>{
     const {from,to,subject,message}=req.body

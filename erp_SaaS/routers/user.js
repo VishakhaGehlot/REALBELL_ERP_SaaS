@@ -4,11 +4,12 @@ const usertable=require('../models/auth')
 
 router.get("/usertable",async(req,res)=>{
     const userdata=await usertable.find()
-     const loginname=req.session.email
+    const loginname=req.session.email
     res.render("usertable.ejs",{userdata,loginname})
 })
 router.get("/userform",(req,res)=>{
-    res.render("userform.ejs")
+    const loginname=req.session.email
+    res.render("userform.ejs",{loginname})
 })
 
 router.post("/userform",async(req,res)=>{

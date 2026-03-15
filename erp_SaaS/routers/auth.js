@@ -151,6 +151,8 @@ router.post('/forgotpasswordform',async(req,res)=>{
     console.log(emailCheck)
     if(emailCheck){
 
+       //email OTP 
+        const otp=Math.floor(100000 + Math.random() * 900000)
 
         const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -167,8 +169,17 @@ router.post('/forgotpasswordform',async(req,res)=>{
     to: email,
     subject: "Hello ✔",
     text: "Hello world?", // Plain-text version of the message
-    html: `<a href="http://localhost:5000/changepassword/${emailCheck.id}">Click to Forgot Password</a>`
+    
+    //email OTP 
+
+    html: `<h2>Your OTP is: ${otp}</h2>`
   });
+
+  //email OTP
+  emailCheck.otp=otp
+  await emailCheck.save()
+  throw new Error("OTP Sent Successfully to your email")
+
         mess="Password reset link has been sent to your registered email address successfully."
     }else{
         throw new Error("Email Not found!!")

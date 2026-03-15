@@ -4,16 +4,18 @@ const swipertable=require('../models/swiper')
 
 router.get('/swipertable',async(req,res)=>{
     const swiperdata=await swipertable.find()
-     const loginname=req.session.email
+    const loginname=req.session.email
     res.render("swipertable.ejs",{swiperdata,loginname})
 })
 router.get('/swiperform',(req,res)=>{
-    res.render("swiperform.ejs")
+    const loginname=req.session.email
+    res.render("swiperform.ejs",{loginname})
 })
 router.post('/swiperform',upload.single('img'),async(req,res)=>{
 const imageFile=req.file.filename
    const Record=await swipertable({img:imageFile})
    Record.save()
+   
 })
 
 router.get('/swiperstatus/:id/:status',async(req,res)=>{

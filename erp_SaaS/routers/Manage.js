@@ -8,7 +8,9 @@ router.get('/managetable',async(req,res)=>{
     res.render("Managetable.ejs",{managedata, loginname})
 })
 router.get('/manageform',(req,res)=>{
-    res.render("Manageform.ejs")
+    const loginname=req.session.email
+
+    res.render("Manageform.ejs",{loginname})
 })
 router.post('/manageform',upload.single('img'),async(req,res)=>{
 const {title,desc}=req.body

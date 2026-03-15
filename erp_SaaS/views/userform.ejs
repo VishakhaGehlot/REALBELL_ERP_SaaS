@@ -1,33 +1,657 @@
 <%- include('../partials/admin/header.ejs')%>
 
-    <section>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #f5f7fb;
+        overflow-x: hidden;
+    }
+
+    /* Main content wrapper */
+    .main-wrapper {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+    }
+
+    /* Sidebar is fixed, so we need to push content */
+    .content-wrapper {
+        flex: 1;
+        margin-left: 280px;
+        width: calc(100% - 280px);
+        padding: 25px;
+        background: #f5f7fb;
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
+
+    .container-fluid {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+        box-sizing: border-box;
+    }
+
+    /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .page-header h2 {
+        color: #1e293b;
+        font-weight: 700;
+        margin: 0;
+        font-size: 28px;
+    }
+
+    .page-header p {
+        color: #64748b;
+        font-size: 14px;
+        margin: 5px 0 0;
+    }
+
+    .back-btn {
+        background: white;
+        color: #64748b;
+        border: 1px solid #e9ecef;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .back-btn:hover {
+        background: #f8fafc;
+        color: #f59e0b;
+        border-color: #f59e0b;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #e9ecef;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-header i {
+        color: #f59e0b;
+        font-size: 24px;
+    }
+
+    .form-header h3 {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .form-body {
+        padding: 30px 25px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .form-label i {
+        color: #f59e0b;
+        margin-right: 8px;
+        font-size: 16px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #1e293b;
+        transition: all 0.2s ease;
+        background: white;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+
+    .form-control::placeholder {
+        color: #94a3b8;
+    }
+
+    /* Name Row */
+    .name-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    /* Password Field with Toggle */
+    .password-wrapper {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748b;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .password-toggle:hover {
+        color: #f59e0b;
+    }
+
+    /* Password Strength Meter */
+    .password-strength {
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .strength-bar {
+        flex: 1;
+        height: 4px;
+        background: #e9ecef;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .strength-fill {
+        height: 100%;
+        width: 0;
+        transition: all 0.3s ease;
+    }
+
+    .strength-fill.weak { width: 33.33%; background: #ef4444; }
+    .strength-fill.medium { width: 66.66%; background: #f59e0b; }
+    .strength-fill.strong { width: 100%; background: #10b981; }
+
+    .strength-text {
+        font-size: 12px;
+        color: #64748b;
+        min-width: 50px;
+    }
+
+    /* Role Selector */
+    .role-selector {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .role-option {
+        position: relative;
+    }
+
+    .role-option input[type="radio"] {
+        display: none;
+    }
+
+    .role-option label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 15px;
+        background: #f8fafc;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .role-option input[type="radio"]:checked + label {
+        border-color: #f59e0b;
+        background: #fff3e0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+    }
+
+    .role-option label i {
+        font-size: 32px;
+    }
+
+    .role-option label span {
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .role-option label small {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .role-option.user label i { color: #64748b; }
+    .role-option.admin label i { color: #10b981; }
+    .role-option.superadmin label i { color: #ef4444; }
+    .role-option.teacher label i { color: #f59e0b; }
+
+    /* Info Box */
+    .info-box {
+        background: #f0f9ff;
+        border-left: 4px solid #3b82f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .info-box i {
+        color: #3b82f6;
+        font-size: 20px;
+    }
+
+    .info-box p {
+        color: #1e293b;
+        margin: 0;
+        font-size: 13px;
+    }
+
+    .info-box p small {
+        color: #64748b;
+        display: block;
+        margin-top: 5px;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+        width: 100%;
+        background: #f59e0b;
+        color: white;
+        border: none;
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .submit-btn:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .submit-btn i {
+        font-size: 18px;
+    }
+
+    /* Cancel Button */
+    .cancel-btn {
+        flex: 1;
+        padding: 12px;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        color: #64748b;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .cancel-btn:hover {
+        background: #f8fafc;
+        color: #ef4444;
+        border-color: #ef4444;
+    }
+
+    .cancel-btn i {
+        font-size: 16px;
+    }
+
+    /* Button Group */
+    .button-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            margin-left: 0;
+            width: 100%;
+            padding: 15px;
+        }
+
+        .form-card {
+            max-width: 100%;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .back-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .name-row {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .role-selector {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="main-wrapper">
+    <%- include('../partials/admin/left.ejs')%>
+
+    <div class="content-wrapper">
         <div class="container-fluid">
-            <div class="row">
-                <%- include('../partials/admin/left.ejs')%>
-                    <div class="col-md-9">
-                        <h1>User Management Form</h1>
-                        <form method="post">
-                             <label>firstName</label>
-                            <input type="text" class="form-control" name="firstName" />
-                             <label>lastName</label>
-                            <input type="text" class="form-control" name="lastName" />
-                            <label>email</label>
-                            <input type="text" class="form-control" name="email" />
-                              <label>Password</label>
-                            <input type="text" class="form-control" name="password" />
-                            <label>Role</label>
-                            <select name="role" class="form-control">
-                                <option value="User">User</option>
-                                <option value="Admin">Admin</option>
-                                <option value="SuperAdmin">SuperAdmin</option>
-                                <option value="teacher">Teacher</option>
-                            </select>
-                            <button class="form-control btn btn-primary mt-2">update role</button>
-                        </form>
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h2>
+                        <i class="bi bi-person-plus me-2" style="color: #f59e0b;"></i>
+                        Add New User
+                    </h2>
+                    <p>Create a new user account</p>
+                </div>
+                <a href="/usertable" class="back-btn">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Users
+                </a>
+            </div>
+
+            <!-- Form Card -->
+            <div class="form-card">
+                <div class="form-header">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <h3>User Information</h3>
+                </div>
+                
+                <div class="form-body">
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <i class="bi bi-info-circle"></i>
+                        <p>
+                            Add a new user to the system. Fill in all the required information below.
+                            <small>All fields are required</small>
+                        </p>
                     </div>
+
+                    <form method="post" action="/userform" id="userForm">
+                        <!-- Name Row - First and Last Name -->
+                        <div class="name-row">
+                            <!-- First Name -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-person"></i>
+                                    First Name
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="firstName" 
+                                       placeholder="e.g., John"
+                                       required
+                                       pattern="[A-Za-z ]+"
+                                       title="Only letters and spaces allowed"
+                                       maxlength="50">
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-person"></i>
+                                    Last Name
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="lastName" 
+                                       placeholder="e.g., Doe"
+                                       required
+                                       pattern="[A-Za-z ]+"
+                                       title="Only letters and spaces allowed"
+                                       maxlength="50">
+                            </div>
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-envelope"></i>
+                                Email Address
+                            </label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   name="email" 
+                                   placeholder="e.g., john.doe@example.com"
+                                   required
+                                   maxlength="100">
+                        </div>
+
+                        <!-- Password Field with Toggle -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-lock"></i>
+                                Password
+                            </label>
+                            <div class="password-wrapper">
+                                <input type="password" 
+                                       class="form-control" 
+                                       name="password" 
+                                       id="password"
+                                       placeholder="Enter secure password"
+                                       required
+                                       minlength="6"
+                                       oninput="checkPasswordStrength(this.value)">
+                                <i class="bi bi-eye-slash password-toggle" 
+                                   id="togglePassword"
+                                   onclick="togglePasswordVisibility()"></i>
+                            </div>
+                            
+                            <!-- Password Strength Meter -->
+                            <div class="password-strength" id="passwordStrength" style="display: none;">
+                                <div class="strength-bar">
+                                    <div class="strength-fill" id="strengthFill"></div>
+                                </div>
+                                <span class="strength-text" id="strengthText">Weak</span>
+                            </div>
+                        </div>
+
+                        <!-- Role Selection -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-shield-check"></i>
+                                Select Role
+                            </label>
+                            <div class="role-selector">
+                                <!-- User Role -->
+                                <div class="role-option user">
+                                    <input type="radio" name="role" id="roleUser" value="User" checked>
+                                    <label for="roleUser">
+                                        <i class="bi bi-person"></i>
+                                        <span>User</span>
+                                        <small>Basic access</small>
+                                    </label>
+                                </div>
+
+                                <!-- Teacher Role -->
+                                <div class="role-option teacher">
+                                    <input type="radio" name="role" id="roleTeacher" value="teacher">
+                                    <label for="roleTeacher">
+                                        <i class="bi bi-person-workspace"></i>
+                                        <span>Teacher</span>
+                                        <small>Educational access</small>
+                                    </label>
+                                </div>
+
+                                <!-- Admin Role -->
+                                <div class="role-option admin">
+                                    <input type="radio" name="role" id="roleAdmin" value="Admin">
+                                    <label for="roleAdmin">
+                                        <i class="bi bi-shield"></i>
+                                        <span>Admin</span>
+                                        <small>Management access</small>
+                                    </label>
+                                </div>
+
+                                <!-- SuperAdmin Role -->
+                                <div class="role-option superadmin">
+                                    <input type="radio" name="role" id="roleSuperAdmin" value="SuperAdmin">
+                                    <label for="roleSuperAdmin">
+                                        <i class="bi bi-shield-fill"></i>
+                                        <span>Super Admin</span>
+                                        <small>Full access</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Button Group -->
+                        <div class="button-group">
+                            <a href="/usertable" class="cancel-btn">
+                                <i class="bi bi-x-circle"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" class="submit-btn" style="margin-top: 0;">
+                                <i class="bi bi-person-plus"></i>
+                                Create User
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </section>
-    </body>
+    </div>
+</div>
 
-    </html>
+<!-- Password Functions -->
+<script>
+// Toggle password visibility
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('togglePassword');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('bi-eye-slash');
+        toggleIcon.classList.add('bi-eye');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('bi-eye');
+        toggleIcon.classList.add('bi-eye-slash');
+    }
+}
+
+// Check password strength
+function checkPasswordStrength(password) {
+    const strengthDiv = document.getElementById('passwordStrength');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    
+    if (password.length > 0) {
+        strengthDiv.style.display = 'flex';
+        
+        // Check password strength
+        let strength = 0;
+        
+        // Length check
+        if (password.length >= 8) strength++;
+        if (password.length >= 12) strength++;
+        
+        // Character variety checks
+        if (/[a-z]/.test(password)) strength += 0.5;
+        if (/[A-Z]/.test(password)) strength += 0.5;
+        if (/[0-9]/.test(password)) strength += 0.5;
+        if (/[^a-zA-Z0-9]/.test(password)) strength += 0.5;
+        
+        // Determine strength level
+        if (strength <= 2) {
+            strengthFill.className = 'strength-fill weak';
+            strengthText.textContent = 'Weak';
+            strengthText.style.color = '#ef4444';
+        } else if (strength <= 4) {
+            strengthFill.className = 'strength-fill medium';
+            strengthText.textContent = 'Medium';
+            strengthText.style.color = '#f59e0b';
+        } else {
+            strengthFill.className = 'strength-fill strong';
+            strengthText.textContent = 'Strong';
+            strengthText.style.color = '#10b981';
+        }
+    } else {
+        strengthDiv.style.display = 'none';
+    }
+}
+
+// Form validation
+document.getElementById('userForm').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    
+    if (password.length < 6) {
+        e.preventDefault();
+        alert('Password must be at least 6 characters long');
+    }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

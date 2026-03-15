@@ -8,7 +8,9 @@ router.get('/leadstable',async(req,res)=>{
     res.render("leadstable.ejs",{leadsdata, loginname})
 })
 router.get('/leadsform',(req,res)=>{
-    res.render("leadsform.ejs")
+    const loginname=req.session.email
+
+    res.render("leadsform.ejs",{loginname})
 })
 router.post('/leadsform',upload.single('img'),async(req,res)=>{
 const {title,desc}=req.body

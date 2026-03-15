@@ -10,7 +10,9 @@ router.get('/accounttable',async(req,res)=>{
 })
 
 router.get('/accountform',(req,res)=>{
-    res.render("AccountingForm.ejs")
+         const loginname=req.session.email
+
+    res.render("AccountingForm.ejs",{loginname})
 })
 router.post('/accountform',upload.single('img'),async(req,res)=>{
    const {title,desc}=req.body

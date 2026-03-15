@@ -32,6 +32,8 @@ const footerRouter=require('./routers/footer')
 
 
 
+
+
 app.use('/',HomeRouter)
 app.use('/',authRouter)
 app.use('/',bannerRouter)
@@ -46,6 +48,8 @@ app.use('/',userRouter)
 app.use('/',premiumsRouter)
 app.use('/',swiperRouter)
 app.use('/',footerRouter)
+
+
 
 
 app.use(express.static('public'))

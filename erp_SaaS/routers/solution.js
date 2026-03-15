@@ -8,7 +8,8 @@ router.get('/solutiontable',async(req,res)=>{
     res.render("solutiontable.ejs",{solutiondata,loginname})
 })
 router.get('/solutionform',(req,res)=>{
-    res.render("solutionform.ejs")
+    const loginname=req.session.email
+    res.render("solutionform.ejs",{loginname})
 })
 router.post('/solutionform',upload.single('img'),async(req,res)=>{
 const {title,desc,mdesc}=req.body

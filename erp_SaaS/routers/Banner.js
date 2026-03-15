@@ -9,7 +9,8 @@ router.get('/bannertable',async(req,res)=>{
 
 
 router.get('/bannerform',(req,res)=>{
-    res.render("BannerForm.ejs")
+    const loginname=req.session.email
+    res.render("BannerForm.ejs",{loginname})
 })
 
 router.post('/bannerform',async(req,res)=>{
