@@ -1,7 +1,8 @@
 const router=require('express').Router()
 const bannerTable=require('../models/Banner')
+const logincheck=require('../middleware/logincheck')
 
-router.get('/bannertable',async(req,res)=>{
+router.get('/bannertable',logincheck,async(req,res)=>{
     const data=await bannerTable.find()
     const loginname=req.session.email
     res.render("BannerTable.ejs",{data,loginname})

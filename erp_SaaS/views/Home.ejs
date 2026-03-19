@@ -79,6 +79,95 @@
         .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(212,160,23,0.15); }
         .features-row { align-items: stretch; }
 
+.modules-section{
+    background:#f5f6f7;
+    padding:80px 0;
+    text-align:center;
+}
+
+.modules-title{
+    font-size:42px;
+    font-weight:700;
+    color:#0b2c3d;
+}
+
+.modules-title span{
+    color:#49c33c;
+}
+
+.modules-desc{
+    max-width:900px;
+    margin:15px auto 60px;
+    color:#555;
+    line-height:1.6;
+}
+
+.modules-wrapper{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.module-item{
+    position:relative;
+    width:140px;
+}
+
+.module-item.up{
+    transform:translateY(-40px);
+}
+
+.module-item.down{
+    transform:translateY(40px);
+}
+
+.module-circle{
+    width:90px;
+    height:90px;
+    margin:auto;
+    border-radius:50%;
+    border:2px dashed #49c33c;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff;
+}
+
+.module-circle img{
+    width:40px;
+}
+
+.module-item h4{
+    margin-top:10px;
+    font-size:16px;
+    font-weight:600;
+}
+
+.module-line{
+    width:120px;
+    border-top:2px dashed #49c33c;
+    margin:0 10px;
+}
+
+@media(max-width:768px){
+
+    .modules-wrapper{
+        flex-direction:column;
+    }
+
+    .module-line{
+        display:none;
+    }
+
+    .module-item.up,
+    .module-item.down{
+        transform:none;
+        margin-bottom:30px;
+    }
+}
+
+
         /* FAQ */
         .accordion-button:not(.collapsed) { background: var(--gold-pale); color: var(--navy-dark); box-shadow: none; }
         .accordion-button:focus { box-shadow: none; }
@@ -156,6 +245,32 @@
         .premium-icon { width:70px; height:70px; border-radius:50%; background:#0f4a54; display:flex; align-items:center; justify-content:center; margin:auto; margin-bottom:10px; }
         .premium-icon img { width:35px; }
         .premium-item h5 { font-size:17px; font-weight:600; margin:0; }
+
+        section{
+    background:#f3f5f7;
+    padding:80px 0;
+    text-align:center;
+}
+
+section p:first-child{
+    font-size:48px;
+    font-weight:700;
+    color:#0b2c3d;
+    margin-bottom:15px;
+}
+
+section p:first-child span{
+    color:#63c13a;
+    border-bottom:3px solid #f39c12;
+}
+
+section p:last-child{
+    max-width:900px;
+    margin:0 auto;
+    font-size:18px;
+    color:#6c7a86;
+    line-height:1.7;
+}
     </style>
 </head>
 
@@ -315,6 +430,20 @@ let activeSlides = swiperdata.filter(s => s.status === "Active");
         <% }) %>
     </div>
 </div>
+
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <%featuredata.forEach((val)=>{%>
+                    <p><%=val.title%></p>
+                    <p><%=val.desc%></p>
+                    <img style="margin-top: 60px;margin-left: -180px;" src="/upload/<%=val.img%>" alt="">
+                <%})%>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- PREMIUM FEATURES BAR -->
 <section class="premium-bar">

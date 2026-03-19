@@ -7,6 +7,7 @@ const leadstable=require('../models/leads')
 const solutiontable=require('../models/solution')
 const financetable=require('../models/finance')
 const premiumstable=require('../models/premiums')
+const FeatureTable=require('../models/feature')
 const swipertable=require('../models/swiper')
 const footertable=require('../models/footer')
 
@@ -20,11 +21,12 @@ router.get('/',async(req,res)=>{
     const solutiondata=await solutiontable.find({status:"Active"})
     const financedata=await financetable.find({status:"Active"})
     const premiumsdata=await premiumstable.find({status:"Active"})
+    const  featuredata=await FeatureTable.find({status:"Active"})
     const  swiperdata=await swipertable.find({status:"Active"})
     const  footerdata=await footertable.find({status:"Active"})
 
 
-    res.render("Home.ejs",{Record,data,faqdata,managedata,leadsdata,solutiondata,financedata,premiumsdata,swiperdata,footerdata})
+    res.render("Home.ejs",{Record,data,faqdata,managedata,leadsdata,solutiondata,financedata,premiumsdata,featuredata,swiperdata,footerdata})
 })
 
 module.exports=router

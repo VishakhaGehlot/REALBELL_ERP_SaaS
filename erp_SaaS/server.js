@@ -25,8 +25,10 @@ const solutionRouter=require('./routers/solution')
 const financeRouter=require('./routers/finance')
 const userRouter=require('./routers/user')
 const premiumsRouter=require('./routers/premiums')
+const FeatureRouter=require('./routers/feature')
 const swiperRouter=require('./routers/swiper')
 const footerRouter=require('./routers/footer')
+
 
 
 
@@ -46,6 +48,7 @@ app.use('/',solutionRouter)
 app.use('/',financeRouter)
 app.use('/',userRouter)
 app.use('/',premiumsRouter)
+app.use('/',FeatureRouter)
 app.use('/',swiperRouter)
 app.use('/',footerRouter)
 

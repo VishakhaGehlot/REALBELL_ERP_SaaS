@@ -1,29 +1,53 @@
 <%- include('../partials/admin/header.ejs')%>
 
 <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     body {
         margin: 0;
         padding: 0;
         background: #f5f7fb;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         overflow-x: hidden;
+        width: 100%;
     }
 
-    /* Main content wrapper */
+    /* Main wrapper - flex layout */
     .main-wrapper {
         display: flex;
         width: 100%;
         min-height: 100vh;
+        position: relative;
     }
 
-    /* Sidebar is fixed, so we need to push content */
+    /* Sidebar fixed width */
+    .main-wrapper .sidebar {
+        width: 280px;
+        height: 100vh;
+        background: white;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        position: fixed;
+        left: 0;
+        top: 0;
+        overflow-y: auto;
+        padding: 0;
+        z-index: 100;
+    }
+
+    /* Content wrapper - matches sidebar width */
     .content-wrapper {
         flex: 1;
-        margin-left: 280px; /* Match sidebar width */
+        margin-left: 280px;
         width: calc(100% - 280px);
-        padding: 25px;
-        background: #f5f7fb;
         min-height: 100vh;
+        background: #f5f7fb;
+        padding: 25px;
         box-sizing: border-box;
+        transition: all 0.3s ease;
     }
 
     .container-fluid {
@@ -33,6 +57,7 @@
         margin-right: auto;
         margin-left: auto;
         box-sizing: border-box;
+        max-width: 100%;
     }
 
     /* Page Header */
@@ -41,6 +66,8 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
     .page-header h2 {
@@ -48,6 +75,14 @@
         font-weight: 700;
         margin: 0;
         font-size: 28px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header h2 i {
+        color: #f59e0b;
+        font-size: 32px;
     }
 
     .page-header p {
@@ -71,11 +106,13 @@
         transition: all 0.3s ease;
         cursor: pointer;
         text-decoration: none;
+        white-space: nowrap;
     }
 
     .btn-add:hover {
         background: #d97706;
         transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3);
         color: white;
     }
 
@@ -84,7 +121,7 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
-        margin-bottom: 24px;
+        margin-bottom: 30px;
     }
 
     .stat-card {
@@ -93,6 +130,12 @@
         padding: 20px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         border-left: 4px solid transparent;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
     }
 
     .stat-card.blue { border-left-color: #3b82f6; }
@@ -108,19 +151,22 @@
     .stat-label {
         color: #64748b;
         font-size: 13px;
+        font-weight: 500;
         margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .stat-value {
         color: #1e293b;
         font-weight: 700;
-        margin: 5px 0 0;
+        margin: 8px 0 0;
         font-size: 28px;
     }
 
     .stat-icon {
-        font-size: 30px;
-        opacity: 0.5;
+        font-size: 32px;
+        opacity: 0.6;
     }
 
     .stat-icon.blue { color: #3b82f6; }
@@ -134,19 +180,21 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         overflow: hidden;
         width: 100%;
+        margin-top: 20px;
     }
 
     .table-header {
-        padding: 15px 20px;
+        padding: 18px 20px;
         border-bottom: 1px solid #e9ecef;
         background: #f8fafc;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
 
     .table-header i {
         color: #f59e0b;
+        font-size: 20px;
     }
 
     .table-header span {
@@ -158,30 +206,33 @@
     .table-responsive {
         overflow-x: auto;
         width: 100%;
+        -webkit-overflow-scrolling: touch;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 900px;
+        min-width: 1000px;
     }
 
     th {
         background: #f8fafc;
         border-bottom: 2px solid #e9ecef;
-        padding: 15px;
+        padding: 15px 16px;
         text-align: left;
         color: #64748b;
         font-weight: 600;
         font-size: 12px;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
         white-space: nowrap;
     }
 
     td {
-        padding: 15px;
+        padding: 15px 16px;
         border-bottom: 1px solid #e9ecef;
         color: #1e293b;
+        font-size: 14px;
         vertical-align: middle;
     }
 
@@ -198,8 +249,11 @@
         border-radius: 30px;
         font-size: 12px;
         font-weight: 600;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         text-decoration: none;
+        white-space: nowrap;
     }
 
     .status-badge.pending {
@@ -220,16 +274,25 @@
     .status-badge.hot {
         background: #fee2e2;
         color: #b91c1c;
+        border-left: 3px solid #b91c1c;
     }
 
     .status-badge.warm {
         background: #fff3cd;
         color: #856404;
+        border-left: 3px solid #856404;
     }
 
     .status-badge.cold {
         background: #d1e7ff;
         color: #0c4a6e;
+        border-left: 3px solid #0c4a6e;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
     }
 
     .action-btn {
@@ -252,6 +315,7 @@
 
     .action-btn.edit:hover {
         background: #d97706;
+        transform: scale(1.05);
     }
 
     .action-btn.delete {
@@ -260,23 +324,34 @@
 
     .action-btn.delete:hover {
         background: #dc2626;
+        transform: scale(1.05);
     }
 
     .leads-image {
-        width: 80px;
-        height: 60px;
+        width: 100px;
+        height: 70px;
         object-fit: cover;
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+        transition: transform 0.2s ease;
+    }
+
+    .leads-image:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     .deal-badge {
         display: inline-block;
-        padding: 4px 8px;
-        border-radius: 4px;
+        padding: 4px 10px;
+        border-radius: 30px;
         font-size: 11px;
         font-weight: 600;
-        text-transform: uppercase;
+        background: #e2e8f0;
+        color: #475569;
+        margin-left: 8px;
+        letter-spacing: 0.3px;
     }
 
     .deal-badge.high {
@@ -294,8 +369,15 @@
         color: #0c4a6e;
     }
 
+    .description-cell {
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .empty-state {
-        padding: 60px;
+        padding: 60px 20px;
         text-align: center;
         color: #94a3b8;
     }
@@ -303,40 +385,117 @@
     .empty-state i {
         font-size: 60px;
         display: block;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
         opacity: 0.3;
     }
 
     .empty-state h5 {
         color: #1e293b;
-        margin: 0 0 5px;
+        margin: 0 0 8px;
+        font-size: 20px;
     }
 
     .empty-state p {
         color: #64748b;
         margin: 0;
+        font-size: 14px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .stats-grid {
+            gap: 15px;
+        }
     }
 
     @media (max-width: 768px) {
+        .main-wrapper {
+            flex-direction: column;
+        }
+
+        .main-wrapper .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            margin-bottom: 0;
+        }
+
         .content-wrapper {
             margin-left: 0;
             width: 100%;
-            padding: 15px;
+            padding: 20px 15px;
         }
 
         .stats-grid {
             grid-template-columns: 1fr;
+            gap: 15px;
         }
 
         .page-header {
             flex-direction: column;
             align-items: flex-start;
-            gap: 15px;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
         }
 
         .btn-add {
             width: 100%;
             justify-content: center;
+        }
+
+        .table-card {
+            border-radius: 8px;
+        }
+
+        td, th {
+            padding: 12px;
+        }
+
+        .leads-image {
+            width: 80px;
+            height: 60px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .content-wrapper {
+            padding: 15px 12px;
+        }
+
+        .stat-card {
+            padding: 15px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+        }
+
+        .page-header h2 {
+            font-size: 22px;
+        }
+
+        .action-buttons {
+            gap: 5px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+        }
+
+        .leads-image {
+            width: 60px;
+            height: 45px;
+        }
+    }
+
+    /* Fix for table on small devices */
+    @media (max-width: 600px) {
+        .table-responsive {
+            margin: 0 -12px;
+            width: calc(100% + 24px);
         }
     }
 </style>
@@ -350,7 +509,7 @@
             <div class="page-header">
                 <div>
                     <h2>
-                        <i class="bi bi-graph-up-arrow me-2" style="color: #f59e0b;"></i>
+                        <i class="bi bi-graph-up-arrow"></i>
                         Leads & Deals Management
                     </h2>
                     <p>Manage all your leads and deals here</p>
@@ -402,14 +561,14 @@
             <div class="table-card">
                 <div class="table-header">
                     <i class="bi bi-table"></i>
-                    <span>All Leads & Deals</span>
+                    <span>All Leads & Deals List</span>
                 </div>
                 
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>SR.</th>
+                                <th>#</th>
                                 <th>Title</th>
                                 <th>Description</th>
                                 <th>Image</th>
@@ -421,9 +580,9 @@
                             <% if(leadsdata && leadsdata.length) { %>
                                 <% leadsdata.forEach((val, k) => { %>
                                     <tr>
-                                        <td><%= k+1 %></td>
+                                        <td><strong><%= k+1 %></strong></td>
                                         <td><strong><%= val.title %></strong></td>
-                                        <td><%= val.desc %></td>
+                                        <td class="description-cell" title="<%= val.desc %>"><%= val.desc %></td>
                                         <td>
                                             <img src="/upload/<%= val.img %>" alt="<%= val.title %>" class="leads-image">
                                         </td>
@@ -431,47 +590,48 @@
                                             <a href="/leadsstatus/<%= val.id %>/<%= val.status %>" style="text-decoration: none;">
                                                 <% if(val.status == "Pending") { %>
                                                     <span class="status-badge pending">
-                                                        <i class="bi bi-clock me-1"></i><%= val.status %>
+                                                        <i class="bi bi-clock"></i> <%= val.status %>
                                                     </span>
                                                 <% } else if(val.status == "Active") { %>
                                                     <span class="status-badge active">
-                                                        <i class="bi bi-check-circle me-1"></i><%= val.status %>
+                                                        <i class="bi bi-check-circle"></i> <%= val.status %>
                                                     </span>
                                                 <% } else if(val.status == "Hot") { %>
                                                     <span class="status-badge hot">
-                                                        <i class="bi bi-fire me-1"></i><%= val.status %>
+                                                        <i class="bi bi-fire"></i> <%= val.status %>
                                                     </span>
                                                 <% } else if(val.status == "Warm") { %>
                                                     <span class="status-badge warm">
-                                                        <i class="bi bi-thermometer-half me-1"></i><%= val.status %>
+                                                        <i class="bi bi-thermometer-half"></i> <%= val.status %>
                                                     </span>
                                                 <% } else if(val.status == "Cold") { %>
                                                     <span class="status-badge cold">
-                                                        <i class="bi bi-thermometer me-1"></i><%= val.status %>
+                                                        <i class="bi bi-thermometer"></i> <%= val.status %>
                                                     </span>
                                                 <% } else { %>
                                                     <span class="status-badge inactive">
-                                                        <i class="bi bi-slash-circle me-1"></i><%= val.status %>
+                                                        <i class="bi bi-slash-circle"></i> <%= val.status %>
                                                     </span>
                                                 <% } %>
                                             </a>
                                         </td>
                                         <td style="text-align: center;">
-                                            <a href="/leadsedit/<%= val.id %>" class="action-btn edit">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                        </td>
-                                        <td style="text-align: center;">
-                                            <a href="/leadsdelete/<%= val.id %>" class="action-btn delete" 
-                                               onclick="return confirm('Are you sure you want to delete this lead/deal?')">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
+                                            <div class="action-buttons">
+                                                <a href="/leadsedit/<%= val.id %>" class="action-btn edit" title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="/leadsdelete/<%= val.id %>" class="action-btn delete" 
+                                                   onclick="return confirm('Are you sure you want to delete this lead/deal?')"
+                                                   title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 <% }) %>
                             <% } else { %>
                                 <tr>
-                                    <td colspan="7">
+                                    <td colspan="6">
                                         <div class="empty-state">
                                             <i class="bi bi-inbox"></i>
                                             <h5>No Leads or Deals Found</h5>

@@ -71,8 +71,10 @@ router.get('/footeredit/:id', async (req, res) => {
     const id = req.params.id
 
     const Record = await footertable.findById(id)
+         const loginname=req.session.email
 
-    res.render("footeredit.ejs", { Record })
+
+    res.render("footeredit.ejs", { Record,loginname })
 
 })
 

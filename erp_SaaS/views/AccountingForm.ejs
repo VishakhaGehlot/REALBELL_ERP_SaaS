@@ -1,29 +1,53 @@
 <%- include('../partials/admin/header.ejs')%>
 
 <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     body {
         margin: 0;
         padding: 0;
         background: #f5f7fb;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         overflow-x: hidden;
+        width: 100%;
     }
 
-    /* Main content wrapper */
+    /* Main wrapper - flex layout */
     .main-wrapper {
         display: flex;
         width: 100%;
         min-height: 100vh;
+        position: relative;
     }
 
-    /* Sidebar is fixed, so we need to push content */
+    /* Sidebar fixed width */
+    .main-wrapper .sidebar {
+        width: 280px;
+        height: 100vh;
+        background: white;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        position: fixed;
+        left: 0;
+        top: 0;
+        overflow-y: auto;
+        padding: 0;
+        z-index: 100;
+    }
+
+    /* Content wrapper - matches sidebar width */
     .content-wrapper {
         flex: 1;
         margin-left: 280px;
         width: calc(100% - 280px);
-        padding: 25px;
-        background: #f5f7fb;
         min-height: 100vh;
+        background: #f5f7fb;
+        padding: 25px;
         box-sizing: border-box;
+        transition: all 0.3s ease;
     }
 
     .container-fluid {
@@ -33,6 +57,7 @@
         margin-right: auto;
         margin-left: auto;
         box-sizing: border-box;
+        max-width: 100%;
     }
 
     /* Page Header */
@@ -41,6 +66,8 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
     .page-header h2 {
@@ -48,6 +75,14 @@
         font-weight: 700;
         margin: 0;
         font-size: 28px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header h2 i {
+        color: #f59e0b;
+        font-size: 32px;
     }
 
     .page-header p {
@@ -70,12 +105,19 @@
         transition: all 0.3s ease;
         cursor: pointer;
         text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
     .back-btn:hover {
         background: #f8fafc;
         color: #f59e0b;
         border-color: #f59e0b;
+        transform: translateX(-3px);
+        box-shadow: 0 4px 8px rgba(245, 158, 11, 0.1);
+    }
+
+    .back-btn i {
+        font-size: 16px;
     }
 
     /* Form Card */
@@ -95,12 +137,15 @@
         background: #f8fafc;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
 
     .form-header i {
         color: #f59e0b;
         font-size: 24px;
+        background: rgba(245, 158, 11, 0.1);
+        padding: 8px;
+        border-radius: 10px;
     }
 
     .form-header h3 {
@@ -115,7 +160,7 @@
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     .form-label {
@@ -130,6 +175,7 @@
         color: #f59e0b;
         margin-right: 8px;
         font-size: 16px;
+        width: 20px;
     }
 
     .form-control {
@@ -151,6 +197,7 @@
 
     .form-control::placeholder {
         color: #94a3b8;
+        font-size: 13px;
     }
 
     /* File Input Styling */
@@ -161,12 +208,13 @@
 
     .file-input-wrapper input[type="file"] {
         width: 100%;
-        padding: 12px;
+        padding: 15px;
         border: 2px dashed #e9ecef;
         border-radius: 8px;
         background: #f8fafc;
         cursor: pointer;
         transition: all 0.2s ease;
+        color: #64748b;
     }
 
     .file-input-wrapper input[type="file"]:hover {
@@ -178,7 +226,12 @@
         display: block;
         color: #64748b;
         font-size: 12px;
-        margin-top: 5px;
+        margin-top: 8px;
+    }
+
+    .file-input-wrapper small i {
+        color: #f59e0b;
+        margin-right: 4px;
     }
 
     /* Image Preview */
@@ -190,20 +243,29 @@
         display: flex;
         align-items: center;
         gap: 15px;
+        border: 1px solid #e9ecef;
     }
 
     .image-preview img {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         object-fit: cover;
         border-radius: 8px;
         border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .image-preview span {
         color: #64748b;
         font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .image-preview span i {
+        color: #10b981;
+        font-size: 16px;
     }
 
     /* Submit Button */
@@ -236,11 +298,37 @@
         font-size: 18px;
     }
 
+    /* Required field indicator */
+    .required-field::after {
+        content: '*';
+        color: #ef4444;
+        margin-left: 4px;
+        font-size: 14px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .form-card {
+            max-width: 90%;
+        }
+    }
+
     @media (max-width: 768px) {
         .content-wrapper {
             margin-left: 0;
             width: 100%;
             padding: 15px;
+        }
+
+        .main-wrapper {
+            flex-direction: column;
+        }
+
+        .main-wrapper .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            margin-bottom: 0;
         }
 
         .form-card {
@@ -257,6 +345,52 @@
             width: 100%;
             justify-content: center;
         }
+
+        .form-header {
+            padding: 15px 20px;
+        }
+
+        .form-body {
+            padding: 20px 15px;
+        }
+
+        .form-header i {
+            font-size: 20px;
+            padding: 6px;
+        }
+
+        .form-header h3 {
+            font-size: 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .content-wrapper {
+            padding: 15px 12px;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+        }
+
+        .form-label {
+            font-size: 13px;
+        }
+
+        .form-control {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .submit-btn {
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .image-preview img {
+            width: 50px;
+            height: 50px;
+        }
     }
 </style>
 
@@ -269,7 +403,7 @@
             <div class="page-header">
                 <div>
                     <h2>
-                        <i class="bi bi-person-badge me-2" style="color: #f59e0b;"></i>
+                        <i class="bi bi-person-badge"></i>
                         Add New Account
                     </h2>
                     <p>Create a new account record</p>
@@ -293,12 +427,12 @@
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-type"></i>
-                                Title
+                                Title <span class="required-field"></span>
                             </label>
                             <input type="text" 
                                    class="form-control" 
                                    name="title" 
-                                   placeholder="Enter account title"
+                                   placeholder="Enter account title (e.g., Savings Account)"
                                    required>
                         </div>
 
@@ -306,7 +440,7 @@
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-text-paragraph"></i>
-                                Description
+                                Description <span class="required-field"></span>
                             </label>
                             <input type="text" 
                                    class="form-control" 
@@ -319,20 +453,27 @@
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-image"></i>
-                                Account Image
+                                Account Image <span class="required-field"></span>
                             </label>
                             <div class="file-input-wrapper">
                                 <input type="file" 
                                        name="img" 
                                        accept="image/*"
-                                       onchange="previewImage(this)">
-                                <small>Supported formats: JPG, PNG, GIF (Max size: 5MB)</small>
+                                       onchange="previewImage(this)"
+                                       required>
+                                <small>
+                                    <i class="bi bi-info-circle"></i>
+                                    Supported formats: JPG, PNG, GIF (Max size: 5MB)
+                                </small>
                             </div>
                             
                             <!-- Image Preview (hidden by default) -->
                             <div id="imagePreview" class="image-preview" style="display: none;">
                                 <img id="previewImg" src="" alt="Preview">
-                                <span>Preview</span>
+                                <span>
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    Image selected successfully
+                                </span>
                             </div>
                         </div>
 
@@ -356,13 +497,32 @@ function previewImage(input) {
     
     if (input.files && input.files[0]) {
         const reader = new FileReader();
+        const file = input.files[0];
+        
+        // Check file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size exceeds 5MB limit. Please choose a smaller file.');
+            input.value = '';
+            preview.style.display = 'none';
+            return;
+        }
+        
+        // Check file type
+        if (!file.type.match('image.*')) {
+            alert('Please select an image file (JPG, PNG, GIF)');
+            input.value = '';
+            preview.style.display = 'none';
+            return;
+        }
         
         reader.onload = function(e) {
             previewImg.src = e.target.result;
             preview.style.display = 'flex';
         }
         
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = 'none';
     }
 }
 </script>

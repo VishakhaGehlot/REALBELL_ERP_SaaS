@@ -1,29 +1,53 @@
 <%- include('../partials/admin/header.ejs')%>
 
 <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     body {
         margin: 0;
         padding: 0;
         background: #f5f7fb;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         overflow-x: hidden;
+        width: 100%;
     }
 
-    /* Main content wrapper */
+    /* Main wrapper - flex layout */
     .main-wrapper {
         display: flex;
         width: 100%;
         min-height: 100vh;
+        position: relative;
     }
 
-    /* Sidebar is fixed, so we need to push content */
+    /* Sidebar fixed width */
+    .main-wrapper .sidebar {
+        width: 280px;
+        height: 100vh;
+        background: white;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        position: fixed;
+        left: 0;
+        top: 0;
+        overflow-y: auto;
+        padding: 0;
+        z-index: 100;
+    }
+
+    /* Content wrapper - matches sidebar width */
     .content-wrapper {
         flex: 1;
         margin-left: 280px;
         width: calc(100% - 280px);
-        padding: 25px;
-        background: #f5f7fb;
         min-height: 100vh;
+        background: #f5f7fb;
+        padding: 25px;
         box-sizing: border-box;
+        transition: all 0.3s ease;
     }
 
     .container-fluid {
@@ -33,6 +57,7 @@
         margin-right: auto;
         margin-left: auto;
         box-sizing: border-box;
+        max-width: 100%;
     }
 
     /* Page Header */
@@ -41,6 +66,8 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
     .page-header h2 {
@@ -48,6 +75,14 @@
         font-weight: 700;
         margin: 0;
         font-size: 28px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header h2 i {
+        color: #f59e0b;
+        font-size: 32px;
     }
 
     .page-header p {
@@ -70,12 +105,19 @@
         transition: all 0.3s ease;
         cursor: pointer;
         text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
     .back-btn:hover {
         background: #f8fafc;
         color: #f59e0b;
         border-color: #f59e0b;
+        transform: translateX(-3px);
+        box-shadow: 0 4px 8px rgba(245, 158, 11, 0.1);
+    }
+
+    .back-btn i {
+        font-size: 16px;
     }
 
     /* Form Card */
@@ -95,12 +137,15 @@
         background: #f8fafc;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
 
     .form-header i {
         color: #f59e0b;
         font-size: 24px;
+        background: rgba(245, 158, 11, 0.1);
+        padding: 8px;
+        border-radius: 10px;
     }
 
     .form-header h3 {
@@ -108,6 +153,10 @@
         color: #1e293b;
         margin: 0;
         font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
     }
 
     .form-body {
@@ -115,7 +164,7 @@
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     .form-label {
@@ -130,6 +179,7 @@
         color: #f59e0b;
         margin-right: 8px;
         font-size: 16px;
+        width: 20px;
     }
 
     .form-control {
@@ -152,6 +202,7 @@
 
     .form-control::placeholder {
         color: #94a3b8;
+        font-size: 13px;
     }
 
     textarea.form-control {
@@ -163,20 +214,24 @@
         text-align: right;
         font-size: 12px;
         color: #94a3b8;
-        margin-top: 5px;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 4px;
     }
 
     .character-count i {
-        margin-right: 4px;
         color: #f59e0b;
+        font-size: 12px;
     }
 
     /* Current Values Box */
     .current-values {
         background: #f8fafc;
         border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 25px;
+        padding: 20px;
+        margin-bottom: 30px;
         border: 1px solid #e9ecef;
     }
 
@@ -187,18 +242,19 @@
         color: #1e293b;
         font-weight: 600;
         font-size: 14px;
-        margin-bottom: 12px;
+        margin-bottom: 15px;
     }
 
     .current-values-title i {
         color: #f59e0b;
+        font-size: 16px;
     }
 
     .value-item {
         display: flex;
         align-items: flex-start;
-        gap: 10px;
-        padding: 8px 0;
+        gap: 15px;
+        padding: 12px 0;
         border-bottom: 1px dashed #e9ecef;
     }
 
@@ -209,7 +265,8 @@
     .value-label {
         color: #64748b;
         font-size: 13px;
-        min-width: 70px;
+        min-width: 80px;
+        font-weight: 500;
     }
 
     .value-content {
@@ -217,13 +274,17 @@
         font-weight: 500;
         font-size: 13px;
         flex: 1;
+        background: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
     }
 
     /* Status Badge */
     .status-badge {
         display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
+        padding: 6px 12px;
+        border-radius: 30px;
         font-size: 12px;
         font-weight: 600;
         margin-left: 10px;
@@ -276,20 +337,37 @@
 
     /* Helper Text */
     .helper-text {
-        background: #f8fafc;
-        padding: 12px 15px;
+        background: #f0f9ff;
+        padding: 15px 20px;
         border-radius: 8px;
-        margin-top: 15px;
+        margin-top: 20px;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        color: #64748b;
+        gap: 12px;
+        color: #0369a1;
         font-size: 13px;
+        border-left: 4px solid #0ea5e9;
     }
 
     .helper-text i {
-        color: #f59e0b;
-        font-size: 16px;
+        color: #0ea5e9;
+        font-size: 18px;
+    }
+
+    /* Required field indicator */
+    .required-field::after {
+        content: '*';
+        color: #ef4444;
+        margin-left: 4px;
+        font-size: 14px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .form-card {
+            max-width: 90%;
+        }
     }
 
     @media (max-width: 768px) {
@@ -297,6 +375,17 @@
             margin-left: 0;
             width: 100%;
             padding: 15px;
+        }
+
+        .main-wrapper {
+            flex-direction: column;
+        }
+
+        .main-wrapper .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            margin-bottom: 0;
         }
 
         .form-card {
@@ -314,9 +403,63 @@
             justify-content: center;
         }
 
+        .form-header {
+            padding: 15px 20px;
+        }
+
+        .form-body {
+            padding: 20px 15px;
+        }
+
+        .form-header i {
+            font-size: 20px;
+            padding: 6px;
+        }
+
+        .form-header h3 {
+            font-size: 16px;
+        }
+
         .value-item {
             flex-direction: column;
-            gap: 4px;
+            gap: 8px;
+        }
+
+        .value-label {
+            min-width: auto;
+        }
+
+        .value-content {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .content-wrapper {
+            padding: 15px 12px;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+        }
+
+        .form-label {
+            font-size: 13px;
+        }
+
+        .form-control {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .submit-btn {
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .helper-text {
+            padding: 12px;
+            font-size: 12px;
         }
     }
 </style>
@@ -330,7 +473,7 @@
             <div class="page-header">
                 <div>
                     <h2>
-                        <i class="bi bi-pencil-square me-2" style="color: #f59e0b;"></i>
+                        <i class="bi bi-pencil-square"></i>
                         Edit FAQ
                     </h2>
                     <p>Update frequently asked question</p>
@@ -349,6 +492,7 @@
                         Edit FAQ
                         <% if(Record.status) { %>
                             <span class="status-badge <%= Record.status.toLowerCase() %>">
+                                <i class="bi bi-<%= Record.status === 'Active' ? 'check-circle' : (Record.status === 'Pending' ? 'clock' : 'slash-circle') %> me-1"></i>
                                 <%= Record.status %>
                             </span>
                         <% } %>
@@ -364,11 +508,11 @@
                         </div>
                         <div class="value-item">
                             <span class="value-label">Question:</span>
-                            <span class="value-content"><%= Record.title %></span>
+                            <span class="value-content"><i class="bi bi-question-circle me-2" style="color: #f59e0b;"></i><%= Record.title %></span>
                         </div>
                         <div class="value-item">
                             <span class="value-label">Answer:</span>
-                            <span class="value-content"><%= Record.desc %></span>
+                            <span class="value-content"><i class="bi bi-chat-dots me-2" style="color: #f59e0b;"></i><%= Record.desc %></span>
                         </div>
                     </div>
 
@@ -377,7 +521,7 @@
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-question-lg"></i>
-                                Question
+                                Question <span class="required-field"></span>
                             </label>
                             <input type="text" 
                                    class="form-control" 
@@ -388,7 +532,7 @@
                                    maxlength="200">
                             <div class="character-count">
                                 <i class="bi bi-text-paragraph"></i>
-                                Max 200 characters
+                                <span id="questionCount">0</span>/200 characters
                             </div>
                         </div>
 
@@ -396,24 +540,25 @@
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-chat-dots"></i>
-                                Answer
+                                Answer <span class="required-field"></span>
                             </label>
                             <textarea class="form-control" 
                                       name="desc" 
                                       placeholder="Provide a detailed answer"
                                       required
                                       maxlength="1000"
-                                      rows="5"><%= Record.desc %></textarea>
+                                      rows="5"
+                                      oninput="updateCount(this, 'answerCount')"><%= Record.desc %></textarea>
                             <div class="character-count">
                                 <i class="bi bi-file-text"></i>
-                                Max 1000 characters
+                                <span id="answerCount">0</span>/1000 characters
                             </div>
                         </div>
 
                         <!-- Helper Text -->
                         <div class="helper-text">
                             <i class="bi bi-lightbulb"></i>
-                            <span>Tip: Make sure your answer is accurate and easy to understand.</span>
+                            <span>💡 Tip: Make sure your answer is accurate, clear, and easy to understand. Include step-by-step instructions if needed.</span>
                         </div>
 
                         <!-- Submit Button -->
@@ -427,6 +572,29 @@
         </div>
     </div>
 </div>
+
+<!-- Character Count Script -->
+<script>
+// Update character count on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const questionField = document.querySelector('input[name="title"]');
+    const answerField = document.querySelector('textarea[name="desc"]');
+    
+    if(questionField) {
+        document.getElementById('questionCount').textContent = questionField.value.length;
+        questionField.addEventListener('input', function() {
+            document.getElementById('questionCount').textContent = this.value.length;
+        });
+    }
+    
+    if(answerField) {
+        document.getElementById('answerCount').textContent = answerField.value.length;
+        answerField.addEventListener('input', function() {
+            document.getElementById('answerCount').textContent = this.value.length;
+        });
+    }
+});
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -2,6 +2,8 @@ const router=require('express').Router()
 const authTable=require('../models/auth')
 const bannerTable=require('../models/Banner')
 const AccountTable=require('../models/Accounting')
+const featuretable=require('../models/feature')
+
 const bcrypt=require('bcrypt')
 const nodemailer=require('nodemailer')
 const logincheck=require('../middleware/logincheck')
@@ -139,55 +141,104 @@ router.get('/dashboard',(req,res)=>{
     res.render("Dashboard.ejs",{loginname})
 })
 
-router.get('/forgotpasswordform',(req,res)=>{
-    let mess=""
-    res.render("forgotpasswordForm.ejs",{mess})
+
+
+// ================= GET =================
+router.get('/forgotpasswordform', (req, res) => {
+    res.render("forgotpasswordForm.ejs", {
+        mess: "",
+        step: "email"
+    })
 })
 
-router.post('/forgotpasswordform',async(req,res)=>{
-    try{
-    const {email}=req.body
-    const emailCheck=await authTable.findOne({email:email})
-    console.log(emailCheck)
-    if(emailCheck){
+// ================= POST =================
+router.post('/forgotpasswordform', async (req, res) => {
 
-       //email OTP 
-        const otp=Math.floor(100000 + Math.random() * 900000)
+    let mess = ""
+    const { email, otp, newpassword } = req.body
 
-        const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // Use true for port 465, false for port 587
-  auth: {
-    user: "swatis8102@gmail.com",
-    pass: "bljvqtvbllernhdy",
-  },
-});
+    try {
 
- const info = await transporter.sendMail({
-    from: 'swatis8102@gmail.com',
-    to: email,
-    subject: "Hello ✔",
-    text: "Hello world?", // Plain-text version of the message
-    
-    //email OTP 
+        // ================= STEP 1: SEND OTP =================
+        if (email && !otp && !newpassword) {
 
-    html: `<h2>Your OTP is: ${otp}</h2>`
-  });
+            const user = await authTable.findOne({ email })
 
-  //email OTP
-  emailCheck.otp=otp
-  await emailCheck.save()
-  throw new Error("OTP Sent Successfully to your email")
+            if (!user) {
+                throw new Error("Email Not Found")
+            }
 
-        mess="Password reset link has been sent to your registered email address successfully."
-    }else{
-        throw new Error("Email Not found!!")
+            const generateOtp = Math.floor(100000 + Math.random() * 900000)
+
+            user.otp = generateOtp
+            await user.save()
+
+            // MAIL
+            const transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: "swatis8102@gmail.com",
+                    pass: "bljvqtvbllernhdy"
+                }
+            })
+
+            await transporter.sendMail({
+                from: "swatis8102@gmail.com",
+                to: email,
+                subject: "OTP Verification",
+                html: `<h2>Your OTP is: ${generateOtp}</h2>`
+            })
+
+            mess = "OTP Sent Successfully"
+
+            return res.render("forgotpasswordForm.ejs", {
+                mess,
+                step: "otp",
+                email
+            })
+        }
+
+        // ================= STEP 2: VERIFY OTP =================
+        if (email && otp && !newpassword) {
+
+            const user = await authTable.findOne({ email })
+
+            if (!user || user.otp != otp) {
+                throw new Error("Invalid OTP")
+            }
+
+            mess = "OTP Verified"
+
+            return res.render("forgotpasswordForm.ejs", {
+                mess,
+                step: "reset",
+                email
+            })
+        }
+
+        // ================= STEP 3: RESET PASSWORD =================
+        if (email && newpassword) {
+
+            const hash = await bcrypt.hash(newpassword, 10)
+
+            await authTable.findOneAndUpdate(
+                { email },
+                { password: hash, otp: null }
+            )
+
+            return res.redirect('/login')
+        }
+
+    } catch (error) {
+
+        mess = error.message
+
+        return res.render("forgotpasswordForm.ejs", {
+            mess,
+            step: "email"
+        })
     }
-}catch(error){
-    mess=error.message
-}
-    res.render("forgotpasswordForm.ejs",{mess})
+
 })
 
 router.get('/changepassword/:id',(req,res)=>{

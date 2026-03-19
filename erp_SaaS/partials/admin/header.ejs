@@ -20,12 +20,12 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Header Styles */
+        /* Header Styles - White Background */
         .erp-header {
-            background: linear-gradient(135deg, #0a1428 0%, #1a2b45 100%);
+            background: white;
             padding: 0;
-            border-bottom: 4px solid #f0b90b;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-bottom: 3px solid #f0b90b;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -35,11 +35,12 @@
             padding: 12px 30px;
         }
 
-        /* Logo Area */
+        /* Logo Area - Left Side */
         .logo-wrapper {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
+            padding: 5px 0;
         }
 
         .logo-icon {
@@ -50,18 +51,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(240, 185, 11, 0.3);
-            transform: rotate(-5deg);
-            transition: transform 0.3s ease;
-        }
-
-        .logo-icon:hover {
-            transform: rotate(0deg) scale(1.05);
+            box-shadow: 0 4px 10px rgba(240, 185, 11, 0.2);
         }
 
         .logo-icon i {
             font-size: 24px;
-            color: #0a1428;
+            color: white;
         }
 
         .logo-text {
@@ -72,122 +67,98 @@
         .logo-main {
             font-size: 1.8rem;
             font-weight: 800;
-            line-height: 1;
+            line-height: 1.2;
             letter-spacing: -0.5px;
         }
 
         .logo-main .real {
-            color: #ffffff;
+            color: #1e293b;
         }
 
         .logo-main .erp {
             color: #f0b90b;
             position: relative;
             display: inline-block;
-        }
-
-        .logo-main .erp::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, #f0b90b, transparent);
+            margin-left: 3px;
         }
 
         .logo-tagline {
-            color: #8a9bb5;
-            font-size: 0.75rem;
+            color: #64748b;
+            font-size: 0.7rem;
             font-weight: 500;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             margin-top: 2px;
         }
 
         /* Badge */
         .admin-badge {
-            background: rgba(240, 185, 11, 0.15);
-            color: #f0b90b;
+            background: #f0b90b;
+            color: white;
             padding: 4px 12px;
             border-radius: 50px;
             font-size: 0.7rem;
             font-weight: 600;
-            letter-spacing: 0.5px;
-            border: 1px solid rgba(240, 185, 11, 0.3);
             margin-left: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        /* Right Section */
+        .login-badge {
+            background: #eef2f6;
+            color: #1e293b;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .login-badge i {
+            color: #f0b90b;
+        }
+
+        /* Right Section - Sirf Profile */
         .header-right {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 25px;
         }
 
-        /* Notification Icon */
-        .notification-icon {
-            position: relative;
-            cursor: pointer;
-        }
-
-        .notification-icon i {
-            font-size: 1.3rem;
-            color: #8a9bb5;
-            transition: color 0.3s ease;
-        }
-
-        .notification-icon:hover i {
-            color: #f0b90b;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #f0b90b;
-            color: #0a1428;
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 2px 5px;
-            border-radius: 20px;
-            min-width: 18px;
-            text-align: center;
-            border: 2px solid #1a2b45;
-        }
-
-        /* User Profile */
+        /* User Profile - Main Focus */
         .user-profile {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(255,255,255,0.05);
-            padding: 6px 15px 6px 6px;
+            background: #f8fafd;
+            padding: 6px 15px 6px 8px;
             border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s ease;
+            border: 1px solid #eef2f6;
+            transition: all 0.2s ease;
             cursor: pointer;
         }
 
         .user-profile:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(240, 185, 11, 0.3);
+            background: #f1f5f9;
+            border-color: #f0b90b;
         }
 
         .user-avatar {
             width: 38px;
             height: 38px;
-            background: linear-gradient(135deg, #2a3b55, #1a2b45);
+            background: linear-gradient(135deg, #f0b90b, #d4a017);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid #f0b90b;
         }
 
         .user-avatar i {
             font-size: 1.2rem;
-            color: #f0b90b;
+            color: white;
         }
 
         .user-info {
@@ -196,7 +167,7 @@
         }
 
         .user-name {
-            color: white;
+            color: #1e293b;
             font-weight: 600;
             font-size: 0.9rem;
             line-height: 1.3;
@@ -208,38 +179,80 @@
             font-weight: 500;
         }
 
-        /* Logout Button */
+        .user-profile i.bi-chevron-down {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+
+        .user-profile[aria-expanded="true"] i.bi-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        /* Dropdown Menu - Profile Options */
+        .dropdown-menu {
+            background: white;
+            border: 1px solid #eef2f6;
+            border-radius: 12px;
+            padding: 8px;
+            margin-top: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            min-width: 200px;
+        }
+
+        .dropdown-item {
+            color: #1e293b;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dropdown-item i {
+            color: #f0b90b;
+            width: 20px;
+            font-size: 1rem;
+        }
+
+        .dropdown-item:hover {
+            background: #f8fafd;
+            color: #f0b90b;
+        }
+
+        .dropdown-divider {
+            border-color: #eef2f6;
+            margin: 8px 0;
+        }
+
+        /* Logout Button (mobile) */
         .logout-btn {
             background: transparent;
-            border: 1.5px solid rgba(240, 185, 11, 0.3);
-            color: #f0b90b;
-            padding: 8px 20px;
+            border: 1px solid #eef2f6;
+            color: #ef4444;
+            padding: 8px 15px;
             border-radius: 50px;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 0.85rem;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            margin-left: 10px;
         }
 
         .logout-btn:hover {
-            background: #f0b90b;
-            color: #0a1428;
-            border-color: #f0b90b;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(240, 185, 11, 0.3);
-        }
-
-        .logout-btn i {
-            font-size: 1rem;
+            background: #fef2f2;
+            border-color: #ef4444;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .header-container {
-                padding: 12px 15px;
+                padding: 10px 15px;
             }
 
             .logo-main {
@@ -247,15 +260,15 @@
             }
 
             .logo-icon {
-                width: 35px;
-                height: 35px;
+                width: 38px;
+                height: 38px;
             }
 
             .logo-icon i {
-                font-size: 18px;
+                font-size: 20px;
             }
 
-            .admin-badge {
+            .admin-badge, .login-badge, .logo-tagline {
                 display: none;
             }
 
@@ -264,11 +277,7 @@
             }
 
             .user-profile {
-                padding: 6px;
-            }
-
-            .notification-icon {
-                display: none;
+                padding: 4px 10px 4px 4px;
             }
         }
 
@@ -285,7 +294,7 @@
 </head>
 <body>
 
-<!-- Enhanced Header Section -->
+<!-- Enhanced Header Section - White Background -->
 <section class="erp-header">
     <div class="container-fluid header-container">
         <div class="row align-items-center">
@@ -304,24 +313,18 @@
                         </div>
                     </div>
                     <span class="admin-badge">
-                        <i class="bi bi-shield-check me-1"></i> ADMIN
+                        <i class="bi bi-shield-check"></i> ADMIN
                     </span>
 
-                      <span class="admin-badge">
-                        <i class="bi bi-shield-check me-1"></i> <%=loginname%>
+                    <span class="login-badge">
+                        <i class="bi bi-person-circle"></i> <%=loginname%>
                     </span>
                 </div>
             </div>
             
             <div class="col-md-6">
                 <div class="header-right">
-                    <!-- Notification Bell -->
-                    <div class="notification-icon">
-                        <i class="bi bi-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </div>
-
-                    <!-- User Profile Dropdown -->
+                    <!-- Only Profile Dropdown with Options -->
                     <div class="user-profile" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="user-avatar">
                             <i class="bi bi-person-fill"></i>
@@ -330,41 +333,34 @@
                             <span class="user-name">John Doe</span>
                             <span class="user-role">Super Admin</span>
                         </div>
-                        <i class="bi bi-chevron-down" style="color: #8a9bb5; font-size: 0.8rem;"></i>
+                        <i class="bi bi-chevron-down"></i>
                     </div>
                     
-                    <!-- Dropdown Menu -->
-                    <ul class="dropdown-menu dropdown-menu-end" style="background: #1a2b45; border: 1px solid rgba(240,185,11,0.2);">
+                    <!-- Dropdown Menu - Profile, Change Password, Logout -->
+                    <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" href="/profile" style="color: white; padding: 8px 20px;">
-                                <i class="bi bi-person me-2" style="color: #f0b90b;"></i> My Profile
+                            <a class="dropdown-item" href="/profile">
+                                <i class="bi bi-person-circle"></i> My Profile
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/settings" style="color: white; padding: 8px 20px;">
-                                <i class="bi bi-gear me-2" style="color: #f0b90b;"></i> Settings
+                            <a class="dropdown-item" href="/change-password">
+                                <i class="bi bi-key"></i> Change Password
                             </a>
                         </li>
+                        <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item" href="/activity" style="color: white; padding: 8px 20px;">
-                                <i class="bi bi-activity me-2" style="color: #f0b90b;"></i> Activity Log
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.1);"></li>
-                        <li>
-                            <a class="dropdown-item" href="/logout" style="color: #ff6b6b; padding: 8px 20px;">
-                                <i class="bi bi-box-arrow-right me-2"></i> Logout
+                            <a class="dropdown-item" href="/logout" style="color: #ef4444;">
+                                <i class="bi bi-box-arrow-right" style="color: #ef4444;"></i> Logout
                             </a>
                         </li>
                     </ul>
 
-                    <!-- Logout Button (visible on mobile) -->
+                    <!-- Logout Button (visible only on mobile) -->
                     <a href="/logout" class="logout-btn d-md-none">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>Logout</span>
                     </a>
-                    
-                  
                 </div>
             </div>
         </div>

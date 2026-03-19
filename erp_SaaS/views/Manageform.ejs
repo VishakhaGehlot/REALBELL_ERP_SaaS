@@ -1,29 +1,53 @@
 <%- include('../partials/admin/header.ejs')%>
 
 <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     body {
         margin: 0;
         padding: 0;
         background: #f5f7fb;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         overflow-x: hidden;
+        width: 100%;
     }
 
-    /* Main content wrapper */
+    /* Main wrapper - flex layout */
     .main-wrapper {
         display: flex;
         width: 100%;
         min-height: 100vh;
+        position: relative;
     }
 
-    /* Sidebar is fixed, so we need to push content */
+    /* Sidebar fixed width */
+    .main-wrapper .sidebar {
+        width: 280px;
+        height: 100vh;
+        background: white;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        position: fixed;
+        left: 0;
+        top: 0;
+        overflow-y: auto;
+        padding: 0;
+        z-index: 100;
+    }
+
+    /* Content wrapper - matches sidebar width */
     .content-wrapper {
         flex: 1;
         margin-left: 280px;
         width: calc(100% - 280px);
-        padding: 25px;
-        background: #f5f7fb;
         min-height: 100vh;
+        background: #f5f7fb;
+        padding: 25px;
         box-sizing: border-box;
+        transition: all 0.3s ease;
     }
 
     .container-fluid {
@@ -33,6 +57,7 @@
         margin-right: auto;
         margin-left: auto;
         box-sizing: border-box;
+        max-width: 100%;
     }
 
     /* Page Header */
@@ -41,6 +66,8 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
     .page-header h2 {
@@ -48,6 +75,14 @@
         font-weight: 700;
         margin: 0;
         font-size: 28px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header h2 i {
+        color: #f59e0b;
+        font-size: 32px;
     }
 
     .page-header p {
@@ -70,12 +105,19 @@
         transition: all 0.3s ease;
         cursor: pointer;
         text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
     .back-btn:hover {
         background: #f8fafc;
         color: #f59e0b;
         border-color: #f59e0b;
+        transform: translateX(-3px);
+        box-shadow: 0 4px 8px rgba(245, 158, 11, 0.1);
+    }
+
+    .back-btn i {
+        font-size: 16px;
     }
 
     /* Form Card */
@@ -95,12 +137,15 @@
         background: #f8fafc;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
 
     .form-header i {
         color: #f59e0b;
         font-size: 24px;
+        background: rgba(245, 158, 11, 0.1);
+        padding: 8px;
+        border-radius: 10px;
     }
 
     .form-header h3 {
@@ -115,7 +160,7 @@
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     .form-label {
@@ -130,6 +175,7 @@
         color: #f59e0b;
         margin-right: 8px;
         font-size: 16px;
+        width: 20px;
     }
 
     .form-control {
@@ -152,6 +198,28 @@
 
     .form-control::placeholder {
         color: #94a3b8;
+        font-size: 13px;
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .character-count {
+        text-align: right;
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 4px;
+    }
+
+    .character-count i {
+        color: #f59e0b;
+        font-size: 12px;
     }
 
     /* File Input Styling */
@@ -162,12 +230,13 @@
 
     .file-input-wrapper input[type="file"] {
         width: 100%;
-        padding: 12px;
+        padding: 15px;
         border: 2px dashed #e9ecef;
         border-radius: 8px;
         background: #f8fafc;
         cursor: pointer;
         transition: all 0.2s ease;
+        color: #64748b;
     }
 
     .file-input-wrapper input[type="file"]:hover {
@@ -179,14 +248,19 @@
         display: block;
         color: #64748b;
         font-size: 12px;
-        margin-top: 5px;
+        margin-top: 8px;
+    }
+
+    .file-input-wrapper small i {
+        color: #f59e0b;
+        margin-right: 4px;
     }
 
     /* Image Preview */
     .image-preview {
         margin-top: 15px;
         padding: 15px;
-        background: #f8fafc;
+        background: #f0f9ff;
         border-radius: 8px;
         display: flex;
         align-items: center;
@@ -195,12 +269,12 @@
     }
 
     .image-preview img {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         object-fit: cover;
         border-radius: 8px;
         border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .image-preview span {
@@ -208,41 +282,49 @@
         font-size: 13px;
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 6px;
+        font-weight: 500;
+    }
+
+    .image-preview span i {
+        font-size: 16px;
     }
 
     /* Info Box */
     .info-box {
         background: #f0f9ff;
         border-left: 4px solid #3b82f6;
-        padding: 15px;
+        padding: 18px 20px;
         border-radius: 8px;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
         display: flex;
         align-items: flex-start;
-        gap: 12px;
+        gap: 15px;
     }
 
     .info-box i {
         color: #3b82f6;
-        font-size: 20px;
+        font-size: 22px;
+        flex-shrink: 0;
     }
 
     .info-box p {
         color: #1e293b;
         margin: 0;
-        font-size: 13px;
+        font-size: 14px;
+        line-height: 1.5;
     }
 
     .info-box p small {
         color: #64748b;
         display: block;
-        margin-top: 5px;
+        margin-top: 6px;
+        font-size: 12px;
     }
 
     /* Submit Button */
     .submit-btn {
-        width: 100%;
+        flex: 1;
         background: #f59e0b;
         color: white;
         border: none;
@@ -257,7 +339,6 @@
         box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
         transition: all 0.3s ease;
         cursor: pointer;
-        margin-top: 20px;
     }
 
     .submit-btn:hover {
@@ -273,7 +354,7 @@
     /* Cancel Button */
     .cancel-btn {
         flex: 1;
-        padding: 12px;
+        padding: 14px 20px;
         background: white;
         border: 1px solid #e9ecef;
         border-radius: 8px;
@@ -282,28 +363,64 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
         cursor: pointer;
         transition: all 0.2s ease;
         text-decoration: none;
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .cancel-btn:hover {
-        background: #f8fafc;
+        background: #fef2f2;
         color: #ef4444;
         border-color: #ef4444;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(239, 68, 68, 0.1);
     }
 
     .cancel-btn i {
-        font-size: 16px;
+        font-size: 18px;
     }
 
     /* Button Group */
     .button-group {
         display: flex;
         gap: 15px;
-        margin-top: 20px;
+        margin-top: 30px;
+    }
+
+    /* Required field indicator */
+    .required-field::after {
+        content: '*';
+        color: #ef4444;
+        margin-left: 4px;
+        font-size: 14px;
+    }
+
+    /* Helper Text */
+    .helper-text {
+        background: #f0f9ff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin: 20px 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #0369a1;
+        font-size: 13px;
+        border-left: 4px solid #0ea5e9;
+    }
+
+    .helper-text i {
+        color: #0ea5e9;
+        font-size: 18px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .form-card {
+            max-width: 90%;
+        }
     }
 
     @media (max-width: 768px) {
@@ -311,6 +428,17 @@
             margin-left: 0;
             width: 100%;
             padding: 15px;
+        }
+
+        .main-wrapper {
+            flex-direction: column;
+        }
+
+        .main-wrapper .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            margin-bottom: 0;
         }
 
         .form-card {
@@ -328,8 +456,72 @@
             justify-content: center;
         }
 
+        .form-header {
+            padding: 15px 20px;
+        }
+
+        .form-body {
+            padding: 20px 15px;
+        }
+
+        .form-header i {
+            font-size: 20px;
+            padding: 6px;
+        }
+
+        .form-header h3 {
+            font-size: 16px;
+        }
+
         .button-group {
             flex-direction: column;
+        }
+
+        .info-box {
+            padding: 15px;
+            gap: 12px;
+        }
+
+        .info-box i {
+            font-size: 18px;
+        }
+
+        .info-box p {
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .content-wrapper {
+            padding: 15px 12px;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+        }
+
+        .form-label {
+            font-size: 13px;
+        }
+
+        .form-control {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .submit-btn, .cancel-btn {
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .image-preview img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .info-box {
+            flex-direction: column;
+            gap: 8px;
         }
     }
 </style>
@@ -343,7 +535,7 @@
             <div class="page-header">
                 <div>
                     <h2>
-                        <i class="bi bi-grid-3x3-gap-fill me-2" style="color: #f59e0b;"></i>
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
                         Add New Manage Item
                     </h2>
                     <p>Create a new management item</p>
@@ -367,7 +559,7 @@
                         <i class="bi bi-info-circle"></i>
                         <p>
                             Add a new management item. Fill in the title, description, and upload an image.
-                            <small>All fields are required</small>
+                            <small><i class="bi bi-exclamation-circle me-1"></i>All fields are required</small>
                         </p>
                     </div>
 
@@ -376,35 +568,45 @@
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-type"></i>
-                                Title
+                                Title <span class="required-field"></span>
                             </label>
                             <input type="text" 
                                    class="form-control" 
                                    name="title" 
-                                   placeholder="Enter item title"
+                                   placeholder="e.g., Project Management, Team Lead, etc."
                                    required
-                                   maxlength="200">
+                                   maxlength="200"
+                                   oninput="updateCount(this, 'titleCount')">
+                            <div class="character-count">
+                                <i class="bi bi-text-paragraph"></i>
+                                <span id="titleCount">0</span>/200 characters
+                            </div>
                         </div>
 
                         <!-- Description Field -->
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-text-paragraph"></i>
-                                Description
+                                Description <span class="required-field"></span>
                             </label>
                             <textarea class="form-control" 
                                       name="desc" 
                                       placeholder="Enter item description"
                                       required
                                       maxlength="500"
-                                      rows="3"></textarea>
+                                      rows="3"
+                                      oninput="updateCount(this, 'descCount')"></textarea>
+                            <div class="character-count">
+                                <i class="bi bi-file-text"></i>
+                                <span id="descCount">0</span>/500 characters
+                            </div>
                         </div>
 
                         <!-- Image Upload Field -->
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-image"></i>
-                                Item Image
+                                Item Image <span class="required-field"></span>
                             </label>
                             <div class="file-input-wrapper">
                                 <input type="file" 
@@ -412,17 +614,26 @@
                                        accept="image/*"
                                        onchange="previewImage(this)"
                                        required>
-                                <small>Supported formats: JPG, PNG, GIF (Max size: 5MB)</small>
+                                <small>
+                                    <i class="bi bi-info-circle"></i>
+                                    Supported formats: JPG, PNG, GIF (Max size: 5MB)
+                                </small>
                             </div>
                             
                             <!-- Image Preview -->
                             <div id="imagePreview" class="image-preview" style="display: none;">
                                 <img id="previewImg" src="" alt="Preview">
                                 <span>
-                                    <i class="bi bi-eye"></i>
-                                    Image Preview
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    Image selected successfully
                                 </span>
                             </div>
+                        </div>
+
+                        <!-- Helper Text -->
+                        <div class="helper-text">
+                            <i class="bi bi-lightbulb"></i>
+                            <span>💡 Tip: Make sure the image clearly represents the management item.</span>
                         </div>
 
                         <!-- Button Group -->
@@ -431,7 +642,7 @@
                                 <i class="bi bi-x-circle"></i>
                                 Cancel
                             </a>
-                            <button type="submit" class="submit-btn" style="margin-top: 0;">
+                            <button type="submit" class="submit-btn">
                                 <i class="bi bi-plus-circle"></i>
                                 Add Item
                             </button>
@@ -451,14 +662,38 @@ function previewImage(input) {
     
     if (input.files && input.files[0]) {
         const reader = new FileReader();
+        const file = input.files[0];
+        
+        // Check file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size exceeds 5MB limit. Please choose a smaller file.');
+            input.value = '';
+            preview.style.display = 'none';
+            return;
+        }
+        
+        // Check file type
+        if (!file.type.match('image.*')) {
+            alert('Please select an image file (JPG, PNG, GIF)');
+            input.value = '';
+            preview.style.display = 'none';
+            return;
+        }
         
         reader.onload = function(e) {
             previewImg.src = e.target.result;
             preview.style.display = 'flex';
         }
         
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = 'none';
     }
+}
+
+// Character count function
+function updateCount(input, elementId) {
+    document.getElementById(elementId).textContent = input.value.length;
 }
 </script>
 

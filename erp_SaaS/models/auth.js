@@ -29,6 +29,14 @@ const authSchema=mongoose.Schema({
         type:String,
         enum:["SuperAdmin","Admin","User","Teacher"],
         default:"User"
+    },
+     otp: {
+        type: String
+    },
+
+    // 🔥 OTP EXPIRE TIME
+    otpExpire: {
+        type: Date
     }
 })
 
