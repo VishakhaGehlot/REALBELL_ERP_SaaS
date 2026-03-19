@@ -32,10 +32,6 @@ const footerRouter=require('./routers/footer')
 
 
 
-
-
-
-
 app.use('/',HomeRouter)
 app.use('/',authRouter)
 app.use('/',bannerRouter)

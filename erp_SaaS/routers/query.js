@@ -13,7 +13,7 @@ router.post('/contact',async(req,res)=>{
 })
 
 router.get('/querytable',async(req,res)=>{
-    const querydata = await querytable.find().sort({ createdDate: 1 })
+    const querydata = await querytable.find()
      const loginname=req.session.email
     res.render("querytable.ejs",{querydata, loginname})
 })
