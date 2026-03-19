@@ -41,7 +41,9 @@ router.get('/managedelete/:id',async(req,res)=>{
 router.get('/manageedit/:id',async(req,res)=>{
     const id=req.params.id
     const Record=await managetable.findById(id)
-    res.render("ManageEdit.ejs",{Record})
+         const loginname=req.session.email
+
+    res.render("ManageEdit.ejs",{Record,loginname})
 })
 router.post('/manageedit/:id',async(req,res)=>{
     const {title,desc}=req.body

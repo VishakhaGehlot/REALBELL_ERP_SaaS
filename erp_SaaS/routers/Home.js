@@ -1,5 +1,4 @@
 const router=require('express').Router()
-const bannerTable=require('../models/Banner')
 const accountTable=require('../models/Accounting')
 const faqtable=require('../models/faq')
 const managetable=require('../models/manage')
@@ -13,7 +12,6 @@ const footertable=require('../models/footer')
 
 
 router.get('/',async(req,res)=>{
-    const Record=await bannerTable.find({status:"Active"})
     const data=await accountTable.find({status:"Active"})
     const faqdata=await faqtable.find({status:"Active"})
     const managedata=await managetable.find({status:"Active"})
@@ -26,7 +24,7 @@ router.get('/',async(req,res)=>{
     const  footerdata=await footertable.find({status:"Active"})
 
 
-    res.render("Home.ejs",{Record,data,faqdata,managedata,leadsdata,solutiondata,financedata,premiumsdata,featuredata,swiperdata,footerdata})
+    res.render("Home.ejs",{data,faqdata,managedata,leadsdata,solutiondata,financedata,premiumsdata,featuredata,swiperdata,footerdata})
 })
 
 module.exports=router

@@ -43,7 +43,9 @@ router.get('/accountstatus/:id/:status',async(req,res)=>{
 router.get('/accountedit/:id',async(req,res)=>{
     const id=req.params.id
     const Record=await accountTable.findById(id)
-    res.render("AccountEdit.ejs",{Record})
+         const loginname=req.session.email
+
+    res.render("AccountEdit.ejs",{Record,loginname})
 })
 router.post('/accountedit/:id',async(req,res)=>{
     const{title,desc}=req.body

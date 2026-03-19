@@ -41,7 +41,9 @@ router.get('/leadsdelete/:id',async(req,res)=>{
 router.get('/leadsedit/:id',async(req,res)=>{
     const id=req.params.id
     const Record=await leadstable.findById(id)
-    res.render("leadsEdit.ejs",{Record})
+         const loginname=req.session.email
+
+    res.render("leadsEdit.ejs",{Record,loginname})
 })
 router.post('/leadsedit/:id',async(req,res)=>{
     const {title,desc}=req.body

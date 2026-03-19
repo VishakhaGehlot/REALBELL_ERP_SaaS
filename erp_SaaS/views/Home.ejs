@@ -414,22 +414,7 @@ let activeSlides = swiperdata.filter(s => s.status === "Active");
 </script>
 <!-- ===== END MAIN SLIDER ===== -->
 
-<!-- FEATURES -->
-<div class="container py-5">
-    <div class="row text-center mb-4">
-        <h2 style="color:var(--navy-dark);">Our Features</h2>
-    </div>
-    <div class="row g-4 features-row">
-        <% Record.forEach((val,k)=>{ %>
-        <div class="col-md-4 d-flex">
-            <div class="card p-4 shadow-sm w-100">
-                <h4 style="color:var(--navy-dark);"><%= val.title %></h4>
-                <p style="color:var(--text-muted); margin-bottom:0;"><%= val.desc %></p>
-            </div>
-        </div>
-        <% }) %>
-    </div>
-</div>
+
 
 <section>
     <div class="container">
@@ -773,10 +758,9 @@ let activeSlides = swiperdata.filter(s => s.status === "Active");
 <img src="/upload/<%= val.img %>" alt="logo" style="height:65px; width:auto; object-fit:contain;">
 
 <div style="line-height:1.3;">
-<div>
-<span style="font-size:26px; font-weight:900; color:#d4a017;"><%= val.title %></span>
-</div>
-<div style="font-size:10px; color:#94a3b8; letter-spacing:2.5px; font-weight:600;">SAAS PLATFORM</div>
+  <div>
+    <span style="font-size:26px; font-weight:900; color:#d4a017;"><%= val.title %></span>
+  </div>
 </div>
 
 </div>

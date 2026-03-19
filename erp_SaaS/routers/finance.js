@@ -28,7 +28,9 @@ router.get('/financedelete/:id',async(req,res)=>{
 router.get('/financeedit/:id',async(req,res)=>{
     const id=req.params.id
     const Record=await financetable.findById(id)
-    res.render("financeedit.ejs",{Record})
+         const loginname=req.session.email
+
+    res.render("financeedit.ejs",{Record,loginname})
 })
 router.post('/financeedit/:id',async(req,res)=>{
     const {title,desc1,desc2,desc3,desc4}=req.body

@@ -39,7 +39,9 @@ router.get('/faqdelete/:id',async(req,res)=>{
 router.get('/faqedit/:id',async(req,res)=>{
     const id=req.params.id
     const Record=await faqtable.findById(id)
-    res.render("faqedit.ejs",{Record})
+         const loginname=req.session.email
+
+    res.render("faqedit.ejs",{Record,loginname})
 })
 router.post('/faqedit/:id',async(req,res)=>{
     const {title,desc}=req.body

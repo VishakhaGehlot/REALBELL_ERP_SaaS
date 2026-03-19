@@ -40,7 +40,9 @@ router.get('/premiumsdelete/:id',async(req,res)=>{
 router.get('/premiumsedit/:id',async(req,res)=>{
     const id=req.params.id
     const Record=await premiumstable.findById(id)
-    res.render("premiumsEdit.ejs",{Record})
+         const loginname=req.session.email
+
+    res.render("premiumsEdit.ejs",{Record,loginname})
 })
 router.post('/premiumsedit/:id',async(req,res)=>{
     const {title}=req.body

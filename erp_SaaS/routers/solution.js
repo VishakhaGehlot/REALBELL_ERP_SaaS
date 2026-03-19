@@ -40,7 +40,9 @@ router.get('/solutiondelete/:id',async(req,res)=>{
 router.get('/solutionedit/:id',async(req,res)=>{
     const id=req.params.id
     const Record=await solutiontable.findById(id)
-    res.render("solutionEdit.ejs",{Record})
+         const loginname=req.session.email
+
+    res.render("solutionEdit.ejs",{Record,loginname})
 })
 router.post('/solutionedit/:id',async(req,res)=>{
     const {title,desc,mdesc}=req.body

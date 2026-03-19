@@ -14,7 +14,6 @@ app.use(session({
 
 app.use(express.urlencoded({ extended: true }));
 const authRouter=require('./routers/auth')
-const bannerRouter=require('./routers/Banner')
 const HomeRouter=require('./routers/Home')
 const AccountRouter=require('./routers/Account')
 const FaqRouter=require('./routers/faq')
@@ -34,7 +33,6 @@ const footerRouter=require('./routers/footer')
 
 app.use('/',HomeRouter)
 app.use('/',authRouter)
-app.use('/',bannerRouter)
 app.use('/',AccountRouter)
 app.use('/',FaqRouter)
 app.use('/',ManageRouter)
