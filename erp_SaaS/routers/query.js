@@ -18,30 +18,37 @@ router.get('/querytable',async(req,res)=>{
     res.render("querytable.ejs",{querydata, loginname})
 })
 
-router.get('/queryreplyform/:email/:message',(req,res)=>{
-    const email=req.params.email
-    const message=req.params.message
-    const loginname=req.session.email
-    res.render("queryform.ejs",{email,message,loginname})
-})
-router.post('/queryreplyform/:email/:message',async(req,res)=>{
-    const {from,to,subject,message}=req.body
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false, // Use true for port 465, false for port 587
-      auth: {
-        user: "swatis8102@gmail.com",
-        pass: "bljvqtvbllernhdy",
-      },
-    });
-    
-     const info = await transporter.sendMail({
-        from: from,
-        to: to,
-        subject: subject,
-        text: message // Plain-text version of the message
-      });
+router.get('/queryreplyform/:id', async (req, res) => {
+    const data = await querytable.findById(req.params.id)
+    const loginname = req.session.email
+
+    res.render("queryform.ejs", { data, loginname })
 })
 
+router.post('/queryreplyform/:id', async (req, res) => {
+    const { from, to, subject, message } = req.body
+
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: {
+            user: "swatis8102@gmail.com",
+            pass: "bljvqtvbllernhdy",
+        },
+    });
+
+    await transporter.sendMail({
+        from,
+        to,
+        subject,
+        text: message
+    });
+
+    const data = await querytable.findById(req.params.id)
+    data.replied = true
+    await data.save()
+
+    res.redirect('/querytable')
+})
 module.exports=router

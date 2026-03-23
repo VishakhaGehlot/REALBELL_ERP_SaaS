@@ -1,12 +1,873 @@
-<%- include('../partials/admin/header.ejs')%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ERP Dashboard | Real ERP</title>
+    <!-- Bootstrap Icons CDN (robust icon set) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <section>
-        <div class="container-fluid">
-            <div class="row">
-                <%- include('../partials/admin/left.ejs')%>
-                <div class="col-md-9">Mid</div>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Main wrapper with flex layout */
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Content area (adjusting for fixed sidebar) */
+        .content-wrapper {
+            flex: 1;
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 30px;
+            background: #f8fafc;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(99, 102, 241, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #a5b4fc;
+            margin-bottom: 15px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .welcome-section h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+        }
+
+        .welcome-section p {
+            color: #cbd5e1;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .date-time {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid #eef2f6;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+        }
+
+        .stat-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon i {
+            font-size: 28px;
+        }
+
+        .stat-icon.queries { background: #fef3c7; color: #f59e0b; }
+        .stat-icon.replied { background: #d1fae5; color: #10b981; }
+        .stat-icon.users { background: #e0e7ff; color: #6366f1; }
+        .stat-icon.active { background: #ffe4e6; color: #ec489a; }
+
+        .stat-info h3 {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 8px 0;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 5px 0;
+        }
+
+        .stat-trend {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-trend.up { color: #10b981; }
+        .stat-trend.down { color: #ef4444; }
+
+        /* Charts Row */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid #eef2f6;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chart-header h4 {
+            color: #0f172a;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-header h4 i {
+            color: #f59e0b;
+        }
+
+        .chart-badge {
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+
+        /* Recent Activity Section */
+        .activity-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .activity-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #eef2f6;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .activity-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eef2f6;
+            background: #fafbfc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header h4 i {
+            color: #f59e0b;
+        }
+
+        .view-all {
+            font-size: 12px;
+            color: #f59e0b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .view-all:hover {
+            color: #d97706;
+            text-decoration: underline;
+        }
+
+        .activity-list {
+            padding: 0 24px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .activity-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .activity-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .activity-list::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 10px;
+        }
+
+        .activity-item {
+            padding: 16px 0;
+            border-bottom: 1px solid #eef2f6;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .activity-item:hover {
+            background: #fafbfc;
+            padding-left: 8px;
+            transform: translateX(5px);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.pending { background: #fef3c7; color: #f59e0b; }
+        .activity-icon.replied { background: #d1fae5; color: #10b981; }
+        .activity-icon.user { background: #e0e7ff; color: #6366f1; }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .activity-time {
+            font-size: 11px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .activity-status {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .activity-status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .activity-status.replied {
+            background: #d1fae5;
+            color: #166534;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid #eef2f6;
+        }
+
+        .quick-actions h4 {
+            color: #0f172a;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: #f8fafc;
+            border: 1px solid #eef2f6;
+            padding: 15px;
+            border-radius: 16px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        .action-btn:hover {
+            background: #fff7ed;
+            border-color: #f59e0b;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.15);
+        }
+
+        .action-btn i {
+            font-size: 24px;
+            color: #f59e0b;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .action-btn span {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* Bar Chart CSS */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+            height: 200px;
+            padding-top: 20px;
+        }
+
+        .bar-item {
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .bar {
+            background: linear-gradient(180deg, #f59e0b, #fbbf24);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 4px;
+        }
+
+        .bar:hover {
+            transform: scaleX(1.02);
+            filter: brightness(1.05);
+        }
+
+        .bar-label {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .bar-value {
+            font-size: 11px;
+            color: #f59e0b;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+            .activity-section {
+                grid-template-columns: 1fr;
+            }
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            .welcome-section h1 {
+                font-size: 24px;
+            }
+            .date-time {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-top: 15px;
+                display: inline-flex;
+                flex-wrap: wrap;
+            }
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .bar-chart {
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <!-- LEFT SIDEBAR PARTIAL (static simulation) -->
+    <div style="width: 280px; background: white; border-right: 1px solid #eef2f6; position: fixed; height: 100vh; overflow-y: auto; padding: 30px 20px; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 40px;">
+            <div style="background: linear-gradient(135deg, #f59e0b, #fbbf24); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-grid-3x3-gap-fill" style="color: white; font-size: 22px;"></i>
+            </div>
+            <h2 style="font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #1e293b, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent;">REAL ERP</h2>
+        </div>
+        <div style="margin-bottom: 30px;">
+            <p style="color: #94a3b8; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 12px;">FRONTEND MANAGEMENT</p>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 8px;"><a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; color: #334155; text-decoration: none; transition: 0.2s; background: #fef3c7; color: #f59e0b;"><i class="bi bi-sliders2"></i> Settings & Users</a></li>
+                <li style="margin-bottom: 8px;"><a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; color: #334155; text-decoration: none;"><i class="bi bi-gear"></i> System Settings</a></li>
+                <li style="margin-bottom: 8px;"><a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; color: #334155; text-decoration: none;"><i class="bi bi-shield-lock"></i> Security</a></li>
+                <li><a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; color: #334155; text-decoration: none;"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+        </div>
+        <div style="margin-top: auto; padding-top: 40px;">
+            <div style="background: #f1f5f9; border-radius: 16px; padding: 16px; text-align: center;">
+                <i class="bi bi-cloud-sun" style="font-size: 28px; color: #f59e0b;"></i>
+                <p style="font-size: 12px; margin-top: 8px; color: #1e293b;"><strong>Weather</strong><br>25°C <br>Partly sunny</p>
+                <div style="background: white; border-radius: 30px; margin-top: 10px; padding: 4px 8px; display: flex; align-items: center; gap: 6px; border:1px solid #e2e8f0;">
+                    <i class="bi bi-search"></i><input type="text" placeholder="Search" style="border: none; outline: none; font-size: 12px; width: 100%;">
+                </div>
             </div>
         </div>
-    </section>
+    </div>
+
+    <div class="content-wrapper">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <div class="welcome-content">
+                <div class="welcome-badge">
+                    <i class="bi bi-stars"></i> Welcome Back!
+                </div>
+                <h1>Hello, Vishakha Gehlot</h1>
+                <p>Here's what's happening with your ERP system today.</p>
+            </div>
+            <div class="date-time">
+                <i class="bi bi-calendar"></i>
+                <span id="currentDate"></span>
+                <i class="bi bi-clock"></i>
+                <span id="currentTime"></span>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon queries">
+                    <i class="bi bi-chat-dots"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Queries</h3>
+                    <div class="stat-number" id="totalQueries">156</div>
+                    <div class="stat-trend up">
+                        <i class="bi bi-arrow-up"></i> 12% this week
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon replied">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Replied</h3>
+                    <div class="stat-number" id="repliedQueries">124</div>
+                    <div class="stat-trend up">
+                        <i class="bi bi-arrow-up"></i> 8% this week
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon users">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Users</h3>
+                    <div class="stat-number" id="totalUsers">2,847</div>
+                    <div class="stat-trend up">
+                        <i class="bi bi-arrow-up"></i> 156 new
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon active">
+                    <i class="bi bi-person-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Active Now</h3>
+                    <div class="stat-number" id="activeNow">342</div>
+                    <div class="stat-trend up">
+                        <i class="bi bi-arrow-up"></i> 23 online
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h4><i class="bi bi-graph-up"></i> Query Statistics</h4>
+                    <span class="chart-badge">Last 7 days</span>
+                </div>
+                <div class="chart-container">
+                    <div class="bar-chart" id="queryChart"></div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h4><i class="bi bi-person-circle"></i> User Activity</h4>
+                    <span class="chart-badge">vs last week</span>
+                </div>
+                <div class="chart-container">
+                    <div class="bar-chart" id="userChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="activity-section">
+            <div class="activity-card">
+                <div class="card-header">
+                    <h4><i class="bi bi-chat-text"></i> Recent Queries</h4>
+                    <a href="/querytable" class="view-all">View All →</a>
+                </div>
+                <div class="activity-list" id="recentQueriesList"></div>
+            </div>
+
+            <div class="activity-card">
+                <div class="card-header">
+                    <h4><i class="bi bi-person-plus"></i> New Users</h4>
+                    <a href="/usertable" class="view-all">View All →</a>
+                </div>
+                <div class="activity-list" id="recentUsersList"></div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h4><i class="bi bi-lightning-charge"></i> Quick Actions</h4>
+            <div class="actions-grid">
+                <a href="/querytable" class="action-btn"><i class="bi bi-chat-dots"></i><span>View Queries</span></a>
+                <a href="/usertable" class="action-btn"><i class="bi bi-people"></i><span>Manage Users</span></a>
+                <a href="/faqtable" class="action-btn"><i class="bi bi-question-circle"></i><span>Manage FAQ</span></a>
+                <a href="/bannertable" class="action-btn"><i class="bi bi-image"></i><span>Banner</span></a>
+                <a href="/servicetable" class="action-btn"><i class="bi bi-briefcase"></i><span>Services</span></a>
+                <a href="/managetable" class="action-btn"><i class="bi bi-people"></i><span>HR</span></a>
+                <a href="/leadstable" class="action-btn"><i class="bi bi-graph-up"></i><span>Leads & Deals</span></a>
+                <a href="/settings" class="action-btn"><i class="bi bi-gear"></i><span>Settings</span></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Current Date and Time
+    function updateDateTime() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const dateElement = document.getElementById('currentDate');
+        const timeElement = document.getElementById('currentTime');
+        if (dateElement) dateElement.textContent = now.toLocaleDateString('en-US', options);
+        if (timeElement) timeElement.textContent = now.toLocaleTimeString('en-US');
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    // Dashboard Data (Enhanced realistic)
+    const dashboardData = {
+        totalQueries: 156,
+        repliedQueries: 124,
+        totalUsers: 2847,
+        activeNow: 342,
+        queryStats: [23, 28, 32, 29, 35, 42, 38],
+        userStats: [145, 162, 158, 175, 182, 198, 210],
+        recentQueries: [
+            { title: "How to reset password?", time: "5 minutes ago", status: "pending" },
+            { title: "Billing inquiry about subscription", time: "1 hour ago", status: "replied" },
+            { title: "Technical support needed", time: "3 hours ago", status: "pending" },
+            { title: "Feature request: Dark mode", time: "Yesterday", status: "replied" },
+            { title: "Account verification issue", time: "Yesterday", status: "pending" }
+        ],
+        recentUsers: [
+            { name: "John Doe", email: "john@example.com", status: "active" },
+            { name: "Sarah Johnson", email: "sarah@example.com", status: "active" },
+            { name: "Michael Chen", email: "michael@example.com", status: "pending" },
+            { name: "Emily Davis", email: "emily@example.com", status: "active" },
+            { name: "David Wilson", email: "david@example.com", status: "active" }
+        ]
+    };
+
+    // Update stats
+    document.getElementById('totalQueries').textContent = dashboardData.totalQueries;
+    document.getElementById('repliedQueries').textContent = dashboardData.repliedQueries;
+    document.getElementById('totalUsers').textContent = dashboardData.totalUsers.toLocaleString();
+    document.getElementById('activeNow').textContent = dashboardData.activeNow;
+
+    // Create bar chart (robust version)
+    function createBarChart(containerId, data, gradientStart, gradientEnd) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const maxValue = Math.max(...data, 1);
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        container.innerHTML = '';
+        data.forEach((value, index) => {
+            const heightPercent = (value / maxValue) * 160;
+            const height = Math.max(heightPercent, 6);
+            const barItem = document.createElement('div');
+            barItem.className = 'bar-item';
+            barItem.innerHTML = `
+                <div class="bar" style="height: ${height}px; background: linear-gradient(180deg, ${gradientStart}, ${gradientEnd}); border-radius: 8px 8px 0 0; width: 100%; transition: 0.2s;"></div>
+                <div class="bar-label">${days[index]}</div>
+                <div class="bar-value">${value}</div>
+            `;
+            container.appendChild(barItem);
+        });
+    }
+    
+    createBarChart('queryChart', dashboardData.queryStats, '#f59e0b', '#fbbf24');
+    createBarChart('userChart', dashboardData.userStats, '#6366f1', '#8b5cf6');
+
+    // Escape HTML helper
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    // Load recent queries
+    const recentQueriesList = document.getElementById('recentQueriesList');
+    if (recentQueriesList) {
+        if (dashboardData.recentQueries.length) {
+            dashboardData.recentQueries.forEach(query => {
+                const statusClass = query.status === 'pending' ? 'pending' : 'replied';
+                const statusIcon = query.status === 'pending' ? 'bi-question-circle' : 'bi-check-circle';
+                const statusText = query.status === 'pending' ? 'Pending' : 'Replied';
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                item.innerHTML = `
+                    <div class="activity-icon ${statusClass}">
+                        <i class="bi ${statusIcon}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${escapeHtml(query.title)}</div>
+                        <div class="activity-time"><i class="bi bi-clock"></i> ${escapeHtml(query.time)}</div>
+                    </div>
+                    <div class="activity-status ${statusClass}">${statusText}</div>
+                `;
+                recentQueriesList.appendChild(item);
+            });
+        } else {
+            recentQueriesList.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><p>No recent queries</p></div>`;
+        }
+    }
+
+    // Load recent users
+    const recentUsersList = document.getElementById('recentUsersList');
+    if (recentUsersList) {
+        if (dashboardData.recentUsers.length) {
+            dashboardData.recentUsers.forEach(user => {
+                const statusColor = user.status === 'active' ? '#10b981' : '#f59e0b';
+                const statusIcon = user.status === 'active' ? 'bi-check-circle-fill' : 'bi-hourglass-split';
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                item.innerHTML = `
+                    <div class="activity-icon user">
+                        <i class="bi bi-person-badge"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${escapeHtml(user.name)}</div>
+                        <div class="activity-time"><i class="bi bi-envelope"></i> ${escapeHtml(user.email)}</div>
+                    </div>
+                    <div style="font-size: 11px; font-weight:500; color: ${statusColor}; display:flex; align-items:center; gap:4px;">
+                        <i class="bi ${statusIcon}"></i> ${user.status === 'active' ? 'Active' : 'Pending'}
+                    </div>
+                `;
+                recentUsersList.appendChild(item);
+            });
+        } else {
+            recentUsersList.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><p>No new users</p></div>`;
+        }
+    }
+
+    // bar hover effects + smooth
+    document.querySelectorAll('.bar').forEach(bar => {
+        bar.addEventListener('mouseenter', function() { this.style.opacity = '0.85'; });
+        bar.addEventListener('mouseleave', function() { this.style.opacity = '1'; });
+    });
+</script>
 </body>
 </html>

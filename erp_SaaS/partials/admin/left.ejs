@@ -256,6 +256,44 @@
 
     <!-- Navigation Menu -->
     <ul class="menu-items">
+        <!-- ==================== CRM SECTION (NEW) ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-people-fill"></i>
+                <span>CRM</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/all-contacts" class="nav-sub-link">
+                            <i class="bi bi-person-lines-fill"></i>
+                            <span>All Contacts</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/add-contact" class="nav-sub-link">
+                            <i class="bi bi-person-plus-fill"></i>
+                            <span>Add Contact</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/groups" class="nav-sub-link">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Groups</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/campaigns" class="nav-sub-link">
+                            <i class="bi bi-megaphone-fill"></i>
+                            <span>Campaigns</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
         <!-- Frontend Management Section -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(this)">
