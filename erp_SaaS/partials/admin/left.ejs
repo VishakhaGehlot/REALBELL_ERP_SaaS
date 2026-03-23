@@ -256,7 +256,7 @@
 
     <!-- Navigation Menu -->
     <ul class="menu-items">
-        <!-- ==================== CRM SECTION (NEW) ==================== -->
+        <!-- ==================== CRM SECTION ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(this)">
                 <i class="bi bi-people-fill"></i>
@@ -294,7 +294,447 @@
             </div>
         </li>
 
-        <!-- Frontend Management Section -->
+        <!-- ==================== DASHBOARD SECTION ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/dashboard" class="nav-sub-link">
+                            <i class="bi bi-graph-up"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/reports" class="nav-sub-link">
+                            <i class="bi bi-file-text-fill"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/kpi" class="nav-sub-link">
+                            <i class="bi bi-bar-chart-steps"></i>
+                            <span>KPI Metrics</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== SUBSCRIPTION MANAGEMENT ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-credit-card-2-front"></i>
+                <span>Subscription Management</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/plans" class="nav-sub-link">
+                            <i class="bi bi-tags"></i>
+                            <span>Plans & Pricing</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/invoices" class="nav-sub-link">
+                            <i class="bi bi-receipt"></i>
+                            <span>Invoices</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/payment-history" class="nav-sub-link">
+                            <i class="bi bi-clock-history"></i>
+                            <span>Payment History</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== HRM (HUMAN RESOURCE MANAGEMENT) ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-briefcase-fill"></i>
+                <span>HRM</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/employees" class="nav-sub-link">
+                            <i class="bi bi-person-badge"></i>
+                            <span>Employees</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/attendance" class="nav-sub-link">
+                            <i class="bi bi-calendar-check"></i>
+                            <span>Attendance</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/payroll" class="nav-sub-link">
+                            <i class="bi bi-calculator-fill"></i>
+                            <span>Payroll</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/leaves" class="nav-sub-link">
+                            <i class="bi bi-umbrella"></i>
+                            <span>Leave Management</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== ACCOUNTING ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-calculator"></i>
+                <span>Accounting</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/ledger" class="nav-sub-link">
+                            <i class="bi bi-journal-bookmark-fill"></i>
+                            <span>General Ledger</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/expenses" class="nav-sub-link">
+                            <i class="bi bi-cart-dash"></i>
+                            <span>Expenses</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/tax" class="nav-sub-link">
+                            <i class="bi bi-percent"></i>
+                            <span>Tax Management</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== POS (POINT OF SALE) ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-shop"></i>
+                <span>POS</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/new-sale" class="nav-sub-link">
+                            <i class="bi bi-cart-plus"></i>
+                            <span>New Sale</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/orders" class="nav-sub-link">
+                            <i class="bi bi-bag-check"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/inventory" class="nav-sub-link">
+                            <i class="bi bi-box-seam"></i>
+                            <span>Inventory</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== SALES MANAGEMENT ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-bar-chart-line"></i>
+                <span>Sales Management</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/sales-targets" class="nav-sub-link">
+                            <i class="bi bi-bullseye"></i>
+                            <span>Sales Targets</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/sales-team" class="nav-sub-link">
+                            <i class="bi bi-people"></i>
+                            <span>Sales Team</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/commission" class="nav-sub-link">
+                            <i class="bi bi-piggy-bank"></i>
+                            <span>Commission Tracking</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== PROJECT MANAGEMENT ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-kanban"></i>
+                <span>Project Management</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/projects" class="nav-sub-link">
+                            <i class="bi bi-folder-symlink"></i>
+                            <span>All Projects</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/tasks" class="nav-sub-link">
+                            <i class="bi bi-check2-square"></i>
+                            <span>Tasks</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/timeline" class="nav-sub-link">
+                            <i class="bi bi-calendar-week"></i>
+                            <span>Timeline</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== LEAD MANAGEMENT ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-funnel-fill"></i>
+                <span>Lead Management</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/leads" class="nav-sub-link">
+                            <i class="bi bi-star"></i>
+                            <span>All Leads</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/lead-capture" class="nav-sub-link">
+                            <i class="bi bi-download"></i>
+                            <span>Lead Capture</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/lead-score" class="nav-sub-link">
+                            <i class="bi bi-activity"></i>
+                            <span>Lead Scoring</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== DEAL MANAGEMENT ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-trophy-fill"></i>
+                <span>Deal Management</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/deals" class="nav-sub-link">
+                            <i class="bi bi-cup-straw"></i>
+                            <span>Active Deals</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/negotiation" class="nav-sub-link">
+                            <i class="bi bi-chat-left-text"></i>
+                            <span>Negotiation Logs</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/closed-won" class="nav-sub-link">
+                            <i class="bi bi-flag-checkered"></i>
+                            <span>Closed Won</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== SMS MANAGEMENT ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>SMS Management</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/sms-templates" class="nav-sub-link">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span>Templates</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/sms-campaigns" class="nav-sub-link">
+                            <i class="bi bi-megaphone"></i>
+                            <span>Campaigns</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/sms-logs" class="nav-sub-link">
+                            <i class="bi bi-journal"></i>
+                            <span>Delivery Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== EMAIL NOTIFICATION ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-envelope-paper-fill"></i>
+                <span>Email Notification</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/email-templates" class="nav-sub-link">
+                            <i class="bi bi-envelope-open"></i>
+                            <span>Email Templates</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/automation" class="nav-sub-link">
+                            <i class="bi bi-robot"></i>
+                            <span>Automation Rules</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/notification-history" class="nav-sub-link">
+                            <i class="bi bi-bell"></i>
+                            <span>Notification History</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== EVENTS MANAGEMENT ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-calendar-event"></i>
+                <span>Events Management</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/calendar" class="nav-sub-link">
+                            <i class="bi bi-calendar3"></i>
+                            <span>Calendar View</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/upcoming-events" class="nav-sub-link">
+                            <i class="bi bi-star-fill"></i>
+                            <span>Upcoming Events</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/event-registration" class="nav-sub-link">
+                            <i class="bi bi-person-add"></i>
+                            <span>Registrations</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== ZOOM MEETING ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-camera-video-fill"></i>
+                <span>Zoom Meeting</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/schedule-meeting" class="nav-sub-link">
+                            <i class="bi bi-clock"></i>
+                            <span>Schedule Meeting</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/meetings-list" class="nav-sub-link">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Meetings List</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/recordings" class="nav-sub-link">
+                            <i class="bi bi-camera-reels"></i>
+                            <span>Recordings</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- ==================== SUPPORT DESK MANAGEMENT ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+                <i class="bi bi-headset"></i>
+                <span>Support Desk Management</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/tickets" class="nav-sub-link">
+                            <i class="bi bi-ticket-perforated"></i>
+                            <span>All Tickets</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/knowledge-base" class="nav-sub-link">
+                            <i class="bi bi-journal-bookmark-fill"></i>
+                            <span>Knowledge Base</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/live-chat" class="nav-sub-link">
+                            <i class="bi bi-chat-right-heart"></i>
+                            <span>Live Chat</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- Frontend Management Section (Original) -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(this)">
                 <i class="bi bi-layout-text-window"></i>
@@ -304,8 +744,6 @@
 
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
-                    
-                  
                     <li class="nav-sub-item">
                         <a href="/faqtable" class="nav-sub-link">
                             <i class="bi bi-question-circle"></i>
