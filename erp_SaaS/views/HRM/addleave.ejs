@@ -1,0 +1,685 @@
+<%- include('../../partials/admin/header.ejs')%>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: #f5f7fb;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    .main-wrapper {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .main-wrapper .sidebar {
+        width: 280px;
+        height: 100vh;
+        background: white;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        position: fixed;
+        left: 0;
+        top: 0;
+        overflow-y: auto;
+        padding: 0;
+        z-index: 100;
+    }
+
+    .content-wrapper {
+        flex: 1;
+        margin-left: 280px;
+        width: calc(100% - 280px);
+        min-height: 100vh;
+        background: #f5f7fb;
+        padding: 25px;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    .container-fluid {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+        box-sizing: border-box;
+        max-width: 100%;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .page-header h2 {
+        color: #1e293b;
+        font-weight: 700;
+        margin: 0;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header h2 i {
+        color: #f59e0b;
+        font-size: 32px;
+    }
+
+    .page-header p {
+        color: #64748b;
+        font-size: 14px;
+        margin: 5px 0 0;
+    }
+
+    .back-btn {
+        background: white;
+        color: #64748b;
+        border: 1px solid #e9ecef;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .back-btn:hover {
+        background: #f8fafc;
+        color: #f59e0b;
+        border-color: #f59e0b;
+        transform: translateX(-3px);
+        box-shadow: 0 4px 8px rgba(245, 158, 11, 0.1);
+    }
+
+    .back-btn i {
+        font-size: 16px;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+        width: 100%;
+        max-width: 650px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #e9ecef;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .form-header i {
+        color: #f59e0b;
+        font-size: 24px;
+        background: rgba(245, 158, 11, 0.1);
+        padding: 8px;
+        border-radius: 10px;
+    }
+
+    .form-header h3 {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .form-body {
+        padding: 30px 25px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .form-label i {
+        color: #f59e0b;
+        margin-right: 8px;
+        font-size: 16px;
+        width: 20px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #1e293b;
+        transition: all 0.2s ease;
+        background: white;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+
+    .form-control::placeholder {
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    select.form-control {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .info-box {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 15px 18px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .info-box i {
+        color: #f59e0b;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .info-box p {
+        color: #92400e;
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .info-box p small {
+        color: #b45309;
+        display: block;
+        margin-top: 5px;
+        font-size: 11px;
+    }
+
+    .warning-box {
+        background: #fee2e2;
+        border-left: 4px solid #ef4444;
+    }
+
+    .warning-box i {
+        color: #ef4444;
+    }
+
+    .warning-box p {
+        color: #991b1b;
+    }
+
+    .employee-details {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #e9ecef;
+        display: none;
+    }
+
+    .employee-details h4 {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 12px;
+    }
+
+    .employee-details .details-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .employee-details .detail-item {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .employee-details .detail-label {
+        font-size: 11px;
+        color: #64748b;
+        margin-bottom: 3px;
+    }
+
+    .employee-details .detail-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .date-row {
+        display: flex;
+        gap: 15px;
+    }
+
+    .date-row .form-group {
+        flex: 1;
+    }
+
+    .submit-btn {
+        width: 100%;
+        background: #f59e0b;
+        color: white;
+        border: none;
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .submit-btn:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .submit-btn i {
+        font-size: 18px;
+    }
+
+    .helper-text {
+        background: #f8fafc;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #64748b;
+        font-size: 12px;
+        border: 1px solid #e9ecef;
+    }
+
+    .helper-text i {
+        color: #f59e0b;
+        font-size: 14px;
+    }
+
+    .required-field::after {
+        content: '*';
+        color: #ef4444;
+        margin-left: 4px;
+        font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            margin-left: 0;
+            width: 100%;
+            padding: 15px;
+        }
+        .main-wrapper {
+            flex-direction: column;
+        }
+        .main-wrapper .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+        }
+        .form-card {
+            max-width: 100%;
+        }
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .back-btn {
+            width: 100%;
+            justify-content: center;
+        }
+        .date-row {
+            flex-direction: column;
+            gap: 0;
+        }
+    }
+</style>
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs')%>
+
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <div class="page-header">
+                <div>
+                    <h2>
+                        <i class="bi bi-umbrella"></i>
+                        Apply for Leave
+                    </h2>
+                    <p>Submit leave application for absent employees</p>
+                </div>
+                <a href="/leave" class="back-btn">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Leave List
+                </a>
+            </div>
+
+            <div class="form-card">
+                <div class="form-header">
+                    <i class="bi bi-envelope-paper"></i>
+                    <h3>Leave Application Form</h3>
+                </div>
+                
+                <div class="form-body">
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <i class="bi bi-info-circle"></i>
+                        <p>
+                            Apply leave for employees who were absent, on half day, or already on leave.
+                            <small><i class="bi bi-exclamation-circle me-1"></i>Only absent employees are shown in the dropdown</small>
+                        </p>
+                    </div>
+
+                    <% if (employees && employees.length > 0) { %>
+                        <form action="/addleave" method="POST" id="leaveForm">
+                            <!-- Employee Dropdown -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-person"></i>
+                                    Select Employee <span class="required-field"></span>
+                                </label>
+                                <select class="form-control" name="employeeId" id="employeeSelect" required onchange="showEmployeeDetails()">
+                                    <option value="">-- Select Employee --</option>
+                                    <% employees.forEach(emp => { %>
+                                        <option value="<%= emp._id %>" 
+                                                data-name="<%= emp.name %>"
+                                                data-email="<%= emp.email %>"
+                                                data-phone="<%= emp.phone %>"
+                                                data-department="<%= emp.department %>"
+                                                data-position="<%= emp.position %>"
+                                                data-joining="<%= emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString() : 'N/A' %>">
+                                            <%= emp.name %> - <%= emp.department %> (<%= emp.position %>)
+                                        </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+
+                            <!-- Employee Details Card -->
+                            <div class="employee-details" id="employeeDetails">
+                                <h4><i class="bi bi-person-badge"></i> Employee Information</h4>
+                                <div class="details-row">
+                                    <div class="detail-item">
+                                        <div class="detail-label">Email</div>
+                                        <div class="detail-value" id="empEmail">-</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Phone</div>
+                                        <div class="detail-value" id="empPhone">-</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Department</div>
+                                        <div class="detail-value" id="empDept">-</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Position</div>
+                                        <div class="detail-value" id="empPosition">-</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Joining Date</div>
+                                        <div class="detail-value" id="empJoining">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Leave Type -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-tag"></i>
+                                    Leave Type <span class="required-field"></span>
+                                </label>
+                                <select class="form-control" name="leaveType" id="leaveType" required>
+                                    <option value="Sick Leave">🤒 Sick Leave</option>
+                                    <option value="Casual Leave">🏖️ Casual Leave</option>
+                                    <option value="Earned Leave">🌴 Earned Leave</option>
+                                    <option value="Emergency Leave">🚨 Emergency Leave</option>
+                                </select>
+                            </div>
+
+                            <!-- Date Range -->
+                            <div class="date-row">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-calendar"></i>
+                                        From Date <span class="required-field"></span>
+                                    </label>
+                                    <input type="date" class="form-control" name="fromDate" id="fromDate" required onchange="calculateDuration()">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-calendar"></i>
+                                        To Date <span class="required-field"></span>
+                                    </label>
+                                    <input type="date" class="form-control" name="toDate" id="toDate" required onchange="calculateDuration()">
+                                </div>
+                            </div>
+
+                            <!-- Duration -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    Duration (Days)
+                                </label>
+                                <input type="number" class="form-control" name="duration" id="duration" readonly step="1" style="background: #f8fafc; font-weight: 600;">
+                                <small class="text-muted">Auto-calculated from selected dates</small>
+                            </div>
+
+                            <!-- Reason -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-chat-text"></i>
+                                    Reason <span class="required-field"></span>
+                                </label>
+                                <textarea class="form-control" name="reason" rows="3" placeholder="Please provide reason for leave..." required></textarea>
+                            </div>
+
+                            <!-- Status (Hidden - Default Pending) -->
+                            <input type="hidden" name="leaveStatus" value="Pending">
+
+                            <!-- Warning Box -->
+                            <div class="warning-box">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <p>
+                                    <strong>Note:</strong> Leave request will be sent for approval. Status will be updated by HR/Admin.
+                                    <small>Please ensure all details are correct before submitting.</small>
+                                </p>
+                            </div>
+
+                            <!-- Helper Text -->
+                            <div class="helper-text">
+                                <i class="bi bi-lightbulb"></i>
+                                <span>💡 Tip: Select dates and reason clearly. Leave balance will be updated after approval.</span>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="submit-btn">
+                                <i class="bi bi-send"></i>
+                                Submit Leave Application
+                            </button>
+                        </form>
+                    <% } else { %>
+                        <div class="warning-box" style="text-align: center;">
+                            <i class="bi bi-emoji-frown"></i>
+                            <p>
+                                <strong>No absent employees found!</strong>
+                                <small>All employees are present today. Leave can only be applied for absent employees.</small>
+                            </p>
+                            <a href="/attendance" class="add-btn" style="display: inline-flex; margin-top: 15px; background: #f59e0b;">
+                                <i class="bi bi-calendar-check"></i> View Attendance
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Show employee details when selected
+    function showEmployeeDetails() {
+        const select = document.getElementById('employeeSelect');
+        const selectedOption = select.options[select.selectedIndex];
+        const detailsCard = document.getElementById('employeeDetails');
+        
+        if(select.value && selectedOption.value) {
+            document.getElementById('empEmail').innerHTML = `<i class="bi bi-envelope"></i> ${selectedOption.getAttribute('data-email') || 'N/A'}`;
+            document.getElementById('empPhone').innerHTML = `<i class="bi bi-telephone"></i> ${selectedOption.getAttribute('data-phone') || 'N/A'}`;
+            document.getElementById('empDept').innerHTML = `<i class="bi bi-building"></i> ${selectedOption.getAttribute('data-department') || 'N/A'}`;
+            document.getElementById('empPosition').innerHTML = `<i class="bi bi-briefcase"></i> ${selectedOption.getAttribute('data-position') || 'N/A'}`;
+            document.getElementById('empJoining').innerHTML = `<i class="bi bi-calendar"></i> ${selectedOption.getAttribute('data-joining') || 'N/A'}`;
+            
+            detailsCard.style.display = 'block';
+        } else {
+            detailsCard.style.display = 'none';
+        }
+    }
+    
+    // Calculate duration between dates
+    function calculateDuration() {
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = document.getElementById('toDate').value;
+        
+        if(fromDate && toDate) {
+            const from = new Date(fromDate);
+            const to = new Date(toDate);
+            const diffTime = Math.abs(to - from);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            document.getElementById('duration').value = diffDays;
+        }
+    }
+    
+    // Form validation
+    document.getElementById('leaveForm')?.addEventListener('submit', function(e) {
+        const employeeId = document.getElementById('employeeSelect').value;
+        const leaveType = document.getElementById('leaveType').value;
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = document.getElementById('toDate').value;
+        const reason = document.querySelector('textarea[name="reason"]').value;
+        
+        if(!employeeId) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please select an employee!',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        if(!leaveType) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please select leave type!',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        if(!fromDate || !toDate) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please select leave dates!',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        if(fromDate > toDate) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Dates',
+                text: 'From date cannot be after to date!',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        if(!reason.trim()) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please provide reason for leave!',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        return true;
+    });
+    
+    // Set today's date as default for from date
+    document.addEventListener('DOMContentLoaded', function() {
+        const fromDateInput = document.getElementById('fromDate');
+        if(fromDateInput && !fromDateInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            fromDateInput.value = today;
+        }
+    });
+</script>
+
+</body>
+</html>

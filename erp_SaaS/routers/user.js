@@ -76,7 +76,7 @@ router.get('/userstatus/:id/:status', async (req, res) => {
     const id = req.params.id
     const currentStatus = req.params.status
 
-    let newStatus = currentStatus == "Pending" ? "Active" : "Pending"
+    let newStatus = currentStatus == "Active" ? "Inactive" : "Active"
 
     await usertable.findByIdAndUpdate(id, { status: newStatus })
 

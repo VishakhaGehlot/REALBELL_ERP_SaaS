@@ -27,7 +27,8 @@ const premiumsRouter=require('./routers/premiums')
 const FeatureRouter=require('./routers/feature')
 const swiperRouter=require('./routers/swiper')
 const footerRouter=require('./routers/footer')
-
+const addcontactRouter=require('./routers/addcontact')
+const hrmRouters=require('./routers/Hrm')
 
 
 
@@ -45,7 +46,8 @@ app.use('/',premiumsRouter)
 app.use('/',FeatureRouter)
 app.use('/',swiperRouter)
 app.use('/',footerRouter)
-
+app.use('/',addcontactRouter)
+app.use('/',hrmRouters)
 
 
 

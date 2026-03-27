@@ -169,6 +169,7 @@
         font-size: 13px;
         transition: all 0.2s;
         border-left: 3px solid transparent;
+        cursor: pointer;
     }
 
     .nav-sub-link i {
@@ -239,6 +240,11 @@
     .user-info-card {
         display: none;
     }
+
+    /* Prevent link default behavior */
+    .nav-sub-link, .nav-main-link[href] {
+        cursor: pointer;
+    }
 </style>
 
 <!-- Sidebar HTML -->
@@ -258,7 +264,7 @@
     <ul class="menu-items">
         <!-- ==================== CRM SECTION ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-people-fill"></i>
                 <span>CRM</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -267,36 +273,26 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/all-contacts" class="nav-sub-link">
+                        <a href="/addcontacttable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-person-lines-fill"></i>
                             <span>All Contacts</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/add-contact" class="nav-sub-link">
+                        <a href="/addcontactform" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-person-plus-fill"></i>
                             <span>Add Contact</span>
                         </a>
                     </li>
-                    <li class="nav-sub-item">
-                        <a href="/groups" class="nav-sub-link">
-                            <i class="bi bi-people-fill"></i>
-                            <span>Groups</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/campaigns" class="nav-sub-link">
-                            <i class="bi bi-megaphone-fill"></i>
-                            <span>Campaigns</span>
-                        </a>
-                    </li>
+                   
+                   
                 </ul>
             </div>
         </li>
 
         <!-- ==================== DASHBOARD SECTION ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -304,19 +300,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/dashboard" class="nav-sub-link">
+                        <a href="/dashboard" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-graph-up"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/reports" class="nav-sub-link">
+                        <a href="/reports" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-file-text-fill"></i>
                             <span>Reports</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/kpi" class="nav-sub-link">
+                        <a href="/kpi" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-bar-chart-steps"></i>
                             <span>KPI Metrics</span>
                         </a>
@@ -327,7 +323,7 @@
 
         <!-- ==================== SUBSCRIPTION MANAGEMENT ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-credit-card-2-front"></i>
                 <span>Subscription Management</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -335,19 +331,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/plans" class="nav-sub-link">
+                        <a href="/plans" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-tags"></i>
                             <span>Plans & Pricing</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/invoices" class="nav-sub-link">
+                        <a href="/invoices" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-receipt"></i>
                             <span>Invoices</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/payment-history" class="nav-sub-link">
+                        <a href="/payment-history" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-clock-history"></i>
                             <span>Payment History</span>
                         </a>
@@ -358,7 +354,7 @@
 
         <!-- ==================== HRM (HUMAN RESOURCE MANAGEMENT) ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-briefcase-fill"></i>
                 <span>HRM</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -366,25 +362,25 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/employees" class="nav-sub-link">
+                        <a href="/employees" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-person-badge"></i>
                             <span>Employees</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/attendance" class="nav-sub-link">
+                        <a href="/Attendance" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-calendar-check"></i>
                             <span>Attendance</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/payroll" class="nav-sub-link">
+                        <a href="/Payroll" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-calculator-fill"></i>
                             <span>Payroll</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/leaves" class="nav-sub-link">
+                        <a href="/Leave" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-umbrella"></i>
                             <span>Leave Management</span>
                         </a>
@@ -395,7 +391,7 @@
 
         <!-- ==================== ACCOUNTING ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-calculator"></i>
                 <span>Accounting</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -403,19 +399,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/ledger" class="nav-sub-link">
+                        <a href="/ledger" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-journal-bookmark-fill"></i>
                             <span>General Ledger</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/expenses" class="nav-sub-link">
+                        <a href="/expenses" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-cart-dash"></i>
                             <span>Expenses</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/tax" class="nav-sub-link">
+                        <a href="/tax" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-percent"></i>
                             <span>Tax Management</span>
                         </a>
@@ -426,7 +422,7 @@
 
         <!-- ==================== POS (POINT OF SALE) ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-shop"></i>
                 <span>POS</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -434,19 +430,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/new-sale" class="nav-sub-link">
+                        <a href="/new-sale" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-cart-plus"></i>
                             <span>New Sale</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/orders" class="nav-sub-link">
+                        <a href="/orders" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-bag-check"></i>
                             <span>Orders</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/inventory" class="nav-sub-link">
+                        <a href="/inventory" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-box-seam"></i>
                             <span>Inventory</span>
                         </a>
@@ -457,7 +453,7 @@
 
         <!-- ==================== SALES MANAGEMENT ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-bar-chart-line"></i>
                 <span>Sales Management</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -465,19 +461,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/sales-targets" class="nav-sub-link">
+                        <a href="/sales-targets" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-bullseye"></i>
                             <span>Sales Targets</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/sales-team" class="nav-sub-link">
+                        <a href="/sales-team" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-people"></i>
                             <span>Sales Team</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/commission" class="nav-sub-link">
+                        <a href="/commission" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-piggy-bank"></i>
                             <span>Commission Tracking</span>
                         </a>
@@ -488,7 +484,7 @@
 
         <!-- ==================== PROJECT MANAGEMENT ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-kanban"></i>
                 <span>Project Management</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -496,19 +492,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/projects" class="nav-sub-link">
+                        <a href="/projects" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-folder-symlink"></i>
                             <span>All Projects</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/tasks" class="nav-sub-link">
+                        <a href="/tasks" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-check2-square"></i>
                             <span>Tasks</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/timeline" class="nav-sub-link">
+                        <a href="/timeline" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-calendar-week"></i>
                             <span>Timeline</span>
                         </a>
@@ -519,7 +515,7 @@
 
         <!-- ==================== LEAD MANAGEMENT ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-funnel-fill"></i>
                 <span>Lead Management</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -527,19 +523,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/leads" class="nav-sub-link">
+                        <a href="/leads" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-star"></i>
                             <span>All Leads</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/lead-capture" class="nav-sub-link">
+                        <a href="/lead-capture" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-download"></i>
                             <span>Lead Capture</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/lead-score" class="nav-sub-link">
+                        <a href="/lead-score" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-activity"></i>
                             <span>Lead Scoring</span>
                         </a>
@@ -550,7 +546,7 @@
 
         <!-- ==================== DEAL MANAGEMENT ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-trophy-fill"></i>
                 <span>Deal Management</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -558,19 +554,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/deals" class="nav-sub-link">
+                        <a href="/deals" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-cup-straw"></i>
                             <span>Active Deals</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/negotiation" class="nav-sub-link">
+                        <a href="/negotiation" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-chat-left-text"></i>
                             <span>Negotiation Logs</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/closed-won" class="nav-sub-link">
+                        <a href="/closed-won" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-flag-checkered"></i>
                             <span>Closed Won</span>
                         </a>
@@ -581,7 +577,7 @@
 
         <!-- ==================== SMS MANAGEMENT ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-chat-dots-fill"></i>
                 <span>SMS Management</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -589,19 +585,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/sms-templates" class="nav-sub-link">
+                        <a href="/sms-templates" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-file-earmark-text"></i>
                             <span>Templates</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/sms-campaigns" class="nav-sub-link">
+                        <a href="/sms-campaigns" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-megaphone"></i>
                             <span>Campaigns</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/sms-logs" class="nav-sub-link">
+                        <a href="/sms-logs" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-journal"></i>
                             <span>Delivery Logs</span>
                         </a>
@@ -612,7 +608,7 @@
 
         <!-- ==================== EMAIL NOTIFICATION ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-envelope-paper-fill"></i>
                 <span>Email Notification</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -620,19 +616,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/email-templates" class="nav-sub-link">
+                        <a href="/email-templates" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-envelope-open"></i>
                             <span>Email Templates</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/automation" class="nav-sub-link">
+                        <a href="/automation" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-robot"></i>
                             <span>Automation Rules</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/notification-history" class="nav-sub-link">
+                        <a href="/notification-history" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-bell"></i>
                             <span>Notification History</span>
                         </a>
@@ -643,7 +639,7 @@
 
         <!-- ==================== EVENTS MANAGEMENT ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-calendar-event"></i>
                 <span>Events Management</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -651,19 +647,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/calendar" class="nav-sub-link">
+                        <a href="/calendar" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-calendar3"></i>
                             <span>Calendar View</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/upcoming-events" class="nav-sub-link">
+                        <a href="/upcoming-events" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-star-fill"></i>
                             <span>Upcoming Events</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/event-registration" class="nav-sub-link">
+                        <a href="/event-registration" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-person-add"></i>
                             <span>Registrations</span>
                         </a>
@@ -674,7 +670,7 @@
 
         <!-- ==================== ZOOM MEETING ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-camera-video-fill"></i>
                 <span>Zoom Meeting</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -682,19 +678,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/schedule-meeting" class="nav-sub-link">
+                        <a href="/schedule-meeting" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-clock"></i>
                             <span>Schedule Meeting</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/meetings-list" class="nav-sub-link">
+                        <a href="/meetings-list" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-list-ul"></i>
                             <span>Meetings List</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/recordings" class="nav-sub-link">
+                        <a href="/recordings" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-camera-reels"></i>
                             <span>Recordings</span>
                         </a>
@@ -705,7 +701,7 @@
 
         <!-- ==================== SUPPORT DESK MANAGEMENT ==================== -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-headset"></i>
                 <span>Support Desk Management</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -713,19 +709,19 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/tickets" class="nav-sub-link">
+                        <a href="/tickets" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-ticket-perforated"></i>
                             <span>All Tickets</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/knowledge-base" class="nav-sub-link">
+                        <a href="/knowledge-base" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-journal-bookmark-fill"></i>
                             <span>Knowledge Base</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/live-chat" class="nav-sub-link">
+                        <a href="/live-chat" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-chat-right-heart"></i>
                             <span>Live Chat</span>
                         </a>
@@ -736,7 +732,7 @@
 
         <!-- Frontend Management Section (Original) -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-layout-text-window"></i>
                 <span>Frontend Management</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -745,61 +741,61 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/faqtable" class="nav-sub-link">
+                        <a href="/faqtable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-question-circle"></i>
                             <span>FAQ Management</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/accounttable" class="nav-sub-link">
+                        <a href="/accounttable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-cash-stack"></i>
                             <span>Accounting Management</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/managetable" class="nav-sub-link">
+                        <a href="/managetable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-people"></i>
                             <span>Manage HR</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/leadstable" class="nav-sub-link">
+                        <a href="/leadstable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-graph-up"></i>
                             <span>Manage Leads & Deals</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/solutiontable" class="nav-sub-link">
+                        <a href="/solutiontable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-lightbulb"></i>
                             <span>Our Solutions</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/financetable" class="nav-sub-link">
+                        <a href="/financetable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-bar-chart"></i>
                             <span>Business Finance</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/premiumstable" class="nav-sub-link">
+                        <a href="/premiumstable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-folder"></i>
                             <span>Resource Management</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/featuretable" class="nav-sub-link">
+                        <a href="/featuretable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-folder"></i>
                             <span>Features</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/swipertable" class="nav-sub-link">
+                        <a href="/swipertable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-images"></i>
                             <span>Swiper Image</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/footertable" class="nav-sub-link">
+                        <a href="/footertable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-layout-text-window"></i>
                             <span>Footer Management</span>
                         </a>
@@ -813,7 +809,7 @@
 
         <!-- User Management Section -->
         <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(this)">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-person-gear"></i>
                 <span>Settings & Users</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
@@ -822,13 +818,13 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/usertable" class="nav-sub-link">
+                        <a href="/usertable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-person"></i>
                             <span>User Management</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/querytable" class="nav-sub-link">
+                        <a href="/querytable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-chat-dots"></i>
                             <span>Query Management</span>
                         </a>
@@ -839,13 +835,13 @@
 
         <!-- Additional Options -->
         <li class="nav-main-item mt-2">
-            <a href="/settings" class="nav-main-link">
+            <a href="/settings" class="nav-main-link" onclick="handleDirectLink(event, this)">
                 <i class="bi bi-gear"></i> System Settings
             </a>
-            <a href="/security" class="nav-main-link">
+            <a href="/security" class="nav-main-link" onclick="handleDirectLink(event, this)">
                 <i class="bi bi-shield-lock"></i> Security
             </a>
-            <a href="/logout" class="nav-main-link" style="color: #ef4444 !important;">
+            <a href="/logout" class="nav-main-link" onclick="handleDirectLink(event, this)" style="color: #ef4444 !important;">
                 <i class="bi bi-box-arrow-right" style="color: #ef4444;"></i> Logout
             </a>
         </li>
@@ -857,9 +853,15 @@
     </div>
 </div>
 
-<!-- Simple JavaScript - 100% working toggle -->
+<!-- Perfect JavaScript - Dropdown stays open on submenu clicks -->
 <script>
-    function toggleSubmenu(element) {
+    // Toggle submenu function - prevents event bubbling
+    function toggleSubmenu(event, element) {
+        // Stop event propagation to prevent any unwanted closing
+        if (event) {
+            event.stopPropagation();
+        }
+        
         // Find the submenu wrapper (next sibling)
         var submenu = element.nextElementSibling;
         
@@ -869,10 +871,101 @@
         // Toggle submenu display
         if (submenu.style.display === 'none' || submenu.style.display === '') {
             submenu.style.display = 'block';
-            chevron.classList.add('rotate-chevron');
+            if (chevron) {
+                chevron.classList.add('rotate-chevron');
+            }
         } else {
             submenu.style.display = 'none';
-            chevron.classList.remove('rotate-chevron');
+            if (chevron) {
+                chevron.classList.remove('rotate-chevron');
+            }
         }
     }
+    
+    // Handle submenu link clicks - prevents dropdown from closing
+    function handleSubmenuClick(event, element) {
+        // Stop event from bubbling up to parent elements
+        event.stopPropagation();
+        
+        // Remove active class from all submenu items
+        document.querySelectorAll('.nav-sub-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        
+        // Add active class to clicked item
+        element.classList.add('active');
+        
+        // Here you can add your navigation logic
+        // For example: window.location.href = element.getAttribute('href');
+        // The link will naturally navigate, but we prevent the dropdown from closing
+        console.log('Navigating to:', element.getAttribute('href'));
+        
+        // Allow the link to work normally
+        return true;
+    }
+    
+    // Handle direct links (non-dropdown items)
+    function handleDirectLink(event, element) {
+        event.stopPropagation();
+        
+        // Remove active class from all main links
+        document.querySelectorAll('.nav-main-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        
+        // Add active class to clicked link
+        element.classList.add('active');
+        
+        console.log('Navigating to:', element.getAttribute('href'));
+        return true;
+    }
+    
+    // Optional: Close other dropdowns when opening a new one
+    function closeOtherDropdowns(currentElement) {
+        var allSubmenus = document.querySelectorAll('.submenu-wrapper');
+        var currentSubmenu = currentElement.nextElementSibling;
+        
+        allSubmenus.forEach(function(submenu) {
+            if (submenu !== currentSubmenu && submenu.style.display === 'block') {
+                submenu.style.display = 'none';
+                // Also rotate back the chevron of the parent
+                var parentLink = submenu.previousElementSibling;
+                if (parentLink) {
+                    var chevron = parentLink.querySelector('.chevron-icon');
+                    if (chevron) {
+                        chevron.classList.remove('rotate-chevron');
+                    }
+                }
+            }
+        });
+    }
+    
+    // Enhanced toggle function with auto-close other dropdowns
+    window.toggleSubmenuEnhanced = function(event, element) {
+        event.stopPropagation();
+        closeOtherDropdowns(element);
+        toggleSubmenu(event, element);
+    };
+    
+    // Optional: Keep dropdowns open when clicking inside them
+    document.addEventListener('click', function(event) {
+        // If click is inside a submenu, don't close it
+        if (event.target.closest('.submenu-wrapper')) {
+            return;
+        }
+        // If click is on a main nav link, don't auto-close (handled by toggle)
+        if (event.target.closest('.nav-main-link')) {
+            return;
+        }
+    });
+    
+    // Initialize - ensure all submenus are closed by default
+    document.querySelectorAll('.submenu-wrapper').forEach(function(submenu) {
+        submenu.style.display = 'none';
+    });
+    
+    // Remove any remaining rotate classes from chevrons
+    document.querySelectorAll('.chevron-icon').forEach(function(chevron) {
+        chevron.classList.remove('rotate-chevron');
+    });
 </script>
