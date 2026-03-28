@@ -262,35 +262,7 @@
 
     <!-- Navigation Menu -->
     <ul class="menu-items">
-        <!-- ==================== CRM SECTION ==================== -->
-        <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
-                <i class="bi bi-people-fill"></i>
-                <span>CRM</span>
-                <i class="bi bi-chevron-right chevron-icon"></i>
-            </div>
-
-            <div class="submenu-wrapper" style="display: none;">
-                <ul class="menu-items">
-                    <li class="nav-sub-item">
-                        <a href="/addcontacttable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-person-lines-fill"></i>
-                            <span>All Contacts</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/addcontactform" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-person-plus-fill"></i>
-                            <span>Add Contact</span>
-                        </a>
-                    </li>
-                   
-                   
-                </ul>
-            </div>
-        </li>
-
-        <!-- ==================== DASHBOARD SECTION ==================== -->
+<!-- ==================== DASHBOARD SECTION ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-speedometer2"></i>
@@ -321,6 +293,9 @@
             </div>
         </li>
 
+
+        
+        
         <!-- ==================== SUBSCRIPTION MANAGEMENT ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -351,6 +326,110 @@
                 </ul>
             </div>
         </li>
+
+<!-- Frontend Management Section (Original) -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
+                <i class="bi bi-layout-text-window"></i>
+                <span>Frontend Management</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/faqtable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-question-circle"></i>
+                            <span>FAQ Management</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/accounttable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-cash-stack"></i>
+                            <span>Accounting Management</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/managetable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-people"></i>
+                            <span>Manage HR</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/leadstable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-graph-up"></i>
+                            <span>Manage Leads & Deals</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/solutiontable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-lightbulb"></i>
+                            <span>Our Solutions</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/financetable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-bar-chart"></i>
+                            <span>Business Finance</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/premiumstable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-folder"></i>
+                            <span>Resource Management</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/featuretable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-folder"></i>
+                            <span>Features</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/swipertable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-images"></i>
+                            <span>Swiper Image</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/footertable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-layout-text-window"></i>
+                            <span>Footer Management</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+<!-- ==================== CRM SECTION ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
+                <i class="bi bi-people-fill"></i>
+                <span>CRM</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/addcontacttable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-person-lines-fill"></i>
+                            <span>All Contacts</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/addcontactform" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-person-plus-fill"></i>
+                            <span>Add Contact</span>
+                        </a>
+                    </li>
+                   
+                   
+                </ul>
+            </div>
+        </li>
+
+
 
         <!-- ==================== HRM (HUMAN RESOURCE MANAGEMENT) ==================== -->
         <li class="nav-main-item">
@@ -616,7 +695,7 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/email-templates" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                        <a href="/smtp" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-envelope-open"></i>
                             <span>Email Templates</span>
                         </a>
@@ -730,79 +809,7 @@
             </div>
         </li>
 
-        <!-- Frontend Management Section (Original) -->
-        <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
-                <i class="bi bi-layout-text-window"></i>
-                <span>Frontend Management</span>
-                <i class="bi bi-chevron-right chevron-icon"></i>
-            </div>
-
-            <div class="submenu-wrapper" style="display: none;">
-                <ul class="menu-items">
-                    <li class="nav-sub-item">
-                        <a href="/faqtable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-question-circle"></i>
-                            <span>FAQ Management</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/accounttable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-cash-stack"></i>
-                            <span>Accounting Management</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/managetable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-people"></i>
-                            <span>Manage HR</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/leadstable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-graph-up"></i>
-                            <span>Manage Leads & Deals</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/solutiontable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-lightbulb"></i>
-                            <span>Our Solutions</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/financetable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-bar-chart"></i>
-                            <span>Business Finance</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/premiumstable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-folder"></i>
-                            <span>Resource Management</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/featuretable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-folder"></i>
-                            <span>Features</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/swipertable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-images"></i>
-                            <span>Swiper Image</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/footertable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-layout-text-window"></i>
-                            <span>Footer Management</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </li>
+        
 
         <!-- Divider -->
         <li class="sidebar-divider"></li>
