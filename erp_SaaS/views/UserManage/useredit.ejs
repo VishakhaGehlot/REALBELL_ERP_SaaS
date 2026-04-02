@@ -1,0 +1,600 @@
+<%- include('../../partials/admin/header.ejs')%>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #f5f7fb;
+        overflow-x: hidden;
+    }
+
+    /* Main content wrapper */
+    .main-wrapper {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+    }
+
+    /* Sidebar is fixed, so we need to push content */
+    .content-wrapper {
+        flex: 1;
+        margin-left: 280px;
+        width: calc(100% - 280px);
+        padding: 25px;
+        background: #f5f7fb;
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
+
+    .container-fluid {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+        box-sizing: border-box;
+    }
+
+    /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .page-header h2 {
+        color: #1e293b;
+        font-weight: 700;
+        margin: 0;
+        font-size: 28px;
+    }
+
+    .page-header p {
+        color: #64748b;
+        font-size: 14px;
+        margin: 5px 0 0;
+    }
+
+    .back-btn {
+        background: white;
+        color: #64748b;
+        border: 1px solid #e9ecef;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .back-btn:hover {
+        background: #f8fafc;
+        color: #f59e0b;
+        border-color: #f59e0b;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #e9ecef;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-header i {
+        color: #f59e0b;
+        font-size: 24px;
+    }
+
+    .form-header h3 {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .form-body {
+        padding: 30px 25px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .form-label i {
+        color: #f59e0b;
+        margin-right: 8px;
+        font-size: 16px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #1e293b;
+        transition: all 0.2s ease;
+        background: white;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+
+    .form-control::placeholder {
+        color: #94a3b8;
+    }
+
+    .form-control:read-only {
+        background: #f8fafc;
+        cursor: not-allowed;
+    }
+
+    /* Role Selector */
+    .role-selector {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .role-option {
+        position: relative;
+    }
+
+    .role-option input[type="radio"] {
+        display: none;
+    }
+
+    .role-option label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 15px;
+        background: #f8fafc;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .role-option input[type="radio"]:checked + label {
+        border-color: #f59e0b;
+        background: #fff3e0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+    }
+
+    .role-option label i {
+        font-size: 32px;
+    }
+
+    .role-option label span {
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .role-option label small {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .role-option.user label i { color: #64748b; }
+    .role-option.admin label i { color: #10b981; }
+    .role-option.superadmin label i { color: #ef4444; }
+    .role-option.teacher label i { color: #f59e0b; }
+
+    /* Current Values Box */
+    .current-values {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 25px;
+        border: 1px solid #e9ecef;
+    }
+
+    .current-values-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+
+    .current-values-title i {
+        color: #f59e0b;
+    }
+
+    .user-avatar-large {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .avatar-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    .user-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .user-fullname {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 16px;
+    }
+
+    .user-email {
+        color: #64748b;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .current-role-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .current-role-badge.user { background: #e2e8f0; color: #475569; }
+    .current-role-badge.admin { background: #dcfce7; color: #166534; }
+    .current-role-badge.superadmin { background: #fee2e2; color: #b91c1c; }
+    .current-role-badge.teacher { background: #fef3c7; color: #92400e; }
+
+    /* Info Box */
+    .info-box {
+        background: #f0f9ff;
+        border-left: 4px solid #3b82f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .info-box i {
+        color: #3b82f6;
+        font-size: 20px;
+    }
+
+    .info-box p {
+        color: #1e293b;
+        margin: 0;
+        font-size: 13px;
+    }
+
+    .info-box p small {
+        color: #64748b;
+        display: block;
+        margin-top: 5px;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+        flex: 1;
+        background: #f59e0b;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .submit-btn:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .submit-btn i {
+        font-size: 18px;
+    }
+
+    /* Cancel Button */
+    .cancel-btn {
+        flex: 1;
+        padding: 12px;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        color: #64748b;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .cancel-btn:hover {
+        background: #f8fafc;
+        color: #ef4444;
+        border-color: #ef4444;
+    }
+
+    .cancel-btn i {
+        font-size: 16px;
+    }
+
+    /* Button Group */
+    .button-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            margin-left: 0;
+            width: 100%;
+            padding: 15px;
+        }
+
+        .form-card {
+            max-width: 100%;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .back-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .role-selector {
+            grid-template-columns: 1fr;
+        }
+
+        .user-avatar-large {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs')%>
+
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h2>
+                        <i class="bi bi-pencil-square me-2" style="color: #f59e0b;"></i>
+                        Edit User Role
+                    </h2>
+                    <p>Update user information and role</p>
+                </div>
+                <a href="/usertable" class="back-btn">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Users
+                </a>
+            </div>
+
+            <!-- Form Card -->
+            <div class="form-card">
+                <div class="form-header">
+                    <i class="bi bi-person-gear"></i>
+                    <h3>Edit User: <%= Record.firstName %> <%= Record.lastName %></h3>
+                </div>
+                
+                <div class="form-body">
+                    <!-- Current User Info -->
+                    <div class="current-values">
+                        <div class="current-values-title">
+                            <i class="bi bi-person-circle"></i>
+                            Current User Information
+                        </div>
+                        <div class="user-avatar-large">
+                            <div class="avatar-circle">
+                                <%= Record.firstName ? Record.firstName.charAt(0).toUpperCase() : 'U' %><%= Record.lastName ? Record.lastName.charAt(0).toUpperCase() : '' %>
+                            </div>
+                            <div class="user-details">
+                                <span class="user-fullname"><%= Record.firstName %> <%= Record.lastName %></span>
+                                <span class="user-email">
+                                    <i class="bi bi-envelope"></i>
+                                    <%= Record.email %>
+                                </span>
+                                <span>
+                                    Current Role: 
+                                    <span class="current-role-badge <%= Record.role ? Record.role.toLowerCase() : 'user' %>">
+                                        <%= Record.role || 'User' %>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <i class="bi bi-shield-lock"></i>
+                        <p>
+                            You can update the user's role here. Changing a user's role will affect their permissions in the system.
+                            <small>Select a new role from the options below</small>
+                        </p>
+                    </div>
+
+                    <form action="/updaterole/<%= Record._id %>" method="POST">
+                        <!-- First Name (Read-only) -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-person"></i>
+                                First Name
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="firstName" 
+                                   value="<%= Record.firstName %>"
+                                   readonly>
+                        </div>
+
+                        <!-- Last Name (Read-only) -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-person"></i>
+                                Last Name
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="lastName" 
+                                   value="<%= Record.lastName %>"
+                                   readonly>
+                        </div>
+
+                        <!-- Email (Read-only) -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-envelope"></i>
+                                Email Address
+                            </label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   name="email" 
+                                   value="<%= Record.email %>"
+                                   readonly>
+                        </div>
+
+                        <!-- Role Selection -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-shield-check"></i>
+                                Select New Role
+                            </label>
+                            <div class="role-selector">
+                                <!-- User Role -->
+                                <div class="role-option user">
+                                    <input type="radio" name="role" id="roleUser" value="User" 
+                                           <%= Record.role == 'User' ? 'checked' : '' %>>
+                                    <label for="roleUser">
+                                        <i class="bi bi-person"></i>
+                                        <span>User</span>
+                                        <small>Basic access</small>
+                                    </label>
+                                </div>
+
+                                <!-- Teacher Role -->
+                                <div class="role-option teacher">
+                                    <input type="radio" name="role" id="roleTeacher" value="teacher"
+                                           <%= Record.role == 'teacher' ? 'checked' : '' %>>
+                                    <label for="roleTeacher">
+                                        <i class="bi bi-person-workspace"></i>
+                                        <span>Teacher</span>
+                                        <small>Educational access</small>
+                                    </label>
+                                </div>
+
+                                <!-- Admin Role -->
+                                <div class="role-option admin">
+                                    <input type="radio" name="role" id="roleAdmin" value="Admin"
+                                           <%= Record.role == 'Admin' ? 'checked' : '' %>>
+                                    <label for="roleAdmin">
+                                        <i class="bi bi-shield"></i>
+                                        <span>Admin</span>
+                                        <small>Management access</small>
+                                    </label>
+                                </div>
+
+                                <!-- SuperAdmin Role -->
+                                <div class="role-option superadmin">
+                                    <input type="radio" name="role" id="roleSuperAdmin" value="SuperAdmin"
+                                           <%= Record.role == 'SuperAdmin' ? 'checked' : '' %>>
+                                    <label for="roleSuperAdmin">
+                                        <i class="bi bi-shield-fill"></i>
+                                        <span>Super Admin</span>
+                                        <small>Full access</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Button Group -->
+                        <div class="button-group">
+                            <a href="/usertable" class="cancel-btn">
+                                <i class="bi bi-x-circle"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" class="submit-btn">
+                                <i class="bi bi-check-circle"></i>
+                                Update User Role
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

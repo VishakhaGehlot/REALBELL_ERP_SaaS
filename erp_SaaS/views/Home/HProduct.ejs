@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | REAL ERP</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --navy:      #1a2b4a;
+            --navy-dark: #0f1c33;
+            --gold:      #d4a017;
+            --gold-light:#f0c040;
+        }
+
+        body {
+            background:#f4f6f9;
+            font-family:'Segoe UI', sans-serif;
+            margin:0;
+        }
+
+        /* TICKER */
+        .announcement-bar { background: linear-gradient(to right, #0f1c33, #1a2b4a); display: flex; align-items: center; height: 40px; overflow: hidden; border-bottom: 2px solid #d4a017; }
+        .announcement-label { background: #d4a017; color: #0f1c33; font-weight: 800; font-size: 12px; padding: 0 16px; height: 100%; display: flex; align-items: center; white-space: nowrap; flex-shrink: 0; }
+        .ticker-wrapper { flex: 1; overflow: hidden; position: relative; }
+        .ticker-wrapper::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px; background: linear-gradient(to right, #0f1c33, transparent); z-index: 1; }
+        .ticker-track { display: inline-flex; white-space: nowrap; animation: ticker-move 40s linear infinite; padding-left: 100%; }
+        .ticker-item { font-size: 13px; color: #e2e8f0; margin-right: 20px; display: inline-flex; align-items: center; gap: 7px; }
+        .ticker-sep { color: #d4a017; margin: 0 20px; font-size: 10px; }
+        @keyframes ticker-move { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* TOP BAR */
+        .top-bar { background: var(--navy-dark); }
+
+        /* NAVBAR */
+        .navbar { border-bottom: 2px solid var(--gold); }
+        .navbar .nav-link:hover { color: var(--gold) !important; }
+        .btn-login { background-color: var(--navy) !important; border-radius: 10px; color: white !important; transition: 0.3s; }
+        .btn-login:hover { background-color: var(--gold) !important; color: var(--navy) !important; }
+        .badge-cart { background: var(--gold) !important; color: var(--navy) !important; }
+
+        /* BREADCRUMB */
+        .breadcrumb-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 30px 0;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin-bottom: 15px;
+        }
+        .breadcrumb-item a {
+            color: var(--navy);
+            text-decoration: none;
+        }
+        .breadcrumb-item.active {
+            color: var(--gold);
+        }
+        .money-back {
+            background: var(--gold-light);
+            color: var(--navy-dark);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* HERO SECTION */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .hero-section h1 span {
+            color: var(--gold);
+        }
+        .hero-section p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        /* SEARCH BAR */
+        .search-container {
+            margin-bottom: 40px;
+        }
+        .search-box {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 50px;
+            font-size: 14px;
+            padding-right: 50px;
+            transition: all 0.3s;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212,160,23,0.1);
+        }
+        .search-box button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: var(--gold);
+            border: none;
+            border-radius: 50px;
+            padding: 7px 20px;
+            color: var(--navy-dark);
+            font-weight: 600;
+        }
+
+        /* SIDEBAR CATEGORIES */
+        .categories-sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        .categories-sidebar h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--navy-dark);
+            border-left: 3px solid var(--gold);
+            padding-left: 12px;
+        }
+        .category-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .category-list li {
+            margin-bottom: 12px;
+        }
+        .category-list a {
+            color: #495057;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            transition: all 0.3s;
+        }
+        .category-list a:hover {
+            color: var(--gold);
+            transform: translateX(5px);
+        }
+        .category-count {
+            color: #adb5bd;
+            font-size: 12px;
+        }
+
+        /* PRODUCT CARD - IMPROVED */
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            margin-bottom: 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .product-body {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--navy-dark);
+        }
+
+        .product-subtitle {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 12px;
+        }
+
+        .price {
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .badge-status {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .in-stock { background: #d4edda; color: #155724; }
+        .low-stock { background: #fff3cd; color: #856404; }
+        .out-stock { background: #f8d7da; color: #721c24; }
+
+        .rating {
+            color: #f5c542;
+            margin-bottom: 8px;
+        }
+
+        .reviews {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        /* FOOTER */
+        .footer-link { color: #64748b; text-decoration: none; font-size: 14px; display: block; text-align: left; transition: 0.2s; padding: 2px 0; }
+        .footer-link:hover { color: #d4a017; padding-left: 6px; }
+        .footer-social { transition: transform 0.2s; display:inline-flex; }
+        .footer-social:hover { transform: translateY(-3px); }
+        .footer-heading { color: #0f1c33; font-weight: 800; font-size: 16px; margin-bottom: 0; text-align: left; }
+        .footer-gold-line { width: 40px; height: 3px; background: #d4a017; border-radius: 2px; margin-top: 8px; margin-bottom: 22px; }
+    </style>
+</head>
+
+<body>
+
+<!-- ANNOUNCEMENT TICKER -->
+<div class="announcement-bar">
+    <div class="announcement-label">🔔 ANNOUNCEMENT</div>
+    <div class="ticker-wrapper">
+        <div class="ticker-track">
+            <span class="ticker-item">🚀 <strong>REALERP v2.0 Is Here!</strong> &nbsp; New modules added — POS, Payroll & Advanced Reports.</span>
+            <span class="ticker-sep">❖</span>
+            <span class="ticker-item">🎉 <strong>Limited Time Offer — 30% Off!</strong> &nbsp; Use code REALERP30 at checkout.</span>
+            <span class="ticker-sep">❖</span>
+            <span class="ticker-item">💬 <strong>24/7 Support Available</strong> &nbsp; Our expert team is available round the clock.</span>
+            <span class="ticker-sep">❖</span>
+        </div>
+    </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="top-bar text-white py-2 px-5 d-flex justify-content-between align-items-center">
+    <div class="fw-semibold">
+        <span style="color:#f0c040; font-size:15px;">REALBELL</span>
+        <span style="color:white; font-size:15px;"> TECHNOLOGIES</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <span style="color:#94a3b8; font-size:13px;">Enterprise ERP Solutions</span>
+        <a href="/register" class="btn btn-sm px-3 fw-bold" style="background:var(--gold); color:var(--navy-dark); border:none;">Get Started</a>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white px-5 shadow-sm">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <img src="/images/companylogo.jpg" alt="logo" style="height:55px; width:auto; object-fit:contain; max-width:80px;">
+        <div style="line-height:1.2;">
+            <span style="font-size:18px; font-weight:800; color:var(--gold);">REAL</span><span style="font-size:18px; font-weight:800; color:var(--navy-dark);">ERP</span>
+            <div style="font-size:10px; color:#94a3b8; letter-spacing:1.5px;">SAAS PLATFORM</div>
+        </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navProducts">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navProducts">
+        <ul class="navbar-nav mx-auto fw-semibold align-items-center gap-3">
+            <li class="nav-item"><a class="nav-link text-dark" href="/">Home</a></li>
+            <li class="nav-item"><a class="nav-link fw-bold" style="color:var(--gold);" href="#">Products</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" href="#">Add-Ons</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" href="#">Bulk Discount</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" href="#">Development</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" href="/contact">Contact Us</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-4">
+            <div class="position-relative">
+                <i class="bi bi-cart3 fs-5 text-dark"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill badge-cart">0</span>
+            </div>
+            <a href="/login" class="btn btn-login px-4">Login</a>
+        </div>
+    </div>
+</nav>
+
+<!-- BREADCRUMB SECTION -->
+<div class="breadcrumb-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Shop</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="money-back">
+                    <i class="bi bi-shield-check"></i> Money Back Guarantee
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HERO SECTION -->
+<div class="container">
+    <div class="hero-section">
+        <h1><span>Fantastic</span> Themes. Use It Like A Pro.</h1>
+        <p>We build modern web tools to help you jump-start your daily business work.</p>
+    </div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="container">
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search entire store here..." onkeyup="filterProducts()">
+            <button><i class="bi bi-search"></i> Search</button>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT WITH SIDEBAR -->
+<div class="container py-3">
+    <div class="row">
+        <!-- SIDEBAR CATEGORIES -->
+        <div class="col-lg-3">
+            <div class="categories-sidebar">
+                <h4>Categories</h4>
+                <ul class="category-list">
+                    <li><a href="#">TicketGo Add-Ons <span class="category-count">(40)</span></a></li>
+                    <li><a href="#">BookingGo SaaS Add-Ons <span class="category-count">(183)</span></a></li>
+                    <li><a href="#">Appointment Add-Ons <span class="category-count">(20)</span></a></li>
+                    <li><a href="#">BookingGo Add-Ons <span class="category-count">(45)</span></a></li>
+                    <li><a href="#">BookingGo Theme <span class="category-count">(58)</span></a></li>
+                    <li><a href="#">BookingGo Payment Gateways <span class="category-count">(12)</span></a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PRODUCTS GRID -->
+        <div class="col-lg-9">
+            <div class="row g-4" id="productGrid">
+                <% if (productdata && productdata.length > 0) { %>
+                    <% productdata.forEach(function(product) { %>
+                        <% if(product.activeStatus === 'Active') { %>
+                            <div class="col-md-6 col-lg-4 product-item" data-name="<%= product.name.toLowerCase() %>">
+                                <div class="product-card">
+                                    <img src="/upload/<%= product.image %>" 
+                                         class="product-img"
+                                         onerror="this.src='https://placehold.co/400x300?text=No+Image'">
+                                    <div class="product-body">
+                                        <div class="product-title"><%= product.name %></div>
+                                        <div class="product-subtitle"><%= product.name %> – Dash SaaS Add-On</div>
+                                        <div class="price">₹ <%= product.price %></div>
+                                        <span class="badge-status 
+                                            <%= product.status === 'In Stock' ? 'in-stock' : 
+                                                (product.status === 'Low Stock' ? 'low-stock' : 'out-stock') %>">
+                                            <%= product.status %>
+                                        </span>
+                                        <div class="rating">
+                                            <% for(let i=1;i<=5;i++){ %>
+                                                <% if(i <= product.rating){ %> ★ <% } else { %> ☆ <% } %>
+                                            <% } %>
+                                        </div>
+                                        <div class="reviews">
+                                            <i class="bi bi-chat"></i> <%= product.numReviews %> reviews
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Stock: <b><%= product.stock %></b></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    <% }); %>
+                <% } else { %>
+                    <div class="col-12 text-center py-5">
+                        <h4>No Products Available</h4>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="background:#f1f5f9; margin-top: 60px;">
+    <div style="padding: 50px 0 40px 0;">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img src="/images/companylogo.jpg" alt="logo" style="height:60px; width:auto; object-fit:contain;">
+                        <div style="line-height:1.3;">
+                            <div><span style="font-size:24px; font-weight:900; color:#d4a017;">REAL</span><span style="font-size:24px; font-weight:900; color:#0f1c33;">ERP</span></div>
+                            <div style="font-size:10px; color:#94a3b8; letter-spacing:2px; font-weight:600;">SAAS PLATFORM</div>
+                        </div>
+                    </div>
+                    <p style="color:#64748b; font-size:14px; line-height:1.9; margin-bottom:24px;">We build modern ERP tools to help you manage and grow your business efficiently.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="btn fw-bold px-4 py-2" style="background:#d4a017; color:#0f1c33; border-radius:8px; font-size:14px;">Support</a>
+                        <a href="/contact" class="btn fw-bold px-4 py-2" style="background:#0f1c33; color:white; border-radius:8px; font-size:14px;">Contact Us</a>
+                    </div>
+                </div>
+                <div class="col-md-2 offset-md-1">
+                    <h5 class="footer-heading">Quick Links:</h5>
+                    <div class="footer-gold-line"></div>
+                    <ul style="list-style:none; padding:0; margin:0;">
+                        <li class="mb-2"><a href="/" class="footer-link">Home</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">About Us</a></li>
+                        <li class="mb-2"><a href="/contact" class="footer-link">Contact Us</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Get Support</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h5 class="footer-heading">Support:</h5>
+                    <div class="footer-gold-line"></div>
+                    <ul style="list-style:none; padding:0; margin:0;">
+                        <li class="mb-2"><a href="#" class="footer-link">Terms & Conditions</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Refund Policy</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Cookie Policy</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="footer-heading">Follow Us:</h5>
+                    <div class="footer-gold-line"></div>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="footer-social" style="width:44px;height:44px;border-radius:50%;background:#1877f2;display:flex;align-items:center;justify-content:center;text-decoration:none;">
+                            <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        </a>
+                        <a href="#" class="footer-social" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;text-decoration:none;">
+                            <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+                        </a>
+                        <a href="#" class="footer-social" style="width:44px;height:44px;border-radius:50%;background:#0077b5;display:flex;align-items:center;justify-content:center;text-decoration:none;">
+                            <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                        </a>
+                        <a href="#" class="footer-social" style="width:44px;height:44px;border-radius:50%;background:#ff0000;display:flex;align-items:center;justify-content:center;text-decoration:none;">
+                            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="white" d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon fill="#ff0000" points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="background:#0f1c33; padding:18px 0;">
+        <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <p style="margin:0; color:#94a3b8; font-size:13px;">© 2026 <span style="color:#f0c040; font-weight:700;">REALBELL TECHNOLOGIES</span>. All Rights Reserved.</p>
+            <div class="d-flex gap-4">
+                <a href="#" style="color:#64748b; font-size:12px; text-decoration:none;">Privacy Policy</a>
+                <a href="#" style="color:#64748b; font-size:12px; text-decoration:none;">Terms of Use</a>
+                <a href="#" style="color:#64748b; font-size:12px; text-decoration:none;">Sitemap</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+function filterProducts() {
+    let input = document.getElementById('searchInput');
+    let filter = input.value.toLowerCase();
+    let products = document.getElementsByClassName('product-item');
+    
+    for (let i = 0; i < products.length; i++) {
+        let name = products[i].getAttribute('data-name');
+        if (name.includes(filter)) {
+            products[i].style.display = "";
+        } else {
+            products[i].style.display = "none";
+        }
+    }
+}
+</script>
+
+</body>
+</html>

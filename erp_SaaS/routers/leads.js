@@ -5,12 +5,12 @@ const leadstable=require('../models/leads')
 router.get('/leadstable',async(req,res)=>{
     const leadsdata=await leadstable.find()
      const loginname=req.session.email
-    res.render("leadstable.ejs",{leadsdata, loginname})
+    res.render("Frontend/Lead/leadstable.ejs",{leadsdata, loginname})
 })
 router.get('/leadsform',(req,res)=>{
     const loginname=req.session.email
 
-    res.render("leadsform.ejs",{loginname})
+    res.render("Frontend/Lead/leadsform.ejs",{loginname})
 })
 router.post('/leadsform',upload.single('img'),async(req,res)=>{
 const {title,desc}=req.body
@@ -43,7 +43,7 @@ router.get('/leadsedit/:id',async(req,res)=>{
     const Record=await leadstable.findById(id)
          const loginname=req.session.email
 
-    res.render("leadsEdit.ejs",{Record,loginname})
+    res.render("Frontend/Lead/leadsEdit.ejs",{Record,loginname})
 })
 router.post('/leadsedit/:id',async(req,res)=>{
     const {title,desc}=req.body

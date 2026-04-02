@@ -5,11 +5,11 @@ const solutiontable=require('../models/solution')
 router.get('/solutiontable',async(req,res)=>{
     const solutiondata=await solutiontable.find()
      const loginname=req.session.email
-    res.render("solutiontable.ejs",{solutiondata,loginname})
+    res.render("Frontend/Solution/solutiontable.ejs",{solutiondata,loginname})
 })
 router.get('/solutionform',(req,res)=>{
     const loginname=req.session.email
-    res.render("solutionform.ejs",{loginname})
+    res.render("Frontend/Solution/solutionform.ejs",{loginname})
 })
 router.post('/solutionform',upload.single('img'),async(req,res)=>{
 const {title,desc,mdesc}=req.body
@@ -42,7 +42,7 @@ router.get('/solutionedit/:id',async(req,res)=>{
     const Record=await solutiontable.findById(id)
          const loginname=req.session.email
 
-    res.render("solutionEdit.ejs",{Record,loginname})
+    res.render("Frontend/Solution/solutionEdit.ejs",{Record,loginname})
 })
 router.post('/solutionedit/:id',async(req,res)=>{
     const {title,desc,mdesc}=req.body

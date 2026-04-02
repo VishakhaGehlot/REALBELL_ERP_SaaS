@@ -5,12 +5,12 @@ const footertable = require('../models/footer')
 router.get('/footertable', async (req, res) => {
     const footerdata = await footertable.find()
      const loginname=req.session.email
-    res.render("footertable.ejs", { footerdata, loginname })
+    res.render("Frontend/Footer/footertable.ejs", { footerdata, loginname })
 })
 
 router.get('/footerform', (req, res) => {
     const loginname=req.session.email
-    res.render("footerform.ejs",{loginname})
+    res.render("Frontend/Footer/footerform.ejs",{loginname})
 })
 
 router.post('/footerform', upload.single('img'), async (req, res) => {
@@ -74,7 +74,7 @@ router.get('/footeredit/:id', async (req, res) => {
          const loginname=req.session.email
 
 
-    res.render("footeredit.ejs", { Record,loginname })
+    res.render("Frontend/Footer/footeredit.ejs", { Record,loginname })
 
 })
 

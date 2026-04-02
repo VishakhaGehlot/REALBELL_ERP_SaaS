@@ -4,13 +4,13 @@ const financetable=require('../models/finance')
 router.get('/financetable',async(req,res)=>{
     const financedata=await financetable.find()
      const loginname=req.session.email
-    res.render("financetable.ejs",{financedata, loginname})
+    res.render("Frontend/Finance/financetable.ejs",{financedata, loginname})
 })
 
 
 router.get('/financeform',(req,res)=>{
     const loginname=req.session.email
-    res.render("financeform.ejs",{loginname})
+    res.render("Frontend/Finance/financeform.ejs",{loginname})
 })
 
 router.post('/financeform',async(req,res)=>{
@@ -30,7 +30,7 @@ router.get('/financeedit/:id',async(req,res)=>{
     const Record=await financetable.findById(id)
          const loginname=req.session.email
 
-    res.render("financeedit.ejs",{Record,loginname})
+    res.render("Frontend/Finance/financeedit.ejs",{Record,loginname})
 })
 router.post('/financeedit/:id',async(req,res)=>{
     const {title,desc1,desc2,desc3,desc4}=req.body

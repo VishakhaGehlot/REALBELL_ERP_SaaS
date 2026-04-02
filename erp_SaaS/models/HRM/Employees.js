@@ -180,4 +180,4 @@ const employeeSchema = mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model("Employees", employeeSchema);
+module.exports = mongoose.model("HRM", employeeSchema);

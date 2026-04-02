@@ -3,7 +3,7 @@ const querytable=require('../models/query')
 const nodemailer=require('nodemailer')
 
 router.get('/contact',(req,res)=>{
-    res.render("contact.ejs")
+    res.render("Home/contact.ejs")
 })
 router.post('/contact',async(req,res)=>{
     const {fname,lname,email,phone,moreDesc}=req.body
@@ -15,14 +15,14 @@ router.post('/contact',async(req,res)=>{
 router.get('/querytable',async(req,res)=>{
     const querydata = await querytable.find()
      const loginname=req.session.email
-    res.render("querytable.ejs",{querydata, loginname})
+    res.render("Query/querytable.ejs",{querydata, loginname})
 })
 
 router.get('/queryreplyform/:id', async (req, res) => {
     const data = await querytable.findById(req.params.id)
     const loginname = req.session.email
 
-    res.render("queryform.ejs", { data, loginname })
+    res.render("Query/queryform.ejs", { data, loginname })
 })
 
 router.post('/queryreplyform/:id', async (req, res) => {

@@ -94,37 +94,6 @@
             margin-top: 2px;
         }
 
-        /* Badge */
-        .admin-badge {
-            background: #f0b90b;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-left: 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .login-badge {
-            background: #eef2f6;
-            color: #1e293b;
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-left: 8px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .login-badge i {
-            color: #f0b90b;
-        }
-
         /* Right Section - Profile Only */
         .header-right {
             display: flex;
@@ -132,95 +101,164 @@
             justify-content: flex-end;
         }
 
-        /* User Profile - Main Focus */
+        /* User Profile - Only Icon */
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: #f8fafd;
-            padding: 6px 15px 6px 8px;
-            border-radius: 50px;
-            border: 1px solid #eef2f6;
-            transition: all 0.2s ease;
+            justify-content: center;
             cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
         }
 
-        .user-profile:hover {
-            background: #f1f5f9;
-            border-color: #f0b90b;
-        }
-
+        /* Profile Picture Styles - Only Icon */
         .user-avatar {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, #f0b90b, #d4a017);
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, #f0b90b, #d4a017);
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 2px solid rgba(240, 185, 11, 0.3);
+            transition: all 0.3s ease;
         }
 
-        .user-avatar i {
-            font-size: 1.2rem;
-            color: white;
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(240, 185, 11, 0.3);
         }
 
-        .user-info {
+        .user-avatar .avatar-placeholder {
+            width: 100%;
+            height: 100%;
             display: flex;
-            flex-direction: column;
-        }
-
-        .user-name {
-            color: #1e293b;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f0b90b, #d4a017);
+            color: white;
+            font-size: 1.2rem;
             font-weight: 600;
-            font-size: 0.9rem;
-            line-height: 1.3;
+            text-transform: uppercase;
         }
 
-        .user-role {
-            color: #f0b90b;
-            font-size: 0.7rem;
-            font-weight: 500;
+        /* Hide user info text - Only show icon */
+        .user-info {
+            display: none;
         }
 
-        .user-profile i.bi-chevron-down {
-            color: #94a3b8;
-            font-size: 0.8rem;
-            transition: transform 0.2s;
-        }
-
-        /* Dropdown Menu - Profile Options */
-        .dropdown-menu {
+        /* Dropdown Menu Styles */
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 15px);
+            right: 0;
             background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.15);
+            min-width: 320px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
             border: 1px solid #eef2f6;
-            border-radius: 12px;
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Profile Header in Dropdown */
+        .dropdown-profile-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #fef9e6 0%, #fff6e0 100%);
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #fde68a;
+        }
+
+        .dropdown-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f0b90b, #d4a017);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-avatar .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f0b90b, #d4a017);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .dropdown-user-info h6 {
+            color: #1e293b;
+            font-weight: 700;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .dropdown-user-info p {
+            color: #64748b;
+            font-size: 0.8rem;
+            margin: 4px 0 0;
+        }
+
+        .dropdown-user-info .user-email {
+            color: #f0b90b;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* Dropdown Items */
+        .dropdown-items {
             padding: 8px;
-            margin-top: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            min-width: 220px;
         }
 
         .dropdown-item {
             color: #1e293b;
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 12px;
             transition: all 0.2s ease;
             font-size: 0.9rem;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             text-decoration: none;
+            margin: 4px 0;
+            cursor: pointer;
         }
 
         .dropdown-item i {
             color: #f0b90b;
-            width: 20px;
-            font-size: 1rem;
+            width: 22px;
+            font-size: 1.1rem;
         }
 
         .dropdown-item:hover {
-            background: #f8fafd;
+            background: #fef9e6;
             color: #f0b90b;
+            transform: translateX(5px);
         }
 
         .dropdown-item:hover i {
@@ -228,8 +266,23 @@
         }
 
         .dropdown-divider {
-            border-color: #eef2f6;
+            height: 1px;
+            background: #eef2f6;
             margin: 8px 0;
+        }
+
+        /* Logout Item Special Style */
+        .dropdown-item.logout-item {
+            color: #ef4444;
+        }
+
+        .dropdown-item.logout-item i {
+            color: #ef4444;
+        }
+
+        .dropdown-item.logout-item:hover {
+            background: #fef2f2;
+            color: #dc2626;
         }
 
         /* Logout Button (mobile only) */
@@ -254,13 +307,22 @@
             border-color: #ef4444;
         }
 
-        /* Responsive */
-        @media (max-width: 992px) {
-            .admin-badge, .login-badge {
-                display: none;
-            }
+        /* Click Outside Overlay */
+        .dropdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 999;
+            display: none;
         }
 
+        .dropdown-overlay.show {
+            display: block;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             .header-container {
                 padding: 10px 15px;
@@ -283,22 +345,19 @@
                 display: none;
             }
 
-            .user-info {
-                display: none;
+            .user-avatar {
+                width: 40px;
+                height: 40px;
             }
 
-            .user-profile {
-                padding: 4px 10px 4px 4px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .logout-btn span {
-                display: none;
+            .profile-dropdown {
+                min-width: 280px;
+                right: 10px;
             }
 
-            .logout-btn {
-                padding: 8px 12px;
+            .dropdown-avatar {
+                width: 50px;
+                height: 50px;
             }
         }
     </style>
@@ -322,44 +381,49 @@
                     ENTERPRISE RESOURCE PLANNING
                 </div>
             </div>
-           
-          
         </div>
         
-        <!-- Right Side - Profile Dropdown -->
+        <!-- Right Side - Profile Icon Only (Dynamic) -->
         <div class="header-right">
-            <!-- Profile Dropdown -->
-            <div class="dropdown">
-                <div class="user-profile" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="profile-container" style="position: relative;">
+                <div class="user-profile" id="profileTrigger">
                     <div class="user-avatar">
-                        <i class="bi bi-person-fill"></i>
+                        <div class="avatar-placeholder">
+                            <%= userInitial ? userInitial : 'U' %>
+                        </div>
                     </div>
-                    <div class="user-info">
-                        <span class="user-name"><%= loginname ? loginname : 'Admin' %></span>
-                        <span class="user-role">Super Admin</span>
-                    </div>
-                    <i class="bi bi-chevron-down"></i>
                 </div>
                 
-                <!-- Dropdown Menu - Profile, Change Password, Logout -->
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
+                <!-- Dropdown Menu - Dynamic User Details -->
+                <div class="profile-dropdown" id="profileDropdown">
+                    <!-- Profile Header with dynamic user details -->
+                    <div class="dropdown-profile-header">
+                        <div class="dropdown-avatar">
+                            <div class="avatar-placeholder">
+                                <%= userInitials ? userInitials : 'U' %>
+                            </div>
+                        </div>
+                        <div class="dropdown-user-info">
+                            <h6><%= userName ? userName : 'User' %></h6>
+                            <p><%= userRole ? userRole : 'User' %></p>
+                            <span class="user-email"><%= userEmail ? userEmail : 'user@realerp.com' %></span>
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown-items">
                         <a class="dropdown-item" href="/profile">
                             <i class="bi bi-person-circle"></i> My Profile
                         </a>
-                    </li>
-                    <li>
                         <a class="dropdown-item" href="/change-password">
                             <i class="bi bi-key"></i> Change Password
                         </a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <a class="dropdown-item" href="/logout" style="color: #ef4444;">
-                            <i class="bi bi-box-arrow-right" style="color: #ef4444;"></i> Logout
+                       
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item logout-item" href="/logout">
+                            <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             </div>
 
             <!-- Logout Button (visible only on mobile) -->
@@ -371,21 +435,53 @@
     </div>
 </section>
 
-<!-- Bootstrap JS (for dropdown) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Overlay for closing dropdown -->
+<div class="dropdown-overlay" id="dropdownOverlay"></div>
 
-<!-- Optional: Close dropdown when clicking outside -->
 <script>
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        const dropdown = document.querySelector('.dropdown');
-        const userProfile = document.querySelector('.user-profile');
-        
-        if (dropdown && !dropdown.contains(event.target)) {
-            const dropdownMenu = document.querySelector('.dropdown-menu');
-            if (dropdownMenu && dropdownMenu.classList.contains('show')) {
-                dropdownMenu.classList.remove('show');
-            }
+    // Dropdown functionality
+    const profileTrigger = document.getElementById('profileTrigger');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const dropdownOverlay = document.getElementById('dropdownOverlay');
+    
+    function openDropdown() {
+        profileDropdown.classList.add('show');
+        dropdownOverlay.classList.add('show');
+    }
+    
+    function closeDropdown() {
+        profileDropdown.classList.remove('show');
+        dropdownOverlay.classList.remove('show');
+    }
+    
+    // Toggle dropdown on click
+    profileTrigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (profileDropdown.classList.contains('show')) {
+            closeDropdown();
+        } else {
+            openDropdown();
         }
     });
+    
+    // Close dropdown when clicking outside
+    dropdownOverlay.addEventListener('click', function() {
+        closeDropdown();
+    });
+    
+    // Prevent dropdown from closing when clicking inside dropdown
+    profileDropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+    
+    // Close dropdown when clicking on any dropdown item
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', function() {
+            closeDropdown();
+        });
+    });
 </script>
+
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

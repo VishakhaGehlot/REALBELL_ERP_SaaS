@@ -1,0 +1,821 @@
+<%- include('../../partials/admin/header.ejs')%>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #f8fafc;
+        overflow-x: hidden;
+    }
+
+    /* Main wrapper with flex layout */
+    .main-wrapper {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    /* Content area (adjusting for fixed sidebar) */
+    .content-wrapper {
+        flex: 1;
+        margin-left: 280px;
+        width: calc(100% - 280px);
+        padding: 30px;
+        background: #f8fafc;
+        min-height: 100vh;
+    }
+
+    /* Container */
+    .container-fluid {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+    /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .page-header div {
+        flex: 1;
+    }
+
+    .page-header h2 {
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 28px;
+        margin: 0 0 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-header h2 i {
+        color: #f59e0b;
+        font-size: 28px;
+    }
+
+    .page-header p {
+        color: #64748b;
+        font-size: 14px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .page-header p i {
+        color: #f59e0b;
+        font-size: 12px;
+    }
+
+    /* Back Button */
+    .back-btn {
+        background: white;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .back-btn::before {
+        content: '\F284';
+        font-family: 'bootstrap-icons';
+        font-size: 16px;
+    }
+
+    .back-btn:hover {
+        background: #f8fafc;
+        color: #f59e0b;
+        border-color: #f59e0b;
+        transform: translateX(-5px);
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+        border: 1px solid #eef2f6;
+        overflow: hidden;
+    }
+
+    /* Card Header */
+    .card-header {
+        background: linear-gradient(135deg, #f8fafc, #ffffff);
+        padding: 25px 30px;
+        border-bottom: 1px solid #eef2f6;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .card-header-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 15px rgba(245, 158, 11, 0.2);
+    }
+
+    .card-header-icon i {
+        font-size: 24px;
+        color: white;
+    }
+
+    .card-header-content h3 {
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 18px;
+        margin: 0 0 5px 0;
+    }
+
+    .card-header-content p {
+        color: #64748b;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    /* Card Body */
+    .form-body {
+        padding: 30px;
+    }
+
+    /* Original Message Section */
+    .original-message-section {
+        background: linear-gradient(135deg, #fef9e7, #fff7ed);
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid #fed7aa;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .original-message-section::before {
+        content: '\F4B9';
+        font-family: 'bootstrap-icons';
+        position: absolute;
+        bottom: -20px;
+        right: -20px;
+        font-size: 100px;
+        opacity: 0.05;
+        color: #f59e0b;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #fed7aa;
+    }
+
+    .section-header i {
+        font-size: 28px;
+        color: #f59e0b;
+        background: white;
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .section-header h4 {
+        color: #92400e;
+        font-weight: 700;
+        font-size: 18px;
+        margin: 0;
+    }
+
+    .message-content {
+        margin-bottom: 20px;
+    }
+
+    .message-text {
+        background: white;
+        padding: 20px;
+        border-radius: 16px;
+        color: #334155;
+        font-size: 15px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        border-left: 4px solid #f59e0b;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .customer-info {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        padding-top: 15px;
+        border-top: 1px solid #fed7aa;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        padding: 8px 15px;
+        border-radius: 30px;
+        font-size: 13px;
+        color: #475569;
+    }
+
+    .info-item i {
+        color: #f59e0b;
+        font-size: 14px;
+    }
+
+    .info-item strong {
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    /* Form Group */
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .form-label i {
+        color: #f59e0b;
+        font-size: 16px;
+    }
+
+    .form-label .required {
+        color: #ef4444;
+        margin-left: 4px;
+    }
+
+    /* Input Wrapper */
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 16px;
+        transition: color 0.2s ease;
+        pointer-events: none;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 14px 15px 14px 45px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        font-size: 14px;
+        color: #0f172a;
+        transition: all 0.2s ease;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #f59e0b;
+        background: white;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+    }
+
+    .form-control:focus + .input-icon {
+        color: #f59e0b;
+    }
+
+    .form-control[readonly] {
+        background: #f1f5f9;
+        cursor: not-allowed;
+        color: #475569;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 180px;
+        padding: 14px 15px;
+        font-family: inherit;
+        line-height: 1.6;
+    }
+
+    textarea.form-control + .input-icon {
+        top: 20px;
+        transform: none;
+    }
+
+    /* Character Counter */
+    .char-counter {
+        margin-top: 8px;
+        text-align: right;
+        font-size: 12px;
+        color: #94a3b8;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .char-counter i {
+        font-size: 12px;
+    }
+
+    .char-count {
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .char-count.warning {
+        color: #f59e0b;
+    }
+
+    .char-count.danger {
+        color: #ef4444;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eef2f6;
+    }
+
+    .btn-primary {
+        flex: 2;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 15px rgba(245, 158, 11, 0.2);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-primary i {
+        font-size: 18px;
+    }
+
+    .btn-secondary {
+        flex: 1;
+        background: white;
+        color: #64748b;
+        border: 1.5px solid #e2e8f0;
+        padding: 14px 28px;
+        border-radius: 14px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+        background: #fef2f2;
+        color: #ef4444;
+        border-color: #ef4444;
+    }
+
+    .btn-secondary i {
+        font-size: 16px;
+    }
+
+    /* Alert Messages */
+    .alert-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        animation: slideInRight 0.3s ease;
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .content-wrapper {
+            margin-left: 0;
+            width: 100%;
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            padding: 15px;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .back-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .form-body {
+            padding: 20px;
+        }
+
+        .original-message-section {
+            padding: 20px;
+        }
+
+        .customer-info {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .info-item {
+            width: 100%;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-primary, .btn-secondary {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs')%>
+
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h2>
+                        <i class="bi bi-reply-fill"></i>
+                        Reply to Query
+                    </h2>
+                    <p>
+                        <i class="bi bi-dot"></i>
+                        Dashboard / Queries / Reply
+                    </p>
+                </div>
+                <a href="/querytable" class="back-btn">Back to Queries</a>
+            </div>
+
+            <!-- Form Card -->
+            <div class="form-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <i class="bi bi-envelope-paper"></i>
+                    </div>
+                    <div class="card-header-content">
+                        <h3>Send Reply</h3>
+                        <p>Respond to customer inquiry with a professional message</p>
+                    </div>
+                </div>
+
+                <div class="form-body">
+                    <!-- Original Message Section -->
+                    <div class="original-message-section">
+                        <div class="section-header">
+                            <i class="bi bi-chat-dots-fill"></i>
+                            <h4>Original Customer Message</h4>
+                        </div>
+                        
+                        <div class="message-content">
+                            <div class="message-text">
+                                <i class="bi bi-quote" style="float: left; font-size: 24px; color: #f59e0b; opacity: 0.5; margin-right: 10px;"></i>
+                                <%= data.message %>
+                            </div>
+                            
+                            <div class="customer-info">
+                                <div class="info-item">
+                                    <i class="bi bi-envelope"></i>
+                                    <strong>Email:</strong> <%= data.email %>
+                                </div>
+                                <div class="info-item">
+                                    <i class="bi bi-person"></i>
+                                    <strong>Name:</strong> <%= data.name || 'Customer' %>
+                                </div>
+                                <div class="info-item">
+                                    <i class="bi bi-calendar"></i>
+                                    <strong>Received:</strong> <%= new Date(data.createdAt).toLocaleString() %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reply Form -->
+                    <form action="/queryreplyform/<%= data._id %>" method="POST" id="replyForm">
+                        <!-- From Field -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-send"></i>
+                                From <span class="required">*</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <i class="bi bi-envelope input-icon"></i>
+                                <input type="email" 
+                                       name="from"
+                                       value="swatis8102@gmail.com"
+                                       class="form-control"
+                                       readonly>
+                            </div>
+                        </div>
+
+                        <!-- To Field -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-person"></i>
+                                To <span class="required">*</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <i class="bi bi-envelope input-icon"></i>
+                                <input type="email" 
+                                       name="to"
+                                       value="<%= data.email %>"
+                                       class="form-control"
+                                       readonly>
+                            </div>
+                        </div>
+
+                        <!-- Subject Field -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-tag"></i>
+                                Subject <span class="required">*</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <i class="bi bi-subscript input-icon"></i>
+                                <input type="text" 
+                                       name="subject"
+                                       value="Re: <%= data.message.substring(0, 50) %>"
+                                       class="form-control"
+                                       readonly>
+                            </div>
+                        </div>
+
+                        <!-- Reply Message Field -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-pencil-square"></i>
+                                Your Reply <span class="required">*</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <i class="bi bi-chat-text input-icon"></i>
+                                <textarea name="message"
+                                          class="form-control"
+                                          id="replyMessage"
+                                          placeholder="Write your professional reply here..."
+                                          required
+                                          maxlength="5000"
+                                          oninput="updateCharCount(this.value)"></textarea>
+                            </div>
+                            <div class="char-counter">
+                                <i class="bi bi-info-circle"></i>
+                                <span>Characters:</span>
+                                <span class="char-count" id="charCount">0</span>
+                                <span>/ 5000</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <a href="/querytable" class="btn-secondary">
+                                <i class="bi bi-x-circle"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn-primary" id="submitBtn">
+                                <i class="bi bi-send"></i>
+                                Send Reply
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    // Character counter function
+    function updateCharCount(text) {
+        const charCount = text.length;
+        const charCountElement = document.getElementById('charCount');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        charCountElement.textContent = charCount;
+        
+        // Update color based on character count
+        if (charCount > 4500) {
+            charCountElement.classList.add('danger');
+            charCountElement.classList.remove('warning');
+        } else if (charCount > 4000) {
+            charCountElement.classList.add('warning');
+            charCountElement.classList.remove('danger');
+        } else {
+            charCountElement.classList.remove('warning', 'danger');
+        }
+        
+        // Disable submit if message is empty
+        if (text.trim() === '') {
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.5';
+            submitBtn.style.cursor = 'not-allowed';
+        } else {
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            submitBtn.style.cursor = 'pointer';
+        }
+    }
+    
+    // Form validation
+    document.getElementById('replyForm').addEventListener('submit', function(e) {
+        const message = document.getElementById('replyMessage').value.trim();
+        
+        if (message === '') {
+            e.preventDefault();
+            showAlert('Please write a reply message before sending.', 'error');
+            return false;
+        }
+        
+        if (message.length < 10) {
+            e.preventDefault();
+            showAlert('Please write a more detailed reply (minimum 10 characters).', 'error');
+            return false;
+        }
+        
+        // Show loading state
+        const submitBtn = document.getElementById('submitBtn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending...';
+        submitBtn.disabled = true;
+        
+        // Allow form to submit
+        setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }, 3000);
+    });
+    
+    // Show alert function
+    function showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert-message';
+        alertDiv.style.cssText = `
+            background: ${type === 'error' ? '#fee2e2' : '#d1fae5'};
+            color: ${type === 'error' ? '#991b1b' : '#065f46'};
+            padding: 15px 20px;
+            border-radius: 12px;
+            border-left: 4px solid ${type === 'error' ? '#ef4444' : '#10b981'};
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        `;
+        
+        const icon = document.createElement('i');
+        icon.className = type === 'error' ? 'bi bi-exclamation-circle' : 'bi bi-check-circle';
+        icon.style.fontSize = '18px';
+        
+        const text = document.createElement('span');
+        text.textContent = message;
+        
+        alertDiv.appendChild(icon);
+        alertDiv.appendChild(text);
+        
+        document.body.appendChild(alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.style.opacity = '0';
+            alertDiv.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => alertDiv.remove(), 300);
+        }, 5000);
+    }
+    
+    // Initialize character count on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const initialMessage = document.getElementById('replyMessage').value;
+        updateCharCount(initialMessage);
+        
+        // Add placeholder suggestions
+        const textarea = document.getElementById('replyMessage');
+        const placeholderSuggestions = [
+            "Thank you for reaching out to us...",
+            "I appreciate your query regarding...",
+            "Here's the information you requested...",
+            "Let me address your concerns...",
+            "Thank you for your patience..."
+        ];
+        
+        textarea.addEventListener('focus', function() {
+            if (this.value === '') {
+                this.placeholder = placeholderSuggestions.join('\n\n');
+            }
+        });
+        
+        textarea.addEventListener('blur', function() {
+            if (this.value === '') {
+                this.placeholder = "Write your professional reply here...";
+            }
+        });
+        
+        // Auto-resize textarea
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 300) + 'px';
+        });
+    });
+    
+    // Prevent accidental navigation
+    let formChanged = false;
+    document.getElementById('replyForm').addEventListener('input', function() {
+        formChanged = true;
+    });
+    
+    window.addEventListener('beforeunload', function(e) {
+        if (formChanged) {
+            e.preventDefault();
+            e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            return e.returnValue;
+        }
+    });
+    
+    document.getElementById('replyForm').addEventListener('submit', function() {
+        formChanged = false;
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,516 @@
+<%- include('../../partials/admin/header.ejs')%>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: #f5f7fb;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    .main-wrapper {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .main-wrapper .sidebar {
+        width: 280px;
+        height: 100vh;
+        background: white;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        position: fixed;
+        left: 0;
+        top: 0;
+        overflow-y: auto;
+        padding: 0;
+        z-index: 100;
+    }
+
+    .content-wrapper {
+        flex: 1;
+        margin-left: 280px;
+        width: calc(100% - 280px);
+        min-height: 100vh;
+        background: #f5f7fb;
+        padding: 25px;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    .container-fluid {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+        box-sizing: border-box;
+        max-width: 100%;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .page-header h2 {
+        color: #1e293b;
+        font-weight: 700;
+        margin: 0;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header h2 i {
+        color: #f59e0b;
+        font-size: 32px;
+    }
+
+    .page-header p {
+        color: #64748b;
+        font-size: 14px;
+        margin: 5px 0 0;
+    }
+
+    .back-btn {
+        background: white;
+        color: #64748b;
+        border: 1px solid #e9ecef;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .back-btn:hover {
+        background: #f8fafc;
+        color: #f59e0b;
+        border-color: #f59e0b;
+        transform: translateX(-3px);
+        box-shadow: 0 4px 8px rgba(245, 158, 11, 0.1);
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #e9ecef;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .form-header i {
+        color: #f59e0b;
+        font-size: 24px;
+        background: rgba(245, 158, 11, 0.1);
+        padding: 8px;
+        border-radius: 10px;
+    }
+
+    .form-header h3 {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .form-body {
+        padding: 30px 25px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .form-label i {
+        color: #f59e0b;
+        margin-right: 8px;
+        font-size: 16px;
+        width: 20px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #1e293b;
+        transition: all 0.2s ease;
+        background: white;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .alert {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .alert-success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .alert i {
+        font-size: 18px;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .submit-btn {
+        flex: 1;
+        background: #f59e0b;
+        color: white;
+        border: none;
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .submit-btn:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .send-btn {
+        flex: 1;
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .send-btn:hover {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .send-form {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .send-form h4 {
+        color: #1e293b;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .send-form h4 i {
+        color: #10b981;
+    }
+
+    .required-field::after {
+        content: '*';
+        color: #ef4444;
+        margin-left: 4px;
+        font-size: 14px;
+    }
+
+    @media (max-width: 1024px) {
+        .form-card {
+            max-width: 90%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .main-wrapper {
+            flex-direction: column;
+        }
+
+        .main-wrapper .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            margin-bottom: 0;
+        }
+
+        .content-wrapper {
+            margin-left: 0;
+            width: 100%;
+            padding: 20px 15px;
+        }
+
+        .form-card {
+            max-width: 100%;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+        }
+
+        .back-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .content-wrapper {
+            padding: 15px 12px;
+        }
+
+        .page-header h2 {
+            font-size: 22px;
+        }
+
+        .form-body {
+            padding: 20px 15px;
+        }
+    }
+</style>
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs')%>
+
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <div class="page-header">
+                <div>
+                    <h2>
+                        <i class="bi bi-pencil-square"></i>
+                        Edit Contact
+                    </h2>
+                    <p>Update contact information</p>
+                </div>
+                <a href="/addcontacttable" class="back-btn">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Contacts
+                </a>
+            </div>
+
+            <div class="form-card">
+                <div class="form-header">
+                    <i class="bi bi-pencil"></i>
+                    <h3>Edit Contact: <%= Record.name %></h3>
+                </div>
+                
+                <div class="form-body">
+                    <% if (typeof error !== 'undefined' && error) { %>
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span><%= error %></span>
+                        </div>
+                    <% } %>
+
+                    <% if (typeof success !== 'undefined' && success) { %>
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span><%= success %></span>
+                        </div>
+                    <% } %>
+
+                    <form method="post" action="/addcontactedit/<%= Record._id %>">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-person"></i>
+                                Name <span class="required-field"></span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="name" 
+                                   value="<%= Record.name %>"
+                                   placeholder="Enter full name"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-telephone"></i>
+                                Phone Number <span class="required-field"></span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="phoneno" 
+                                   value="<%= Record.phoneno %>"
+                                   placeholder="Enter phone number"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-whatsapp"></i>
+                                WhatsApp Number
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="whatsappno" 
+                                   value="<%= Record.whatsappno %>"
+                                   placeholder="Enter WhatsApp number">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-envelope"></i>
+                                Email <span class="required-field"></span>
+                            </label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   name="email" 
+                                   value="<%= Record.email %>"
+                                   placeholder="Enter email address"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-file-text"></i>
+                                Note
+                            </label>
+                            <textarea class="form-control" 
+                                      name="note" 
+                                      placeholder="Add any notes about this contact"><%= Record.note %></textarea>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="submit-btn">
+                                <i class="bi bi-check-circle"></i>
+                                Update Contact
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Send Email Form -->
+                    <div class="send-form">
+                        <h4>
+                            <i class="bi bi-envelope-paper"></i>
+                            Send Email
+                        </h4>
+                        <form method="post" action="/addcontactsend/<%= Record._id %>">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-subject"></i>
+                                    Subject
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="subject" 
+                                       placeholder="Email subject"
+                                       value="Message from REAL ERP">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-envelope"></i>
+                                    Message
+                                </label>
+                                <textarea class="form-control" 
+                                          name="message" 
+                                          rows="4" 
+                                          placeholder="Type your message here..."></textarea>
+                            </div>
+
+                            <button type="submit" class="send-btn">
+                                <i class="bi bi-send"></i>
+                                Send Email
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

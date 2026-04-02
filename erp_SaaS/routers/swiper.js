@@ -5,11 +5,11 @@ const swipertable=require('../models/swiper')
 router.get('/swipertable',async(req,res)=>{
     const swiperdata=await swipertable.find()
     const loginname=req.session.email
-    res.render("swipertable.ejs",{swiperdata,loginname})
+    res.render("Frontend/Swiper/swipertable.ejs",{swiperdata,loginname})
 })
 router.get('/swiperform',(req,res)=>{
     const loginname=req.session.email
-    res.render("swiperform.ejs",{loginname})
+    res.render("Frontend/Swiper/swiperform.ejs",{loginname})
 })
 router.post('/swiperform',upload.single('img'),async(req,res)=>{
 const imageFile=req.file.filename

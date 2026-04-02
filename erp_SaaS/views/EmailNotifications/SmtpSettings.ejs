@@ -1,0 +1,916 @@
+<%- include('../../partials/admin/header.ejs')%>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #f5f7fb;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+
+    .main-wrapper {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .content-wrapper {
+        flex: 1;
+        margin-left: 280px;
+        width: calc(100% - 280px);
+        min-height: 100vh;
+        padding: 30px;
+        transition: all 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            margin-left: 0;
+            width: 100%;
+            padding: 20px;
+        }
+    }
+
+    /* Container */
+    .settings-container {
+        max-width: 900px;
+        margin: 0 auto;
+        animation: fadeInUp 0.5s ease;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Header Section */
+    .settings-header {
+        background: white;
+        border-radius: 16px;
+        padding: 28px 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e9ecef;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .icon-circle {
+        width: 64px;
+        height: 64px;
+        background: #f59e0b;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+    }
+
+    .icon-circle i {
+        font-size: 28px;
+        color: white;
+    }
+
+    .header-text h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 6px 0;
+    }
+
+    .header-text p {
+        color: #64748b;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    /* Main Card */
+    .settings-card {
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e9ecef;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 32px;
+        border-bottom: 2px solid #eef2f6;
+        padding-bottom: 0;
+    }
+
+    .nav-tab {
+        padding: 12px 24px;
+        background: transparent;
+        border: none;
+        font-weight: 600;
+        font-size: 14px;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .nav-tab i {
+        font-size: 16px;
+    }
+
+    .nav-tab:hover {
+        color: #f59e0b;
+        background: #fef9e6;
+    }
+
+    .nav-tab.active {
+        color: #f59e0b;
+        background: #fef9e6;
+    }
+
+    .nav-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: #f59e0b;
+        border-radius: 3px;
+    }
+
+    /* Provider Section */
+    .provider-section {
+        margin-bottom: 32px;
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 16px;
+        border: 1px solid #eef2f6;
+    }
+
+    .section-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-label i {
+        color: #f59e0b;
+        font-size: 14px;
+    }
+
+    .provider-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .provider-btn {
+        padding: 8px 20px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .provider-btn i {
+        font-size: 14px;
+    }
+
+    .provider-btn:hover {
+        border-color: #f59e0b;
+        color: #f59e0b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+        background: #fef9e6;
+    }
+
+    /* Form Groups */
+    .form-group {
+        margin-bottom: 24px;
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .form-group label {
+        width: 160px;
+        font-weight: 600;
+        color: #334155;
+        font-size: 14px;
+        padding-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-group label i {
+        color: #f59e0b;
+        font-size: 16px;
+        width: 20px;
+    }
+
+    .form-control {
+        flex: 1;
+        min-width: 280px;
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: white;
+        font-family: inherit;
+        color: #1e293b;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #f59e0b !important;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1) !important;
+    }
+
+    select.form-control {
+        cursor: pointer;
+        background: white;
+    }
+
+    /* Checkbox */
+    .checkbox-group {
+        margin-left: 180px;
+        margin-bottom: 28px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: #f8fafc;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 1px solid #eef2f6;
+    }
+
+    .checkbox-group:hover {
+        background: #fef9e6;
+        border-color: #f59e0b;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #f59e0b;
+    }
+
+    .checkbox-group label {
+        cursor: pointer;
+        font-weight: 500;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+    }
+
+    .checkbox-group i {
+        color: #f59e0b;
+        font-size: 16px;
+    }
+
+    /* Test Result */
+    .test-result {
+        margin-left: 180px;
+        margin-top: 12px;
+        margin-bottom: 20px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        display: none;
+        animation: slideDown 0.3s ease;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .test-result.success {
+        background: #e6f7e6;
+        color: #2e7d32;
+        border-left: 4px solid #f59e0b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .test-result.error {
+        background: #fee;
+        color: #c62828;
+        border-left: 4px solid #f59e0b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .test-result i {
+        font-size: 18px;
+    }
+
+    /* Action Buttons - ALL ORANGE NOW */
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #eef2f6;
+    }
+
+    .btn {
+        padding: 10px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: #f59e0b;
+        color: white;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+    }
+
+    .btn-primary:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-outline {
+        background: white;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+    }
+
+    .btn-outline:hover {
+        border-color: #f59e0b;
+        color: #f59e0b;
+        transform: translateY(-2px);
+        background: #fef9e6;
+    }
+
+    /* Success Button - Orange */
+    .btn-success {
+        background: #f59e0b;
+        color: white;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+    }
+
+    .btn-success:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Success Message */
+    .success-message {
+        margin-top: 32px;
+        padding: 24px;
+        background: #fef9e6;
+        border-radius: 16px;
+        text-align: center;
+        animation: fadeInUp 0.5s ease;
+        border: 1px solid #fde68a;
+    }
+
+    .success-message i {
+        font-size: 48px;
+        color: #f59e0b;
+        margin-bottom: 12px;
+    }
+
+    .success-message h4 {
+        color: #92400e;
+        margin-bottom: 8px;
+        font-size: 18px;
+    }
+
+    .success-message p {
+        color: #b45309;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    /* Toast Notifications */
+    #toast {
+        position: fixed;
+        top: 90px;
+        right: 30px;
+        min-width: 320px;
+        padding: 14px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+        color: white;
+        z-index: 1001;
+    }
+
+    #toast.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .toast-success {
+        background: #10b981;
+    }
+
+    .toast-error {
+        background: #ef4444;
+    }
+
+    .toast-info {
+        background: #f59e0b;
+    }
+
+    .toast-content {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .toast-icon {
+        font-size: 20px;
+    }
+
+    .toast-text h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .toast-text p {
+        margin: 4px 0 0;
+        font-size: 12px;
+        opacity: 0.9;
+    }
+
+    .toast-progress {
+        height: 3px;
+        background: rgba(255, 255, 255, 0.6);
+        margin-top: 10px;
+        width: 100%;
+        animation: progress 3s linear;
+    }
+
+    @keyframes progress {
+        from {
+            width: 100%;
+        }
+        to {
+            width: 0%;
+        }
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid #f59e0b;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .loading-text {
+        color: white;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .settings-card {
+            padding: 24px;
+        }
+
+        .form-group label {
+            width: 100%;
+        }
+
+        .checkbox-group {
+            margin-left: 0;
+        }
+
+        .test-result {
+            margin-left: 0;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .nav-tabs {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .nav-tab.active::after {
+            display: none;
+        }
+    }
+</style>
+
+<!-- Toast Container -->
+<div id="toast"></div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Saving Settings...</div>
+</div>
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs')%>
+
+    <div class="content-wrapper">
+        <div class="settings-container">
+            <!-- Header -->
+            <div class="settings-header">
+                <div class="header-content">
+                    <div class="icon-circle">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="header-text">
+                        <h1>SMTP Configuration</h1>
+                        <p>Configure your email server settings to send notifications and emails</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Card -->
+            <div class="settings-card">
+                <!-- Navigation Tabs -->
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="window.location.href='/smtp'">
+                        <i class="fas fa-cog"></i>
+                        SMTP Settings
+                    </button>
+                    <button class="nav-tab" onclick="window.location.href='/send-email'">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Email
+                    </button>
+                </div>
+
+                <!-- Provider Presets -->
+                <div class="provider-section">
+                    <div class="section-label">
+                        <i class="fas fa-bolt"></i> Quick Presets
+                    </div>
+                    <div class="provider-buttons">
+                        <button class="provider-btn" onclick="setProvider('gmail')">
+                            <i class="fab fa-google"></i> Gmail
+                        </button>
+                        <button class="provider-btn" onclick="setProvider('outlook')">
+                            <i class="fab fa-microsoft"></i> Outlook
+                        </button>
+                        <button class="provider-btn" onclick="setProvider('yahoo')">
+                            <i class="fab fa-yahoo"></i> Yahoo
+                        </button>
+                        <button class="provider-btn" onclick="setProvider('stackmail')">
+                            <i class="fas fa-server"></i> StackMail
+                        </button>
+                        <button class="provider-btn" onclick="setProvider('custom')">
+                            <i class="fas fa-code"></i> Custom
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form id="smtpForm">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-server"></i>
+                            SMTP Host
+                        </label>
+                        <input type="text" 
+                               name="host" 
+                               id="host"
+                               class="form-control"
+                               value="<%= config.host ? config.host : '' %>"
+                               placeholder="smtp.gmail.com"
+                               style="border-color: #e2e8f0;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-plug"></i>
+                            SMTP Port
+                        </label>
+                        <select name="port" id="port" class="form-control" style="border-color: #e2e8f0;">
+                            <option value="465" <%= (config.port == '465') ? 'selected' : '' %>>465 (SSL - Recommended)</option>
+                            <option value="587" <%= (config.port == '587') ? 'selected' : '' %>>587 (TLS)</option>
+                            <option value="25" <%= (config.port == '25') ? 'selected' : '' %>>25 (Unencrypted)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-user"></i>
+                            Username/Email
+                        </label>
+                        <input type="email" 
+                               name="username" 
+                               id="username"
+                               class="form-control"
+                               value="<%= config.username ? config.username : '' %>"
+                               placeholder="your-email@domain.com"
+                               style="border-color: #e2e8f0;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        <input type="password" 
+                               name="password" 
+                               id="password"
+                               class="form-control"
+                               value="<%= config.password ? config.password : '' %>"
+                               placeholder="Your SMTP password"
+                               style="border-color: #e2e8f0;">
+                    </div>
+
+                    <input type="hidden" name="secure" id="secure" value="true">
+
+                    <!-- Test Result -->
+                    <div id="testResult" class="test-result"></div>
+
+                    <!-- Checkbox -->
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="secureConnection" checked>
+                        <label>
+                            <i class="fas fa-shield-alt"></i>
+                            Use secure connection (SSL/TLS)
+                        </label>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-outline" onclick="testConnection()">
+                            <i class="fas fa-vial"></i> Test Connection
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="clearForm()">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Success Message -->
+                <% if (showEmailForm) { %>
+                    <div class="success-message">
+                        <i class="fas fa-check-circle"></i>
+                        <h4>SMTP Configured Successfully!</h4>
+                        <p>Your email server is ready to send emails</p>
+                        <a href="/send-email" class="btn btn-success">
+                            <i class="fas fa-paper-plane"></i> Send Email Now →
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script>
+    // Toast Function
+    let toastTimer;
+    function showToast(title, message, type = 'info') {
+        const toast = document.getElementById('toast');
+        clearTimeout(toastTimer);
+        
+        const icons = { 'success': '✅', 'error': '❌', 'info': 'ℹ️' };
+        const icon = icons[type] || 'ℹ️';
+        
+        toast.innerHTML = `
+            <div class="toast-content">
+                <div class="toast-icon">${icon}</div>
+                <div class="toast-text">
+                    <h4>${title}</h4>
+                    <p>${message}</p>
+                </div>
+            </div>
+            <div class="toast-progress"></div>
+        `;
+        
+        toast.className = `toast-${type} show`;
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function showLoading() {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+    function hideLoading() {
+        document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    function setProvider(provider) {
+        const presets = {
+            gmail: { host: 'smtp.gmail.com', port: '587', secure: 'false' },
+            outlook: { host: 'smtp.office365.com', port: '587', secure: 'false' },
+            yahoo: { host: 'smtp.mail.yahoo.com', port: '465', secure: 'true' },
+            stackmail: { host: 'smtp.stackmail.com', port: '465', secure: 'true' },
+            custom: { host: '', port: '465', secure: 'true' }
+        };
+        
+        const preset = presets[provider];
+        if (preset) {
+            document.getElementById('host').value = preset.host;
+            document.getElementById('port').value = preset.port;
+            document.getElementById('secure').value = preset.secure;
+            document.getElementById('secureConnection').checked = preset.secure === 'true';
+            if (provider === 'custom') document.getElementById('host').focus();
+            showToast('Provider Selected', `${provider} preset loaded`, 'info');
+        }
+    }
+
+    async function testConnection() {
+        const host = document.getElementById('host').value;
+        const port = document.getElementById('port').value;
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const secure = document.getElementById('secure').value;
+        
+        if (!host || !port || !username || !password) {
+            showToast('Validation Error', 'Please fill all fields', 'error');
+            return;
+        }
+        
+        const testResult = document.getElementById('testResult');
+        testResult.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing connection...';
+        testResult.className = 'test-result';
+        
+        try {
+            const response = await fetch('/test-connection', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ host, port, username, password, secure })
+            });
+            
+            const data = await response.json();
+            testResult.innerHTML = `<i class="fas ${data.success ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${data.message}`;
+            testResult.className = data.success ? 'test-result success' : 'test-result error';
+            showToast(data.success ? 'Success' : 'Failed', data.message, data.success ? 'success' : 'error');
+        } catch (error) {
+            testResult.innerHTML = '<i class="fas fa-exclamation-circle"></i> Connection test failed';
+            testResult.className = 'test-result error';
+            showToast('Error', 'Connection test failed', 'error');
+        }
+    }
+
+    function clearForm() {
+        document.getElementById('host').value = '';
+        document.getElementById('port').value = '465';
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('secure').value = 'true';
+        document.getElementById('secureConnection').checked = true;
+        document.getElementById('testResult').style.display = 'none';
+        showToast('Form Cleared', 'All fields have been reset', 'info');
+    }
+
+    async function saveSettings() {
+        showLoading();
+        const formData = new FormData(document.getElementById('smtpForm'));
+        const data = Object.fromEntries(formData);
+        
+        try {
+            const response = await fetch('/configure-smtp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                showToast('Success', 'Settings saved successfully!', 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showToast('Error', result.message, 'error');
+                hideLoading();
+            }
+        } catch (error) {
+            showToast('Error', 'Failed to save settings', 'error');
+            hideLoading();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('port').addEventListener('change', function() {
+            const secure = this.value === '465' ? 'true' : 'false';
+            document.getElementById('secure').value = secure;
+            document.getElementById('secureConnection').checked = secure === 'true';
+        });
+        
+        document.getElementById('secureConnection').addEventListener('change', function() {
+            document.getElementById('secure').value = this.checked ? 'true' : 'false';
+            document.getElementById('port').value = this.checked ? '465' : '587';
+        });
+        
+        document.getElementById('smtpForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveSettings();
+        });
+        
+        showToast('Welcome', 'SMTP Settings loaded', 'info');
+    });
+</script>

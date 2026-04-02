@@ -1,0 +1,829 @@
+<%- include('../../partials/admin/header.ejs')%>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: #f5f7fb;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    .main-wrapper {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .main-wrapper .sidebar {
+        width: 280px;
+        height: 100vh;
+        background: white;
+        box-shadow: 2px 10px rgba(0, 0, 0, 0.05);
+        position: fixed;
+        left: 0;
+        top: 0;
+        overflow-y: auto;
+        padding: 0;
+        z-index: 100;
+    }
+
+    .content-wrapper {
+        flex: 1;
+        margin-left: 280px;
+        width: calc(100% - 280px);
+        min-height: 100vh;
+        background: #f5f7fb;
+        padding: 25px;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    .container-fluid {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+        box-sizing: border-box;
+        max-width: 100%;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .page-header h2 {
+        color: #1e293b;
+        font-weight: 700;
+        margin: 0;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header h2 i {
+        color: #f59e0b;
+        font-size: 32px;
+    }
+
+    .page-header p {
+        color: #64748b;
+        font-size: 14px;
+        margin: 5px 0 0;
+    }
+
+    .back-btn {
+        background: white;
+        color: #64748b;
+        border: 1px solid #e9ecef;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .back-btn:hover {
+        background: #f8fafc;
+        color: #f59e0b;
+        border-color: #f59e0b;
+        transform: translateX(-3px);
+        box-shadow: 0 4px 8px rgba(245, 158, 11, 0.1);
+    }
+
+    .back-btn i {
+        font-size: 16px;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #e9ecef;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .form-header i {
+        color: #f59e0b;
+        font-size: 24px;
+        background: rgba(245, 158, 11, 0.1);
+        padding: 8px;
+        border-radius: 10px;
+    }
+
+    .form-header h3 {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .form-body {
+        padding: 30px 25px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .form-label i {
+        color: #f59e0b;
+        margin-right: 8px;
+        font-size: 16px;
+        width: 20px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #1e293b;
+        transition: all 0.2s ease;
+        background: white;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+
+    .form-control::placeholder {
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    select.form-control {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+    }
+
+    .character-count {
+        text-align: right;
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 4px;
+    }
+
+    .character-count i {
+        color: #f59e0b;
+        font-size: 12px;
+    }
+
+    .info-box {
+        background: #f0f9ff;
+        border-left: 4px solid #3b82f6;
+        padding: 18px 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .info-box i {
+        color: #3b82f6;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    .info-box p {
+        color: #1e293b;
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .info-box p small {
+        color: #64748b;
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+    }
+
+    .image-preview-container {
+        margin-top: 10px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .preview-image {
+        max-width: 120px;
+        max-height: 120px;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 5px;
+        background: white;
+        display: none;
+    }
+
+    .preview-image.has-image {
+        display: block;
+    }
+
+    .remove-image {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ef4444;
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 12px;
+        border: none;
+        display: none;
+    }
+
+    .remove-image.show {
+        display: flex;
+    }
+
+    .submit-btn {
+        width: 100%;
+        background: #f59e0b;
+        color: white;
+        border: none;
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .submit-btn:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .submit-btn i {
+        font-size: 18px;
+    }
+
+    .helper-text {
+        background: #f8fafc;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #64748b;
+        font-size: 13px;
+        border: 1px solid #e9ecef;
+    }
+
+    .helper-text i {
+        color: #f59e0b;
+        font-size: 16px;
+    }
+
+    .required-field::after {
+        content: '*';
+        color: #ef4444;
+        margin-left: 4px;
+        font-size: 14px;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .col-md-6 {
+        flex: 0 0 calc(50% - 10px);
+        max-width: calc(50% - 10px);
+    }
+
+    @media (max-width: 1024px) {
+        .form-card {
+            max-width: 95%;
+        }
+        .col-md-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            margin-left: 0;
+            width: 100%;
+            padding: 50px;
+        }
+        .main-wrapper {
+            flex-direction: column;
+        }
+        .main-wrapper .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            margin-bottom: 0;
+        }
+        .form-card {
+            max-width: 100%;
+        }
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .back-btn {
+            width: 100%;
+            justify-content: center;
+        }
+        .form-header {
+            padding: 15px 20px;
+        }
+        .form-body {
+            padding: 20px 15px;
+        }
+        .form-header i {
+            font-size: 20px;
+            padding: 6px;
+        }
+        .form-header h3 {
+            font-size: 16px;
+        }
+        .info-box {
+            padding: 15px;
+            gap: 12px;
+        }
+        .info-box i {
+            font-size: 18px;
+        }
+        .info-box p {
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .content-wrapper {
+            padding: 15px 12px;
+        }
+        .page-header h2 {
+            font-size: 24px;
+        }
+        .form-label {
+            font-size: 13px;
+        }
+        .form-control {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+        .submit-btn {
+            padding: 12px;
+            font-size: 14px;
+        }
+        .helper-text {
+            padding: 12px;
+            font-size: 12px;
+        }
+        .info-box {
+            flex-direction: column;
+            gap: 8px;
+        }
+    }
+</style>
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs')%>
+
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h2>
+                        <i class="bi bi-pencil-square"></i>
+                        Edit Employee
+                    </h2>
+                    <p>Update the employee information in the system</p>
+                </div>
+                <a href="/employees" class="back-btn">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Employees
+                </a>
+            </div>
+
+            <!-- Form Card -->
+            <div class="form-card">
+                <div class="form-header">
+                    <i class="bi bi-person-badge"></i>
+                    <h3>Edit Employee Information</h3>
+                </div>
+                
+                <div class="form-body">
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <i class="bi bi-info-circle"></i>
+                        <p>
+                            Update employee details. Leave the image field empty to keep the current image.
+                            <small><i class="bi bi-exclamation-circle me-1"></i>Fields marked with * are required</small>
+                        </p>
+                    </div>
+
+                    <!-- FIXED: Correct form action to match your backend route -->
+                    <form action="/employees/update/<%= employee._id %>" method="POST" enctype="multipart/form-data" id="employeeForm">
+                        <div class="row">
+                            <!-- Full Name -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-person"></i>
+                                        Full Name <span class="required-field"></span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           name="name" 
+                                           placeholder="Enter full name"
+                                           value="<%= employee.name %>"
+                                           required
+                                           maxlength="100"
+                                           oninput="updateCount(this, 'nameCount')">
+                                    <div class="character-count">
+                                        <i class="bi bi-text-paragraph"></i>
+                                        <span id="nameCount"><%= employee.name ? employee.name.length : 0 %></span>/100 characters
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-envelope"></i>
+                                        Email Address <span class="required-field"></span>
+                                    </label>
+                                    <input type="email" 
+                                           class="form-control" 
+                                           name="email" 
+                                           placeholder="employee@company.com"
+                                           value="<%= employee.email %>"
+                                           required>
+                                </div>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-telephone"></i>
+                                        Phone Number
+                                    </label>
+                                    <input type="tel" 
+                                           class="form-control" 
+                                           name="phone" 
+                                           placeholder="+91 9876543210"
+                                           value="<%= employee.phone || '' %>"
+                                           maxlength="15">
+                                </div>
+                            </div>
+
+                            <!-- Department -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-building"></i>
+                                        Department <span class="required-field"></span>
+                                    </label>
+                                    <select class="form-control" name="department" required>
+                                        <option value="">Select Department</option>
+                                        <option value="IT" <%= employee.department === 'IT' ? 'selected' : '' %>>IT</option>
+                                        <option value="HR" <%= employee.department === 'HR' ? 'selected' : '' %>>HR</option>
+                                        <option value="Finance" <%= employee.department === 'Finance' ? 'selected' : '' %>>Finance</option>
+                                        <option value="Marketing" <%= employee.department === 'Marketing' ? 'selected' : '' %>>Marketing</option>
+                                        <option value="Sales" <%= employee.department === 'Sales' ? 'selected' : '' %>>Sales</option>
+                                        <option value="Operations" <%= employee.department === 'Operations' ? 'selected' : '' %>>Operations</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Position -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-briefcase"></i>
+                                        Position <span class="required-field"></span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           name="position" 
+                                           placeholder="e.g., Software Developer"
+                                           value="<%= employee.position %>"
+                                           required>
+                                </div>
+                            </div>
+
+                            <!-- Joining Date -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-calendar"></i>
+                                        Joining Date
+                                    </label>
+                                    <input type="date" 
+                                           class="form-control" 
+                                           name="joiningDate"
+                                           value="<%= employee.joiningDate ? new Date(employee.joiningDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0] %>">
+                                </div>
+                            </div>
+
+                            <!-- Salary -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-currency-rupee"></i>
+                                        Salary (₹)
+                                    </label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           name="salary" 
+                                           placeholder="e.g., 50000"
+                                           value="<%= employee.salary || '' %>"
+                                           step="1000">
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-toggle-on"></i>
+                                        Status
+                                    </label>
+                                    <select class="form-control" name="status">
+                                        <option value="Active" <%= employee.status === 'Active' ? 'selected' : '' %>>Active</option>
+                                        <option value="Inactive" <%= employee.status === 'Inactive' ? 'selected' : '' %>>Inactive</option>
+                                        <option value="On Leave" <%= employee.status === 'On Leave' ? 'selected' : '' %>>On Leave</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Address -->
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-geo-alt"></i>
+                                        Address
+                                    </label>
+                                    <textarea class="form-control" 
+                                              name="address" 
+                                              placeholder="Enter complete address"
+                                              rows="3"
+                                              maxlength="500"
+                                              oninput="updateCount(this, 'addressCount')"><%= employee.address || '' %></textarea>
+                                    <div class="character-count">
+                                        <i class="bi bi-file-text"></i>
+                                        <span id="addressCount"><%= employee.address ? employee.address.length : 0 %></span>/500 characters
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Profile Image -->
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-image"></i>
+                                        Profile Image
+                                    </label>
+                                    <input type="file" 
+                                           class="form-control" 
+                                           name="image" 
+                                           accept="image/*"
+                                           onchange="previewImage(this)">
+                                    <div class="image-preview-container">
+                                        <% if(employee.image) { %>
+                                            <img id="imagePreview" class="preview-image has-image" src="/uploads/<%= employee.image %>" alt="Current Image">
+                                            <button type="button" class="remove-image show" onclick="removeImage()">✕</button>
+                                        <% } else { %>
+                                            <img id="imagePreview" class="preview-image" alt="Preview">
+                                            <button type="button" class="remove-image" onclick="removeImage()">✕</button>
+                                        <% } %>
+                                    </div>
+                                    <div class="character-count mt-2">
+                                        <i class="bi bi-info-circle"></i>
+                                        <span>Allowed: JPG, JPEG, PNG (Max: 5MB). Leave empty to keep current image.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Helper Text -->
+                        <div class="helper-text">
+                            <i class="bi bi-lightbulb"></i>
+                            <span>💡 Tip: Make sure to upload a professional profile picture. All employee data is stored securely.</span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="submit-btn">
+                            <i class="bi bi-save"></i>
+                            Update Employee
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Character count function
+    function updateCount(input, elementId) {
+        document.getElementById(elementId).textContent = input.value.length;
+    }
+
+    // Image preview function
+    function previewImage(input) {
+        const preview = document.getElementById('imagePreview');
+        const removeBtn = document.querySelector('.remove-image');
+        
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const fileSize = file.size / 1024 / 1024; // in MB
+            
+            if (fileSize > 5) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File Too Large',
+                    text: 'Image size should be less than 5MB',
+                    confirmButtonText: 'OK'
+                });
+                input.value = '';
+                preview.style.display = 'none';
+                removeBtn.style.display = 'none';
+                preview.classList.remove('has-image');
+                removeBtn.classList.remove('show');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                preview.classList.add('has-image');
+                removeBtn.style.display = 'flex';
+                removeBtn.classList.add('show');
+            }
+            reader.readAsDataURL(file);
+        } else {
+            // If no file selected, revert to existing image if any
+            const currentImage = '<%= employee.image || "" %>';
+            if(currentImage) {
+                preview.src = '/uploads/' + currentImage;
+                preview.classList.add('has-image');
+                removeBtn.classList.add('show');
+            } else {
+                preview.classList.remove('has-image');
+                removeBtn.classList.remove('show');
+            }
+        }
+    }
+    
+    // Remove image function
+    function removeImage() {
+        const fileInput = document.querySelector('input[name="image"]');
+        const preview = document.getElementById('imagePreview');
+        const removeBtn = document.querySelector('.remove-image');
+        
+        fileInput.value = '';
+        preview.style.display = 'none';
+        removeBtn.style.display = 'none';
+        preview.classList.remove('has-image');
+        removeBtn.classList.remove('show');
+        preview.src = '';
+        
+        // Optional: Add a hidden field to indicate image removal
+        let hiddenInput = document.querySelector('input[name="removeImage"]');
+        if(!hiddenInput) {
+            hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'removeImage';
+            hiddenInput.value = 'true';
+            document.getElementById('employeeForm').appendChild(hiddenInput);
+        }
+    }
+    
+    // Form validation
+    document.getElementById('employeeForm').addEventListener('submit', function(e) {
+        const name = document.querySelector('input[name="name"]').value.trim();
+        const email = document.querySelector('input[name="email"]').value.trim();
+        const department = document.querySelector('select[name="department"]').value;
+        const position = document.querySelector('input[name="position"]').value.trim();
+        
+        if(!name || !email || !department || !position) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please fill all required fields!',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(!emailRegex.test(email)) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Email',
+                text: 'Please enter a valid email address!',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        return true;
+    });
+    
+    // Initialize character counts on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const nameField = document.querySelector('input[name="name"]');
+        const addressField = document.querySelector('textarea[name="address"]');
+        
+        if(nameField) {
+            document.getElementById('nameCount').textContent = nameField.value.length;
+        }
+        if(addressField) {
+            document.getElementById('addressCount').textContent = addressField.value.length;
+        }
+    });
+</script>
+
+</body>
+</html>

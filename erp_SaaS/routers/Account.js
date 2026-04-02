@@ -6,13 +6,13 @@ const accountTable=require('../models/Accounting')
 router.get('/accounttable',async(req,res)=>{
     const data=await accountTable.find()
      const loginname=req.session.email
-    res.render("AccountingTable.ejs",{data,loginname})
+    res.render("Frontend/Account/AccountingTable.ejs",{data,loginname})
 })
 
 router.get('/accountform',(req,res)=>{
          const loginname=req.session.email
 
-    res.render("AccountingForm.ejs",{loginname})
+    res.render("Frontend/Account/AccountingForm.ejs",{loginname})
 })
 router.post('/accountform',upload.single('img'),async(req,res)=>{
    const {title,desc}=req.body
@@ -45,7 +45,7 @@ router.get('/accountedit/:id',async(req,res)=>{
     const Record=await accountTable.findById(id)
          const loginname=req.session.email
 
-    res.render("AccountEdit.ejs",{Record,loginname})
+    res.render("Frontend/Account/AccountEdit.ejs",{Record,loginname})
 })
 router.post('/accountedit/:id',async(req,res)=>{
     const{title,desc}=req.body

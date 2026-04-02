@@ -5,11 +5,11 @@ const premiumstable=require('../models/premiums')
 router.get('/premiumstable',async(req,res)=>{
     const premiumsdata=await premiumstable.find()
      const loginname=req.session.email
-    res.render("premiumstable.ejs",{premiumsdata, loginname})
+    res.render("Frontend/Premium/premiumstable.ejs",{premiumsdata, loginname})
 })
 router.get('/premiumsform',(req,res)=>{
     const loginname=req.session.email
-    res.render("premiumsform.ejs",{loginname})
+    res.render("Frontend/Premium/premiumsform.ejs",{loginname})
 })
 router.post('/premiumsform',upload.single('img'),async(req,res)=>{
 const {title}=req.body
@@ -42,7 +42,7 @@ router.get('/premiumsedit/:id',async(req,res)=>{
     const Record=await premiumstable.findById(id)
          const loginname=req.session.email
 
-    res.render("premiumsEdit.ejs",{Record,loginname})
+    res.render("Frontend/Premium/premiumsEdit.ejs",{Record,loginname})
 })
 router.post('/premiumsedit/:id',async(req,res)=>{
     const {title}=req.body

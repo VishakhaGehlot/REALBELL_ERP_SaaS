@@ -6,13 +6,13 @@ const bcrypt = require('bcrypt')
 router.get("/usertable", async (req, res) => {
     const userdata = await usertable.find()
     const loginname = req.session.email
-    res.render("usertable.ejs", { userdata, loginname })
+    res.render("UserManage/usertable.ejs", { userdata, loginname })
 })
 
 // ================= FORM =================
 router.get("/userform", (req, res) => {
     const loginname = req.session.email
-    res.render("userform.ejs", { loginname })
+    res.render("UserManage/userform.ejs", { loginname })
 })
 
 // ================= CREATE USER (bcrypt added) =================
@@ -53,7 +53,7 @@ router.get('/useredit/:id', async (req, res) => {
     const Record = await usertable.findById(id)
     const loginname = req.session.email
 
-    res.render("useredit.ejs", { Record, loginname })
+    res.render("UserManage/useredit.ejs", { Record, loginname })
 })
 
 // ================= UPDATE (NO PASSWORD CHANGE HERE) =================

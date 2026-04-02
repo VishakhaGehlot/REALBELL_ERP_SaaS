@@ -5,11 +5,11 @@ const faqtable=require('../models/faq')
 router.get("/faqtable",async(req,res)=>{
     const loginname=req.session.email
     const faqdata=await faqtable.find()
-    res.render("FaqTable.ejs",{faqdata,loginname})
+    res.render("Frontend/Faq/FaqTable.ejs",{faqdata,loginname})
 })
 router.get("/faqform",(req,res)=>{
     const loginname=req.session.email
-    res.render("FaqForm.ejs",{loginname})
+    res.render("Frontend/Faq/FaqForm.ejs",{loginname})
 })
 
 router.post("/faqform",async(req,res)=>{
@@ -41,7 +41,7 @@ router.get('/faqedit/:id',async(req,res)=>{
     const Record=await faqtable.findById(id)
          const loginname=req.session.email
 
-    res.render("faqedit.ejs",{Record,loginname})
+    res.render("Frontend/Faq/faqedit.ejs",{Record,loginname})
 })
 router.post('/faqedit/:id',async(req,res)=>{
     const {title,desc}=req.body

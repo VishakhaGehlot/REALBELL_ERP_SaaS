@@ -29,15 +29,31 @@ function parseEmails(emailString) {
         .filter(email => email && email.includes('@'));
 }
 
+// Helper function to escape HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 // ======================
 // SMTP SETTINGS PAGE
 // ======================
 router.get('/smtp', (req, res) => {
-    res.render("SmtpSettings", { 
+    // Get user info from session or request
+    const loginname = req.session.user ? req.session.user.name : (req.user ? req.user.name : 'Admin');
+    
+    res.render("EmailNotifications/SmtpSettings", { 
         message: null, 
         error: null,
         config: req.session.smtpConfig || {},
-        showEmailForm: false
+        showEmailForm: false,
+        loginname: loginname,  // Add this line
+        user: req.session.user || req.user || null  // Also pass full user object if needed
     });
 });
 
@@ -108,16 +124,21 @@ router.get('/send-email', (req, res) => {
         return res.redirect('/smtp');
     }
 
-    res.render("SendEmail", { 
+    // Get user info from session or request
+    const loginname = req.session.user ? req.session.user.name : (req.user ? req.user.name : 'Admin');
+
+    res.render("EmailNotifications/SendEmail", { 
         message: null, 
         error: null,
         oldInput: {},
-        config: req.session.smtpConfig
+        config: req.session.smtpConfig,
+        loginname: loginname,  // Add this line
+        user: req.session.user || req.user || null  // Also pass full user object if needed
     });
 });
 
 // ======================
-// SEND EMAIL (API) - CLEAN VERSION
+// SEND EMAIL (API)
 // ======================
 router.post('/send-email', async (req, res) => {
     try {
@@ -275,16 +296,5 @@ router.get('/clear-settings', (req, res) => {
         res.redirect('/smtp');
     });
 });
-
-// Helper function to escape HTML
-function escapeHtml(text) {
-    if (!text) return '';
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
 
 module.exports = router;

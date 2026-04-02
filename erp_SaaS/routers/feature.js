@@ -6,13 +6,13 @@ const FeatureTable=require('../models/feature')
 router.get('/featuretable',async(req,res)=>{
     const featuredata=await  FeatureTable.find()
      const loginname=req.session.email
-    res.render("FeatureTable.ejs",{featuredata,loginname})
+    res.render("Frontend/Feature/FeatureTable.ejs",{featuredata,loginname})
 })
 
 router.get('/featureform',(req,res)=>{
          const loginname=req.session.email
 
-    res.render("FeatureForm.ejs",{loginname})
+    res.render("Frontend/Feature/FeatureForm.ejs",{loginname})
 })
 router.post('/featureform',upload.single('img'),async(req,res)=>{
    const {title,desc}=req.body
@@ -45,7 +45,7 @@ router.get('/featureedit/:id',async(req,res)=>{
     const Record=await FeatureTable.findById(id)
          const loginname=req.session.email
 
-    res.render("FeatureEdit.ejs",{Record,loginname})
+    res.render("Frontend/Feature/FeatureEdit.ejs",{Record,loginname})
 })
 router.post('/featureedit/:id',async(req,res)=>{
     const{title,desc}=req.body

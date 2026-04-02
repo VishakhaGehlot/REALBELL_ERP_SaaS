@@ -37,6 +37,14 @@ const authSchema=mongoose.Schema({
     // 🔥 OTP EXPIRE TIME
     otpExpire: {
         type: Date
+    },
+    mobile:{
+        type:String,
+        required:true
+    },
+    dob:{
+        type:String,
+        required:true
     }
 })
 

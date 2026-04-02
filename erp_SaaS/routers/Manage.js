@@ -5,12 +5,12 @@ const managetable=require('../models/manage')
 router.get('/managetable',async(req,res)=>{
     const managedata=await managetable.find()
      const loginname=req.session.email
-    res.render("Managetable.ejs",{managedata, loginname})
+    res.render("Frontend/Manage/Managetable.ejs",{managedata, loginname})
 })
 router.get('/manageform',(req,res)=>{
     const loginname=req.session.email
 
-    res.render("Manageform.ejs",{loginname})
+    res.render("Frontend/Manage/Manageform.ejs",{loginname})
 })
 router.post('/manageform',upload.single('img'),async(req,res)=>{
 const {title,desc}=req.body
@@ -43,7 +43,7 @@ router.get('/manageedit/:id',async(req,res)=>{
     const Record=await managetable.findById(id)
          const loginname=req.session.email
 
-    res.render("ManageEdit.ejs",{Record,loginname})
+    res.render("Frontend/Manage/ManageEdit.ejs",{Record,loginname})
 })
 router.post('/manageedit/:id',async(req,res)=>{
     const {title,desc}=req.body

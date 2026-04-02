@@ -277,18 +277,7 @@
                             <span>Dashboard</span>
                         </a>
                     </li>
-                    <li class="nav-sub-item">
-                        <a href="/reports" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-file-text-fill"></i>
-                            <span>Reports</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/kpi" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-bar-chart-steps"></i>
-                            <span>KPI Metrics</span>
-                        </a>
-                    </li>
+                    
                 </ul>
             </div>
         </li>
@@ -430,6 +419,26 @@
         </li>
 
 
+          <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
+                <i class="bi bi-briefcase-fill"></i>
+                <span>Products</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
+                    <li class="nav-sub-item">
+                        <a href="/producttable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-person-badge"></i>
+                            <span>Product</span>
+                        </a>
+                    </li>
+                    
+                    
+                  
+                </ul>
+            </div>
+        </li>
 
         <!-- ==================== HRM (HUMAN RESOURCE MANAGEMENT) ==================== -->
         <li class="nav-main-item">
