@@ -552,12 +552,12 @@ async function finalizeSubscriptionPayment({ registration, selectedPlan, payment
 router.get("/plan", async (req, res) => {
     const loginname = req.session.email;
     const Data = await subTable.find();
-    res.render("plans.ejs", { Data, loginname });
+    res.render("subscription/plans.ejs", { Data, loginname });
 });
 
 router.get("/addplan", (req, res) => {
     const loginname = req.session.email;
-    res.render("Addplan.ejs", { loginname });
+    res.render("subscription/Addplan.ejs", { loginname });
 });
 
 router.post("/addplan", async (req, res) => {
@@ -586,7 +586,7 @@ router.get('/paymentStatus', async (req, res) => {
     const loginname = req.session.email;
     const records = await registerTable.find().sort({ createdAt: -1, _id: -1 });
     const userDetails = hidePendingWhenPaidExists(records);
-    res.render('pendingSub.ejs', { userDetails, loginname });
+    res.render('subscription/pendingSub.ejs', { userDetails, loginname });
 });
 
 router.get('/invoices', logincheck, async (req, res) => {
@@ -627,7 +627,7 @@ router.get('/invoices', logincheck, async (req, res) => {
 
     const totalRevenue = invoices.reduce((sum, invoice) => sum + safeAmount(invoice.amount), 0);
 
-    res.render('invoices.ejs', {
+    res.render('subscription/invoices.ejs', {
         loginname,
         invoices: filteredInvoices,
         filters: {
@@ -700,7 +700,7 @@ router.get('/payment-history', logincheck, async (req, res) => {
         .filter((record) => record.paymentStatus === 'Pending')
         .reduce((sum, record) => sum + safeAmount(record.amount), 0);
 
-    res.render('paymentHistory.ejs', {
+    res.render('subscription/paymentHistory.ejs', {
         loginname,
         paymentHistory: filteredHistory,
         filters: {
@@ -727,7 +727,7 @@ router.get('/pricingForm', async (req, res) => {
     const { plans, selectedPlan } = await buildPricingPageData(req.query);
     const razorpayConfig = await getRazorpayConfig();
 
-    res.render('pricingForm.ejs', {
+    res.render('subscription/pricingForm.ejs', {
         loginname,
         plans,
         selectedPlan,
@@ -795,7 +795,7 @@ router.get('/subscription/payment', async (req, res) => {
         return;
     }
 
-    res.render('subscriptionCheckout.ejs', {
+    res.render('subscription/subscriptionCheckout.ejs', {
         loginname: req.session.email,
         registration: draft.registration,
         selectedPlan,
@@ -1158,7 +1158,7 @@ router.get('/subscription/settings', logincheck, async (req, res) => {
     const loginname = req.session.email;
     const razorpayConfig = await getRazorpayConfig();
 
-    res.render('RazorpaySettings.ejs', {
+    res.render('subscription/RazorpaySettings.ejs', {
         loginname,
         success: req.query.success === '1',
         error: sanitizeText(req.query.error),
