@@ -1,6 +1,11 @@
 const router=require('express').Router()
 const upload=require('../middleware/multer')
 const solutiontable=require('../models/solution')
+const { requireAuth } = require('../middleware/roleAuth')
+const { requireModuleAccess } = require('../middleware/permissionAuth')
+
+router.use(requireAuth)
+router.use(requireModuleAccess('frontendManagement'))
 
 router.get('/solutiontable',async(req,res)=>{
     const solutiondata=await solutiontable.find()

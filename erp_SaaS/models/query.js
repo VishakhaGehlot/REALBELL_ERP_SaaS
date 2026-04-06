@@ -6,6 +6,10 @@ const querySchema = new mongoose.Schema({
     email: String,
     phone: String,
     message: String,
+    replied: {
+        type: Boolean,
+        default: false
+    },
     createdDate:{
         type:Date,
         default:Date.now

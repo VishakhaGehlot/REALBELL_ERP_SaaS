@@ -99,6 +99,26 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #0f172a;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: #f0b90b;
+            color: #f0b90b;
         }
 
         /* User Profile - Only Icon */
@@ -360,6 +380,116 @@
                 height: 50px;
             }
         }
+
+        [data-theme="dark"] body {
+            background: #090f1f !important;
+            color: #e5e7eb !important;
+        }
+
+        [data-theme="dark"] .erp-header,
+        [data-theme="dark"] .sidebar,
+        [data-theme="dark"] .table-card,
+        [data-theme="dark"] .card,
+        [data-theme="dark"] .chart-card,
+        [data-theme="dark"] .activity-card,
+        [data-theme="dark"] .quick-actions,
+        [data-theme="dark"] .filter-card,
+        [data-theme="dark"] .profile-dropdown,
+        [data-theme="dark"] .stat-card,
+        [data-theme="dark"] .form-card,
+        [data-theme="dark"] .current-values,
+        [data-theme="dark"] .info-box,
+        [data-theme="dark"] .welcome-section {
+            background: #111a2e !important;
+            border-color: #253454 !important;
+            color: #e5e7eb !important;
+        }
+
+        [data-theme="dark"] .content-wrapper,
+        [data-theme="dark"] .main-wrapper,
+        [data-theme="dark"] .table-header,
+        [data-theme="dark"] .card-header,
+        [data-theme="dark"] th,
+        [data-theme="dark"] .dropdown-profile-header {
+            background: #0d1427 !important;
+            color: #e5e7eb !important;
+            border-color: #253454 !important;
+        }
+
+        [data-theme="dark"] td,
+        [data-theme="dark"] p,
+        [data-theme="dark"] span,
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] h4,
+        [data-theme="dark"] h5,
+        [data-theme="dark"] h6,
+        [data-theme="dark"] label,
+        [data-theme="dark"] a,
+        [data-theme="dark"] .form-label,
+        [data-theme="dark"] .activity-title,
+        [data-theme="dark"] .user-name,
+        [data-theme="dark"] .user-fullname {
+            color: #e5e7eb !important;
+        }
+
+        [data-theme="dark"] .activity-time,
+        [data-theme="dark"] .stat-label,
+        [data-theme="dark"] .user-email,
+        [data-theme="dark"] .page-header p,
+        [data-theme="dark"] .form-text {
+            color: #9fb0cb !important;
+        }
+
+        [data-theme="dark"] .nav-main-link,
+        [data-theme="dark"] .nav-sub-link {
+            color: #c7d2fe !important;
+        }
+
+        [data-theme="dark"] .submenu-wrapper,
+        [data-theme="dark"] .search-box,
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] .form-select,
+        [data-theme="dark"] input,
+        [data-theme="dark"] select,
+        [data-theme="dark"] textarea {
+            background: #16233d !important;
+            border-color: #2a3c61 !important;
+            color: #e5e7eb !important;
+        }
+
+        [data-theme="dark"] .form-control::placeholder,
+        [data-theme="dark"] input::placeholder,
+        [data-theme="dark"] textarea::placeholder {
+            color: #8ea3c2 !important;
+        }
+
+        [data-theme="dark"] .btn-add,
+        [data-theme="dark"] .submit-btn,
+        [data-theme="dark"] .save-btn,
+        [data-theme="dark"] .action-btn.update {
+            background: #eab308 !important;
+            color: #0f172a !important;
+            border-color: #eab308 !important;
+        }
+
+        [data-theme="dark"] .btn-add:hover,
+        [data-theme="dark"] .submit-btn:hover,
+        [data-theme="dark"] .save-btn:hover,
+        [data-theme="dark"] .action-btn.update:hover {
+            background: #facc15 !important;
+        }
+
+        [data-theme="dark"] .view-all,
+        [data-theme="dark"] .table-header i,
+        [data-theme="dark"] .chart-header h4 i,
+        [data-theme="dark"] .card-header h4 i,
+        [data-theme="dark"] .page-header h2 i,
+        [data-theme="dark"] .form-label i,
+        [data-theme="dark"] .dropdown-item i {
+            color: #facc15 !important;
+        }
     </style>
 </head>
 <body>
@@ -385,6 +515,9 @@
         
         <!-- Right Side - Profile Icon Only (Dynamic) -->
         <div class="header-right">
+            <button type="button" class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+                <i class="bi bi-moon-stars"></i>
+            </button>
             <div class="profile-container" style="position: relative;">
                 <div class="user-profile" id="profileTrigger">
                     <div class="user-avatar">
@@ -439,6 +572,30 @@
 <div class="dropdown-overlay" id="dropdownOverlay"></div>
 
 <script>
+    // Dark / light mode
+    const savedTheme = localStorage.getItem("erp-theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
+    const themeToggle = document.getElementById("themeToggle");
+    const setThemeIcon = () => {
+        const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+        if (themeToggle) {
+            themeToggle.innerHTML = currentTheme === "dark"
+                ? '<i class="bi bi-sun"></i>'
+                : '<i class="bi bi-moon-stars"></i>';
+        }
+    };
+    setThemeIcon();
+    if (themeToggle) {
+        themeToggle.addEventListener("click", () => {
+            const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+            const nextTheme = currentTheme === "dark" ? "light" : "dark";
+            document.documentElement.setAttribute("data-theme", nextTheme);
+            localStorage.setItem("erp-theme", nextTheme);
+            setThemeIcon();
+        });
+    }
+
     // Dropdown functionality
     const profileTrigger = document.getElementById('profileTrigger');
     const profileDropdown = document.getElementById('profileDropdown');

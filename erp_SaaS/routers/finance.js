@@ -1,5 +1,10 @@
 const router=require('express').Router()
 const financetable=require('../models/finance')
+const { requireAuth } = require('../middleware/roleAuth')
+const { requireModuleAccess } = require('../middleware/permissionAuth')
+
+router.use(requireAuth)
+router.use(requireModuleAccess('frontendManagement'))
 
 router.get('/financetable',async(req,res)=>{
     const financedata=await financetable.find()

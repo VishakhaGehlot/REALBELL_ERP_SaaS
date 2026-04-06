@@ -209,10 +209,12 @@
         font-size: 12px;
     }
 
-    .role-option.user label i { color: #64748b; }
-    .role-option.admin label i { color: #10b981; }
+    .role-option.employee label i { color: #64748b; }
+    .role-option.hr label i { color: #f97316; }
+    .role-option.manager label i { color: #10b981; }
+    .role-option.admin label i { color: #14b8a6; }
+    .role-option.ceo label i { color: #3b82f6; }
     .role-option.superadmin label i { color: #ef4444; }
-    .role-option.teacher label i { color: #f59e0b; }
 
     /* Current Values Box */
     .current-values {
@@ -285,10 +287,12 @@
         font-weight: 600;
     }
 
-    .current-role-badge.user { background: #e2e8f0; color: #475569; }
-    .current-role-badge.admin { background: #dcfce7; color: #166534; }
+    .current-role-badge.employee { background: #e2e8f0; color: #475569; }
+    .current-role-badge.hr { background: #ffedd5; color: #9a3412; }
+    .current-role-badge.manager { background: #dcfce7; color: #166534; }
+    .current-role-badge.admin { background: #ccfbf1; color: #115e59; }
+    .current-role-badge.ceo { background: #dbeafe; color: #1d4ed8; }
     .current-role-badge.superadmin { background: #fee2e2; color: #b91c1c; }
-    .current-role-badge.teacher { background: #fef3c7; color: #92400e; }
 
     /* Info Box */
     .info-box {
@@ -467,7 +471,7 @@
                                 </span>
                                 <span>
                                     Current Role: 
-                                    <span class="current-role-badge <%= Record.role ? Record.role.toLowerCase() : 'user' %>">
+                                    <span class="current-role-badge <%= (Record.role === 'Teacher' || Record.role === 'teacher' || Record.role === 'User' ? 'employee' : (Record.role ? Record.role.toLowerCase() : 'employee')) %>">
                                         <%= Record.role || 'User' %>
                                     </span>
                                 </span>
@@ -479,13 +483,13 @@
                     <div class="info-box">
                         <i class="bi bi-shield-lock"></i>
                         <p>
-                            You can update the user's role here. Changing a user's role will affect their permissions in the system.
-                            <small>Select a new role from the options below</small>
+                            You can update user details and role here. Changes will be saved immediately after submit.
+                            <small>Edit required fields and select role below</small>
                         </p>
                     </div>
 
-                    <form action="/updaterole/<%= Record._id %>" method="POST">
-                        <!-- First Name (Read-only) -->
+                    <form action="/useredit/<%= Record._id %>" method="POST">
+                        <!-- First Name -->
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-person"></i>
@@ -495,10 +499,10 @@
                                    class="form-control" 
                                    name="firstName" 
                                    value="<%= Record.firstName %>"
-                                   readonly>
+                                   required>
                         </div>
 
-                        <!-- Last Name (Read-only) -->
+                        <!-- Last Name -->
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-person"></i>
@@ -508,10 +512,10 @@
                                    class="form-control" 
                                    name="lastName" 
                                    value="<%= Record.lastName %>"
-                                   readonly>
+                                   required>
                         </div>
 
-                        <!-- Email (Read-only) -->
+                        <!-- Email -->
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-envelope"></i>
@@ -521,60 +525,84 @@
                                    class="form-control" 
                                    name="email" 
                                    value="<%= Record.email %>"
-                                   readonly>
+                                   required>
                         </div>
 
-                        <!-- Role Selection -->
+                        <!-- Mobile -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-telephone"></i>
+                                Mobile
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="mobile"
+                                   value="<%= Record.mobile || '' %>">
+                        </div>
+
+                        <!-- DOB -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-calendar-event"></i>
+                                Date of Birth
+                            </label>
+                            <input type="date"
+                                   class="form-control"
+                                   name="dob"
+                                   value="<%= Record.dob || '' %>">
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-toggle-on"></i>
+                                Status
+                            </label>
+                            <select class="form-control" name="status">
+                                <option value="Active" <%= Record.status === 'Active' ? 'selected' : '' %>>Active</option>
+                                <option value="Inactive" <%= Record.status === 'Inactive' ? 'selected' : '' %>>Inactive</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-diagram-3"></i>
+                                Reports To
+                            </label>
+                            <select class="form-control" name="reportsTo">
+                                <option value="none" <%= !Record.reportsTo ? 'selected' : '' %>>No Reporting Manager</option>
+                                <% if (managerOptions && managerOptions.length) { %>
+                                    <% managerOptions.forEach((mgr) => { %>
+                                        <option value="<%= mgr._id %>" <%= String(Record.reportsTo || '') === String(mgr._id) ? 'selected' : '' %>>
+                                            <%= mgr.firstName %> <%= mgr.lastName %> (<%= mgr.role %>)
+                                        </option>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                        </div>
+
+                        <!-- Role Input -->
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-shield-check"></i>
-                                Select New Role
+                                User Role
                             </label>
-                            <div class="role-selector">
-                                <!-- User Role -->
-                                <div class="role-option user">
-                                    <input type="radio" name="role" id="roleUser" value="User" 
-                                           <%= Record.role == 'User' ? 'checked' : '' %>>
-                                    <label for="roleUser">
-                                        <i class="bi bi-person"></i>
-                                        <span>User</span>
-                                        <small>Basic access</small>
-                                    </label>
-                                </div>
-
-                                <!-- Teacher Role -->
-                                <div class="role-option teacher">
-                                    <input type="radio" name="role" id="roleTeacher" value="teacher"
-                                           <%= Record.role == 'teacher' ? 'checked' : '' %>>
-                                    <label for="roleTeacher">
-                                        <i class="bi bi-person-workspace"></i>
-                                        <span>Teacher</span>
-                                        <small>Educational access</small>
-                                    </label>
-                                </div>
-
-                                <!-- Admin Role -->
-                                <div class="role-option admin">
-                                    <input type="radio" name="role" id="roleAdmin" value="Admin"
-                                           <%= Record.role == 'Admin' ? 'checked' : '' %>>
-                                    <label for="roleAdmin">
-                                        <i class="bi bi-shield"></i>
-                                        <span>Admin</span>
-                                        <small>Management access</small>
-                                    </label>
-                                </div>
-
-                                <!-- SuperAdmin Role -->
-                                <div class="role-option superadmin">
-                                    <input type="radio" name="role" id="roleSuperAdmin" value="SuperAdmin"
-                                           <%= Record.role == 'SuperAdmin' ? 'checked' : '' %>>
-                                    <label for="roleSuperAdmin">
-                                        <i class="bi bi-shield-fill"></i>
-                                        <span>Super Admin</span>
-                                        <small>Full access</small>
-                                    </label>
-                                </div>
-                            </div>
+                            <input type="text"
+                                   class="form-control"
+                                   name="role"
+                                   list="roleSuggestions"
+                                   value="<%= Record.role || 'Employee' %>"
+                                   placeholder="Enter any role"
+                                   required
+                                   maxlength="50">
+                            <datalist id="roleSuggestions">
+                                <option value="Employee"></option>
+                                <option value="HR"></option>
+                                <option value="Manager"></option>
+                                <option value="Admin"></option>
+                                <option value="CEO"></option>
+                                <option value="SuperAdmin"></option>
+                            </datalist>
                         </div>
 
                         <!-- Button Group -->

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Business Registration | Secure Payment via Razorpay</title>
+  <!-- Razorpay's official JS (for production, load from CDN) -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <!-- Google Fonts & simple reset -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f0f4ff 0%, #e9eff8 100%);
+      font-family: 'Inter', sans-serif;
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* main card container */
+    .reg-container {
+      max-width: 1000px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 2rem;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 8px 18px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    /* header area with step indicator (inspired by first image "steps") */
+    .steps-header {
+      background: #ffffff;
+      padding: 1.8rem 2rem 1rem 2rem;
+      border-bottom: 1px solid #eef2f6;
+    }
+
+    .steps-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .step-item {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #6c7a91;
+      background: #f8fafd;
+      padding: 0.6rem 1rem;
+      border-radius: 60px;
+      transition: all 0.2s;
+    }
+
+    .step-number {
+      width: 30px;
+      height: 30px;
+      background: #e2e8f0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #2d3a4b;
+    }
+
+    .step-item.active {
+      background: #eef3ff;
+      color: #1e3a8a;
+    }
+
+    .step-item.active .step-number {
+      background: #1e3a8a;
+      color: white;
+      box-shadow: 0 4px 8px rgba(30,58,138,0.2);
+    }
+
+    .step-item.completed .step-number {
+      background: #10b981;
+      color: white;
+    }
+
+    .step-text {
+      font-weight: 500;
+    }
+
+    /* form panels */
+    .form-panels {
+      padding: 2rem 2rem 1.8rem 2rem;
+    }
+
+    .form-panel {
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .form-panel.active-panel {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem 2rem;
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .input-group label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+      color: #1f2a44;
+    }
+
+    .input-group input, 
+    .input-group select {
+      padding: 0.85rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1rem;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      background: #fefefe;
+      transition: 0.2s;
+      outline: none;
+    }
+
+    .input-group input:focus, 
+    .input-group select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+
+    .input-group input.error-border {
+      border-color: #ef4444;
+      background-color: #fff8f8;
+    }
+
+    .error-msg {
+      font-size: 0.7rem;
+      color: #dc2626;
+      margin-top: 0.2rem;
+      display: block;
+    }
+
+    /* navigation buttons */
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #edf2f7;
+    }
+
+    .btn {
+      padding: 0.8rem 2rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #1e3a8a;
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .btn-primary:hover {
+      background: #0f2b6d;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #1f2a44;
+      border: 1px solid #cbd5e1;
+    }
+
+    .btn-secondary:hover {
+      background: #e6edf4;
+    }
+
+    .btn-pay {
+      background: #0f172a;
+      color: white;
+      background: linear-gradient(95deg, #0f2b3d, #1e3a8a);
+      font-weight: 700;
+      padding: 0.85rem 2.5rem;
+    }
+
+    .btn-pay:hover {
+      background: linear-gradient(95deg, #1e3a8a, #0f2b6d);
+      transform: scale(1.01);
+    }
+
+    /* summary box */
+    .summary-box {
+      background: #f8fafc;
+      border-radius: 1.2rem;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1.8rem;
+      border: 1px solid #eef2ff;
+    }
+
+    .summary-title {
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      font-size: 1rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .summary-details {
+      font-size: 0.85rem;
+      color: #2c3e66;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+    }
+
+    .plan-amount {
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: #1e3a8a;
+    }
+
+    hr {
+      margin: 0.8rem 0;
+      border-color: #e2edf2;
+    }
+
+    @media (max-width: 700px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .full-width {
+        grid-column: span 1;
+      }
+      .steps-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .reg-container {
+        margin: 0;
+      }
+      .step-item {
+        width: 100%;
+      }
+      .btn {
+        padding: 0.7rem 1.5rem;
+      }
+    }
+
+    .razorpay-logo-tag {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #6c86a3;
+      margin-top: 0.5rem;
+    }
+
+    small.hint {
+      display: block;
+      font-size: 0.7rem;
+      color: #5b6e8c;
+      margin-top: 0.2rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="reg-container" id="app">
+  <div class="steps-header">
+    <div class="steps-row" id="stepsContainer">
+      <!-- step 1: Account & Business Details -->
+      <div class="step-item" data-step="1">
+        <span class="step-number">1</span>
+        <span class="step-text">Registration</span>
+      </div>
+      <!-- step 2: Payment & Plan -->
+      <div class="step-item" data-step="2">
+        <span class="step-number">2</span>
+        <span class="step-text">Payment & Plan</span>
+      </div>
+      <!-- step 3: Confirmation (summary + pay) -->
+      <div class="step-item" data-step="3">
+        <span class="step-number">3</span>
+        <span class="step-text">Confirm & Pay</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-panels">
+    <!-- PANEL 1: Registration (All fields matching second image + extra) -->
+    <div class="form-panel" id="panel1">
+      <form id="step1Form" onsubmit="return false;">
+        <div class="form-grid">
+          <div class="input-group full-width">
+            <label>Full Name *</label>
+            <input type="text" id="fullName" placeholder="John Carter" autocomplete="name">
+            <span class="error-msg" id="errorName"></span>
+          </div>
+          <div class="input-group">
+            <label>Email *</label>
+            <input type="email" id="emailReg" placeholder="business@example.com" autocomplete="email">
+            <span class="error-msg" id="errorEmail"></span>
+          </div>
+          <div class="input-group">
+            <label>Phone *</label>
+            <input type="tel" id="phoneReg" placeholder="+91 9876543210" autocomplete="tel">
+            <span class="error-msg" id="errorPhone"></span>
+          </div>
+          <div class="input-group">
+            <label>Business Name *</label>
+            <input type="text" id="businessName" placeholder="Your Brand / Ltd">
+            <span class="error-msg" id="errorBusinessName"></span>
+          </div>
+          <div class="input-group">
+            <label>Address *</label>
+            <input type="text" id="address" placeholder="Street, City, ZIP">
+            <span class="error-msg" id="errorAddress"></span>
+          </div>
+          <div class="input-group">
+            <label>Type of Business *</label>
+            <select id="businessType">
+              <option value="">Select type</option>
+              <option value="Sole Proprietorship">Sole Proprietorship</option>
+              <option value="Partnership">Partnership</option>
+              <option value="Private Limited">Private Limited</option>
+              <option value="LLP">LLP</option>
+              <option value="Freelancer">Freelancer / Individual</option>
+            </select>
+            <span class="error-msg" id="errorBusType"></span>
+          </div>
+          <div class="input-group">
+            <label>Business Email *</label>
+            <input type="email" id="businessEmail" placeholder="contact@mybusiness.com">
+            <span class="error-msg" id="errorBusEmail"></span>
+          </div>
+          <div class="input-group">
+            <label>Business Phone *</label>
+            <input type="tel" id="businessPhone" placeholder="Office phone">
+            <span class="error-msg" id="errorBusPhone"></span>
+          </div>
+          <div class="input-group">
+            <label>Password *</label>
+            <input type="password" id="password" placeholder="Create password">
+            <span class="error-msg" id="errorPassword"></span>
+          </div>
+          <div class="input-group">
+            <label>Confirm Password *</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm password">
+            <span class="error-msg" id="errorConfirmPwd"></span>
+          </div>
+        </div>
+        <div class="nav-buttons">
+          <div></div>
+          <button type="button" class="btn btn-primary" id="nextToStep2">Next: Select Plan →</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- PANEL 2: Plan Selection / Payment details (Razorpay plan selection) -->
+    <div class="form-panel" id="panel2">
+      <div class="summary-box">
+        <div class="summary-title">💰 Choose your subscription plan</div>
+        <div class="summary-details" style="flex-direction: column; gap: 1rem;">
+          <label style="display: flex; align-items: center; gap: 12px; background: white; padding: 0.8rem 1rem; border-radius: 1rem; border: 1px solid #e0e7ff; cursor: pointer;">
+            <input type="radio" name="plan" value="basic" checked> <strong>Starter Plan</strong> – ₹999 / month <span style="margin-left: auto; font-size: 0.7rem; background:#eef2ff; padding: 2px 8px; border-radius: 20px;">popular</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 12px; background: white; padding: 0.8rem 1rem; border-radius: 1rem; border: 1px solid #e0e7ff; cursor: pointer;">
+            <input type="radio" name="plan" value="professional"> <strong>Professional Plan</strong> – ₹2,499 / month <span style="margin-left: auto; font-size: 0.7rem;">+ advanced analytics</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 12px; background: white; padding: 0.8rem 1rem; border-radius: 1rem; border: 1px solid #e0e7ff; cursor: pointer;">
+            <input type="radio" name="plan" value="enterprise"> <strong>Enterprise Plan</strong> – ₹5,999 / month <span style="margin-left: auto;">priority support</span>
+          </label>
+        </div>
+        <hr>
+        <div class="summary-title">💳 Payment via Razorpay (secure)</div>
+        <small class="hint">All plans include GST invoice. You'll be redirected to Razorpay Checkout after final confirmation.</small>
+      </div>
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-secondary" id="backToStep1">← Back</button>
+        <button type="button" class="btn btn-primary" id="nextToStep3">Review & Proceed →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 3: Final confirmation + Submit & Pay (Razorpay integration) -->
+    <div class="form-panel" id="panel3">
+      <div class="summary-box">
+        <div class="summary-title">📋 Verify registration details</div>
+        <div id="confirmDetails" style="font-size: 0.85rem; line-height: 1.5; color: #1f2a3e;"></div>
+        <hr>
+        <div class="summary-title">💸 Plan & Amount</div>
+        <div id="planSummary" style="font-weight: 600;">-</div>
+        <div class="plan-amount" id="amountToPay">₹0</div>
+      </div>
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-secondary" id="backToStep2">← Edit Plan/Info</button>
+        <button type="button" class="btn btn-pay" id="submitAndPayBtn">Submit & Pay 💳</button>
+      </div>
+      <div class="razorpay-logo-tag">🔒 Secured by Razorpay | Test mode integration ready</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // DOM elements
+  let currentStep = 1;        // 1,2,3
+  const panels = {
+    1: document.getElementById('panel1'),
+    2: document.getElementById('panel2'),
+    3: document.getElementById('panel3')
+  };
+  const steps = document.querySelectorAll('.step-item');
+  
+  // Form fields from step1
+  const fullName = document.getElementById('fullName');
+  const emailReg = document.getElementById('emailReg');
+  const phoneReg = document.getElementById('phoneReg');
+  const businessName = document.getElementById('businessName');
+  const address = document.getElementById('address');
+  const businessType = document.getElementById('businessType');
+  const businessEmail = document.getElementById('businessEmail');
+  const businessPhone = document.getElementById('businessPhone');
+  const password = document.getElementById('password');
+  const confirmPassword = document.getElementById('confirmPassword');
+
+  // Plan radio buttons
+  const planRadios = document.querySelectorAll('input[name="plan"]');
+  
+  // Helper: get selected plan and amount
+  function getSelectedPlanDetails() {
+    let selectedVal = 'basic';
+    for (let radio of planRadios) {
+      if (radio.checked) {
+        selectedVal = radio.value;
+        break;
+      }
+    }
+    switch(selectedVal) {
+      case 'basic': return { name: 'Starter Plan (Monthly)', amount: 999 };
+      case 'professional': return { name: 'Professional Plan (Monthly)', amount: 2499 };
+      case 'enterprise': return { name: 'Enterprise Plan (Monthly)', amount: 5999 };
+      default: return { name: 'Starter Plan', amount: 999 };
+    }
+  }
+
+  // Validation for step1 (all required fields, password match)
+  function validateStep1() {
+    let isValid = true;
+    const clearErrors = () => {
+      document.querySelectorAll('.error-msg').forEach(el => el.innerText = '');
+      document.querySelectorAll('.input-group input, .input-group select').forEach(el => el.classList.remove('error-border'));
+    };
+    clearErrors();
+    
+    if (!fullName.value.trim()) { showError('errorName', 'Full name is required'); markError(fullName); isValid=false; }
+    const emailVal = emailReg.value.trim();
+    if (!emailVal) { showError('errorEmail', 'Email required'); markError(emailReg); isValid=false; }
+    else if (!/^\S+@\S+\.\S+$/.test(emailVal)) { showError('errorEmail', 'Invalid email format'); markError(emailReg); isValid=false; }
+    if (!phoneReg.value.trim()) { showError('errorPhone', 'Phone number required'); markError(phoneReg); isValid=false; }
+    if (!businessName.value.trim()) { showError('errorBusinessName', 'Business name required'); markError(businessName); isValid=false; }
+    if (!address.value.trim()) { showError('errorAddress', 'Address required'); markError(address); isValid=false; }
+    if (!businessType.value) { showError('errorBusType', 'Select business type'); markError(businessType); isValid=false; }
+    if (!businessEmail.value.trim()) { showError('errorBusEmail', 'Business email required'); markError(businessEmail); isValid=false; }
+    else if (!/^\S+@\S+\.\S+$/.test(businessEmail.value.trim())) { showError('errorBusEmail', 'Invalid business email'); markError(businessEmail); isValid=false; }
+    if (!businessPhone.value.trim()) { showError('errorBusPhone', 'Business phone required'); markError(businessPhone); isValid=false; }
+    if (!password.value) { showError('errorPassword', 'Password required'); markError(password); isValid=false; }
+    else if (password.value.length < 6) { showError('errorPassword', 'Minimum 6 characters'); markError(password); isValid=false; }
+    if (password.value !== confirmPassword.value) { showError('errorConfirmPwd', 'Passwords do not match'); markError(confirmPassword); isValid=false; }
+    return isValid;
+  }
+
+  function showError(elementId, msg) { const el = document.getElementById(elementId); if(el) el.innerText = msg; }
+  function markError(field) { if(field) field.classList.add('error-border'); }
+
+  // Update step UI
+  function setStep(step) {
+    currentStep = step;
+    for(let i=1; i<=3; i++) {
+      if(panels[i]) {
+        if(i === step) panels[i].classList.add('active-panel');
+        else panels[i].classList.remove('active-panel');
+      }
+    }
+    // update step indicator styling
+    steps.forEach((stepDiv, idx) => {
+      const stepNum = idx+1;
+      stepDiv.classList.remove('active', 'completed');
+      if(stepNum === currentStep) stepDiv.classList.add('active');
+      if(stepNum < currentStep) stepDiv.classList.add('completed');
+    });
+    // if moving to step3, refresh the summary block
+    if(step === 3) {
+      buildConfirmationSummary();
+    }
+  }
+
+  // Build confirmation details from step1 data + selected plan
+  function buildConfirmationSummary() {
+    const confirmDiv = document.getElementById('confirmDetails');
+    const plan = getSelectedPlanDetails();
+    const nameVal = fullName.value.trim() || '—';
+    const emailVal = emailReg.value.trim() || '—';
+    const phoneVal = phoneReg.value.trim() || '—';
+    const bizNameVal = businessName.value.trim() || '—';
+    const addrVal = address.value.trim() || '—';
+    const bizTypeVal = businessType.value || '—';
+    const bizEmailVal = businessEmail.value.trim() || '—';
+    const bizPhoneVal = businessPhone.value.trim() || '—';
+    
+    confirmDiv.innerHTML = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap: 8px 12px;">
+        <span style="font-weight:600;">Name:</span> <span>${escapeHtml(nameVal)}</span>
+        <span style="font-weight:600;">Email:</span> <span>${escapeHtml(emailVal)}</span>
+        <span style="font-weight:600;">Phone:</span> <span>${escapeHtml(phoneVal)}</span>
+        <span style="font-weight:600;">Business:</span> <span>${escapeHtml(bizNameVal)}</span>
+        <span style="font-weight:600;">Address:</span> <span>${escapeHtml(addrVal)}</span>
+        <span style="font-weight:600;">Business Type:</span> <span>${escapeHtml(bizTypeVal)}</span>
+        <span style="font-weight:600;">Business Email:</span> <span>${escapeHtml(bizEmailVal)}</span>
+        <span style="font-weight:600;">Business Phone:</span> <span>${escapeHtml(bizPhoneVal)}</span>
+      </div>
+    `;
+    const planSummaryDiv = document.getElementById('planSummary');
+    planSummaryDiv.innerHTML = `${plan.name}  •  ₹${plan.amount}/month`;
+    document.getElementById('amountToPay').innerHTML = `₹${plan.amount}`;
+  }
+
+  function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+  
+  // Razorpay payment handler (production ready simulation using test keys)
+  // For demo, we use razorpay test checkout. You need to replace key_id with actual test key.
+  // Since this is a frontend simulation, we'll create a dummy order generation on client-side (Razorpay supports direct amount).
+  // For better integration, one should call backend to create order, but here we simulate with pre-defined amount + prefill.
+  function initiateRazorpayPayment(planAmount, planName, userDetails) {
+    // Use Razorpay test Key (sandbox public key) - Replace with your test key if needed, but the below is a dummy format.
+    // However, to ensure the checkout opens we must use a valid test key. For demo purposes we show that the integration works.
+    // NOTE: In real scenario you should generate order_id from backend. For frontend prototype we use options.amount in paise.
+    const options = {
+      key: "rzp_test_YourTestKeyHere",   // In real production, replace with actual key. For demo, we show config.
+      amount: planAmount * 100,          // amount in paise
+      currency: "INR",
+      name: "Business Plan Registration",
+      description: `Payment for ${planName}`,
+      image: "https://cdn.razorpay.com/logo.png",  // optional
+      prefill: {
+        name: userDetails.fullName,
+        email: userDetails.email,
+        contact: userDetails.phone
+      },
+      notes: {
+        business_name: userDetails.businessName,
+        plan: planName,
+        type: "registration_fee"
+      },
+      theme: {
+        color: "#1e3a8a"
+      },
+      modal: {
+        ondismiss: function() {
+          alert("Payment process cancelled. You can try again.");
+        }
+      }
+    };
+    // Since we can't guarantee a live test key without server, we show an alert and simulate successful payment with a demo flow.
+    // But Razorpay SDK requires a valid key. For showcasing that the integration logic is correct, we display a simulation 
+    // and also trigger real checkout if proper key is placed. For maximum demo usability we will show success simulation after prompt.
+    // To respect your requirement, we provide working razorpay checkout simulation:
+    // If key is invalid, razorpay will throw error, so we alternatively use a confirmation modal + mock payment.
+    // But to make it truly "Razorpay" we display checkout mock? Actually we will call Razorpay with a dummy but provide fallback.
+    // However, for production-level implementation, merchant must replace key. We will show a native alert: "Razorpay Integration Ready"
+    // and if key placeholder present, we instruct. To avoid broken flow we show a simulated success after confirm.
+    if (options.key === "rzp_test_YourTestKeyHere") {
+      // Demo mode: Simulate successful payment using alert & console.
+      if (confirm(`🔐 TEST MODE: Razorpay payment of ₹${planAmount} would be processed.\nProceed with demo payment?`)) {
+        alert(`✅ Payment Success (Demo)!\nTransaction ID: RAZOR_DEMO_${Date.now()}\nThank you for registering! We'll send confirmation to ${userDetails.email}.`);
+        finalizeRegistration();
+      } else {
+        alert("Payment cancelled.");
+      }
+    } else {
+      // If actual test key provided, open Razorpay checkout
+      const razorpayInstance = new Razorpay(options);
+      razorpayInstance.on('payment.success', function(response) {
+        alert(`Payment Successful! Payment ID: ${response.razorpay_payment_id}\nRegistration complete.`);
+        finalizeRegistration();
+      });
+      razorpayInstance.on('payment.error', function(error) {
+        alert(`Payment Failed: ${error.error.description}\nPlease try again.`);
+      });
+      razorpayInstance.open();
+    }
+  }
+  
+  function finalizeRegistration() {
+    // final success action: reset or show success message
+    alert("🎉 Registration & Payment completed! Redirecting to dashboard (demo).");
+    // optional: clear or reset form.
+    // In real case, you would send data to backend.
+  }
+  
+  // Event listener for submit & pay
+  document.getElementById('submitAndPayBtn').addEventListener('click', function(e) {
+    // ensure all data is consistent from step1
+    if (!fullName.value.trim() || !emailReg.value.trim() || !businessName.value.trim()) {
+      alert("Please complete all registration details in step 1 first. Go back and fill required fields.");
+      setStep(1);
+      return;
+    }
+    // simple extra check on email/password consistency not needed but ensure data
+    if (!validateStep1()) {
+      alert("Some registration info is invalid. Please go back to Step 1 and fix errors.");
+      setStep(1);
+      return;
+    }
+    const plan = getSelectedPlanDetails();
+    const userDetails = {
+      fullName: fullName.value.trim(),
+      email: emailReg.value.trim(),
+      phone: phoneReg.value.trim(),
+      businessName: businessName.value.trim()
+    };
+    initiateRazorpayPayment(plan.amount, plan.name, userDetails);
+  });
+  
+  // navigation buttons
+  document.getElementById('nextToStep2').addEventListener('click', () => {
+    if(validateStep1()) {
+      setStep(2);
+    } else {
+      // scroll to error
+      document.querySelector('.error-msg')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+  document.getElementById('backToStep1').addEventListener('click', () => setStep(1));
+  document.getElementById('nextToStep3').addEventListener('click', () => {
+    // no extra validation for step2 besides plan is always selected
+    setStep(3);
+  });
+  document.getElementById('backToStep2').addEventListener('click', () => setStep(2));
+  
+  // initial active step
+  setStep(1);
+  
+  // Add plan change listener to show dynamic effect (optional)
+  planRadios.forEach(radio => radio.addEventListener('change', () => {
+    if(currentStep === 3) buildConfirmationSummary();
+  }));
+</script>
+</body>
+</html>

@@ -1,5 +1,10 @@
 const router=require('express').Router()
 const faqtable=require('../models/faq')
+const { requireAuth } = require('../middleware/roleAuth')
+const { requireModuleAccess } = require('../middleware/permissionAuth')
+
+router.use(requireAuth)
+router.use(requireModuleAccess('frontendManagement'))
 
 
 router.get("/faqtable",async(req,res)=>{

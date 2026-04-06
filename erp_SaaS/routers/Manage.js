@@ -1,6 +1,11 @@
 const router=require('express').Router()
 const upload=require('../middleware/multer')
 const managetable=require('../models/manage')
+const { requireAuth } = require('../middleware/roleAuth')
+const { requireModuleAccess } = require('../middleware/permissionAuth')
+
+router.use(requireAuth)
+router.use(requireModuleAccess('frontendManagement'))
 
 router.get('/managetable',async(req,res)=>{
     const managedata=await managetable.find()

@@ -1,6 +1,11 @@
 const router=require('express').Router()
 const upload=require('../middleware/multer')
 const leadstable=require('../models/leads')
+const { requireAuth } = require('../middleware/roleAuth')
+const { requireModuleAccess } = require('../middleware/permissionAuth')
+
+router.use(requireAuth)
+router.use(requireModuleAccess('frontendManagement'))
 
 router.get('/leadstable',async(req,res)=>{
     const leadsdata=await leadstable.find()

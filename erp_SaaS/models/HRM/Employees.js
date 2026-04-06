@@ -51,6 +51,15 @@ const employeeSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    createdByUserId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "auth",
+        default: null
+    },
+    createdByEmail: {
+        type: String,
+        default: ""
+    },
 
     // Attendance Records
     attendanceRecords: [{

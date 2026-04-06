@@ -1,6 +1,11 @@
 const router=require('express').Router()
 const upload=require('../middleware/multer')
 const accountTable=require('../models/Accounting')
+const { requireAuth } = require('../middleware/roleAuth')
+const { requireModuleAccess } = require('../middleware/permissionAuth')
+
+router.use(requireAuth)
+router.use(requireModuleAccess('frontendManagement'))
 
 
 router.get('/accounttable',async(req,res)=>{

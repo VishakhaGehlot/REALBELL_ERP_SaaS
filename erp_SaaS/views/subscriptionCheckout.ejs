@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Review | REAL ERP SaaS</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+    :root{
+        --navy:#0f1c33;
+        --gold:#d4a017;
+        --gold-soft:#f3c654;
+        --muted:#64748b;
+        --success:#166534;
+        --danger:#b91c1c;
+    }
+    *{ box-sizing:border-box; }
+    body{
+        margin:0;
+        min-height:100vh;
+        font-family:'Segoe UI',sans-serif;
+        background:
+            radial-gradient(circle at top right, rgba(212,160,23,0.18), transparent 30%),
+            linear-gradient(135deg, #f8fafc 0%, #edf2f7 52%, #e5ebf3 100%);
+        color:#1f2937;
+    }
+    .page-wrap{ padding:48px 16px; }
+    .shell{ max-width:1180px; margin:0 auto; }
+    .hero{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
+    .hero h1{ margin:0 0 8px; font-size:clamp(2rem,4vw,3rem); color:var(--navy); font-weight:800; }
+    .hero p{ margin:0; color:var(--muted); max-width:760px; }
+    .brand{ text-decoration:none; color:var(--navy); font-weight:800; letter-spacing:0.06em; }
+    .content-grid{ display:grid; grid-template-columns:1.05fr 0.95fr; gap:24px; align-items:start; }
+    .panel{
+        background:#fff;
+        border-radius:28px;
+        border:1px solid rgba(15,28,51,0.08);
+        box-shadow:0 24px 60px rgba(15,28,51,0.08);
+        padding:30px;
+    }
+    .eyebrow{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:8px 14px;
+        border-radius:999px;
+        background:rgba(212,160,23,0.14);
+        color:#9a6700;
+        font-size:0.84rem;
+        font-weight:700;
+        margin-bottom:16px;
+    }
+    .section-title{ margin:0 0 8px; font-size:1.45rem; font-weight:800; color:var(--navy); }
+    .section-subtitle{ margin:0 0 20px; color:var(--muted); }
+    .alert-banner{ border:none; border-radius:16px; padding:14px 16px; font-weight:600; margin-bottom:16px; }
+    .summary-card{
+        border:1px solid #e2e8f0;
+        border-radius:22px;
+        padding:18px;
+        background:linear-gradient(180deg,#ffffff,#fafbfd);
+        margin-bottom:16px;
+    }
+    .summary-card h3{ margin:0 0 10px; color:var(--navy); font-size:1.3rem; font-weight:800; }
+    .price{
+        font-size:2.2rem;
+        font-weight:900;
+        color:var(--gold);
+        margin-bottom:14px;
+    }
+    .feature-list{
+        list-style:none;
+        padding:0;
+        margin:0;
+        display:grid;
+        gap:10px;
+    }
+    .feature-list li{
+        display:flex;
+        gap:10px;
+        align-items:flex-start;
+        color:#334155;
+    }
+    .feature-list i{ color:var(--success); }
+    .detail-list{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:14px;
+    }
+    .detail-item{
+        border:1px solid #e2e8f0;
+        border-radius:18px;
+        padding:14px 16px;
+        background:#f8fafc;
+    }
+    .detail-item.full{ grid-column:1 / -1; }
+    .detail-item small{ display:block; color:var(--muted); margin-bottom:6px; }
+    .detail-item strong{ color:var(--navy); font-size:0.98rem; word-break:break-word; }
+    .info-row{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:14px;
+        padding:14px 0;
+        border-bottom:1px solid #edf2f7;
+    }
+    .info-row:last-child{ border-bottom:none; }
+    .info-row small{ display:block; color:var(--muted); margin-bottom:4px; }
+    .info-row strong{ color:var(--navy); }
+    .checkout-btn{
+        width:100%;
+        min-height:56px;
+        border:none;
+        border-radius:16px;
+        background:linear-gradient(90deg, var(--gold), var(--gold-soft));
+        color:var(--navy);
+        font-weight:800;
+        font-size:1rem;
+        box-shadow:0 16px 32px rgba(212,160,23,0.24);
+    }
+    .checkout-btn:disabled{ opacity:0.7; cursor:not-allowed; }
+    .scanner-btn{
+        width:100%;
+        min-height:52px;
+        border-radius:16px;
+        border:1px solid #cbd5e1;
+        background:#f8fafc;
+        color:var(--navy);
+        font-weight:800;
+        margin-top:12px;
+    }
+    .scanner-btn:disabled{ opacity:0.7; cursor:not-allowed; }
+    .status-message{ margin-top:14px; min-height:24px; font-weight:600; }
+    .status-message.error{ color:var(--danger); }
+    .status-message.success{ color:var(--success); }
+    .status-message.info{ color:#1d4ed8; }
+    .qr-card{
+        margin-top:18px;
+        padding:18px;
+        border-radius:22px;
+        border:1px solid #dbeafe;
+        background:linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+    }
+    .qr-card[hidden]{ display:none !important; }
+    .qr-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:12px;
+        margin-bottom:14px;
+    }
+    .qr-head h3{
+        margin:0 0 4px;
+        color:var(--navy);
+        font-size:1.05rem;
+        font-weight:800;
+    }
+    .qr-head p{
+        margin:0;
+        color:var(--muted);
+        font-size:0.9rem;
+    }
+    .qr-chip{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        border-radius:999px;
+        padding:8px 12px;
+        background:#dbeafe;
+        color:#1d4ed8;
+        font-size:0.8rem;
+        font-weight:700;
+    }
+    .qr-box{
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        min-height:236px;
+        border-radius:18px;
+        background:#ffffff;
+        border:1px dashed #93c5fd;
+        padding:14px;
+    }
+    .qr-box img{
+        max-width:100%;
+        height:auto;
+    }
+    .qr-link{
+        display:block;
+        margin-top:14px;
+        color:#1d4ed8;
+        font-weight:700;
+        text-decoration:none;
+        word-break:break-all;
+    }
+    .qr-note{
+        margin-top:12px;
+        color:var(--muted);
+        font-size:0.88rem;
+    }
+    .qr-status{
+        margin-top:10px;
+        min-height:22px;
+        color:#1d4ed8;
+        font-weight:700;
+    }
+    .back-link{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        text-decoration:none;
+        color:var(--navy);
+        font-weight:700;
+        margin-top:18px;
+    }
+    @media (max-width: 991px){
+        .content-grid{ grid-template-columns:1fr; }
+        .detail-list{ grid-template-columns:1fr; }
+    }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+    <div class="shell">
+        <div class="hero">
+            <div>
+                <a href="/" class="brand">REAL ERP SAAS</a>
+                <h1>Step 2: Review and pay</h1>
+                <p>Your registration details are ready. Review the selected plan and click the payment button below to continue to Razorpay.</p>
+            </div>
+            <a href="/pricingForm?planId=<%= selectedPlan._id %>" class="btn btn-outline-dark rounded-pill px-4 py-2">Back to Registration</a>
+        </div>
+
+        <div class="content-grid">
+            <section class="panel">
+                <div class="eyebrow"><i class="bi bi-file-earmark-check-fill"></i> Registration review</div>
+                <h2 class="section-title">Customer and business details</h2>
+                <p class="section-subtitle">This information will be used after successful payment to create the subscription request.</p>
+
+                <% if (success) { %>
+                    <div class="alert alert-success alert-banner">Payment successful. Your subscription request has been created.</div>
+                <% } %>
+
+                <% if (error) { %>
+                    <div class="alert alert-danger alert-banner"><%= error %></div>
+                <% } %>
+
+                <div class="detail-list">
+                    <div class="detail-item">
+                        <small>Full name</small>
+                        <strong><%= registration.name %></strong>
+                    </div>
+                    <div class="detail-item">
+                        <small>Email</small>
+                        <strong><%= registration.email %></strong>
+                    </div>
+                    <div class="detail-item">
+                        <small>Phone</small>
+                        <strong><%= registration.phone %></strong>
+                    </div>
+                    <div class="detail-item">
+                        <small>Business name</small>
+                        <strong><%= registration.businessName %></strong>
+                    </div>
+                    <div class="detail-item">
+                        <small>Business email</small>
+                        <strong><%= registration.businessEmail %></strong>
+                    </div>
+                    <div class="detail-item">
+                        <small>Business phone</small>
+                        <strong><%= registration.businessPhone %></strong>
+                    </div>
+                    <div class="detail-item full">
+                        <small>Business type</small>
+                        <strong><%= registration.businessType %></strong>
+                    </div>
+                    <div class="detail-item full">
+                        <small>Business address</small>
+                        <strong><%= registration.address %></strong>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="panel">
+                <div class="eyebrow"><i class="bi bi-credit-card-2-front-fill"></i> Payment step</div>
+                <h2 class="section-title">Plan summary</h2>
+                <p class="section-subtitle">Pay using Razorpay checkout or use UPI apps like PhonePe from the scan option.</p>
+
+                <div class="summary-card">
+                    <h3><%= selectedPlan.title %></h3>
+                    <div class="price">₹ <%= selectedPlan.price %></div>
+                    <ul class="feature-list">
+                        <% if (selectedPlan.features && selectedPlan.features.length) { %>
+                            <% selectedPlan.features.forEach(function(feature) { %>
+                                <li><i class="bi bi-check-circle-fill"></i><span><%= feature %></span></li>
+                            <% }) %>
+                        <% } else { %>
+                            <li><i class="bi bi-check-circle-fill"></i><span>Premium subscription access</span></li>
+                        <% } %>
+                    </ul>
+                </div>
+
+                <div class="info-row">
+                    <div>
+                        <small>Payment gateway</small>
+                        <strong>Razorpay Checkout + UPI Apps (PhonePe, GPay, Paytm)</strong>
+                    </div>
+                    <i class="bi bi-shield-lock fs-4 text-success"></i>
+                </div>
+
+                <div class="info-row">
+                    <div>
+                        <small>After payment</small>
+                        <strong>Payment Paid, Subscription Pending</strong>
+                    </div>
+                    <i class="bi bi-clock-history fs-4 text-warning"></i>
+                </div>
+
+                <div class="info-row">
+                    <div>
+                        <small>Data save rule</small>
+                        <strong>Saved only after successful verification</strong>
+                    </div>
+                    <i class="bi bi-database-check fs-4 text-primary"></i>
+                </div>
+
+                <% if (!razorpayConfigured && !customUpiPayload) { %>
+                    <div class="alert alert-warning alert-banner mt-3 mb-0">Payment gateway is not configured yet. Please ask admin to save Razorpay keys or custom UPI QR payload.</div>
+                <% } %>
+
+                <button type="button" class="checkout-btn mt-4" id="checkoutButton" <%= razorpayConfigured ? '' : 'disabled' %>>
+                    Pay with Razorpay
+                </button>
+                <button type="button" class="scanner-btn" id="scannerButton" <%= (razorpayConfigured || customUpiPayload) ? '' : 'disabled' %>>
+                    Pay via Paytm / UPI QR
+                </button>
+                <div class="status-message" id="statusMessage"></div>
+
+                <div class="qr-card" id="qrCard" <%= (savedPaymentLink && savedPaymentLink.shortUrl) || customUpiPayload ? '' : 'hidden' %>>
+                    <div class="qr-head">
+                        <div>
+                            <h3>Scan and pay on your phone</h3>
+                            <p>If checkout does not open, scan this QR in Paytm or any UPI app.</p>
+                        </div>
+                        <span class="qr-chip"><i class="bi bi-qr-code-scan"></i> QR Fallback</span>
+                    </div>
+
+                    <div class="qr-box" id="qrContainer"></div>
+                    <a href="<%= savedPaymentLink?.shortUrl || '#' %>" target="_blank" rel="noopener noreferrer" class="qr-link" id="qrLink"><%= savedPaymentLink?.shortUrl || '' %></a>
+                    <div class="qr-note">Keep this page open. We auto-detect payment after scan from Paytm, PhonePe, GPay, or any UPI app.</div>
+                    <div class="qr-status" id="qrStatus"></div>
+                </div>
+
+                <a href="/pricingForm?planId=<%= selectedPlan._id %>" class="back-link">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Edit registration details</span>
+                </a>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<script>
+    const registration = <%- JSON.stringify(registration || {}) %>;
+    const selectedPlan = <%- JSON.stringify(selectedPlan || {}) %>;
+    const savedPaymentLink = <%- JSON.stringify(savedPaymentLink || null) %>;
+    const customUpiPayload = <%- JSON.stringify(customUpiPayload || '') %>;
+    const checkoutButton = document.getElementById('checkoutButton');
+    const scannerButton = document.getElementById('scannerButton');
+    const statusMessage = document.getElementById('statusMessage');
+    const qrCard = document.getElementById('qrCard');
+    const qrContainer = document.getElementById('qrContainer');
+    const qrLink = document.getElementById('qrLink');
+    const qrStatus = document.getElementById('qrStatus');
+    let paymentLinkId = savedPaymentLink && savedPaymentLink.id ? savedPaymentLink.id : '';
+    let paymentLinkUrl = savedPaymentLink && savedPaymentLink.shortUrl ? savedPaymentLink.shortUrl : '';
+    let paymentStatusTimer = null;
+    let pendingRegistrationId = '';
+
+    function setStatus(message, type) {
+        if (!statusMessage) return;
+        statusMessage.textContent = message || '';
+        statusMessage.className = 'status-message' + (type ? ' ' + type : '');
+    }
+
+    function setQrStatus(message) {
+        if (!qrStatus) return;
+        qrStatus.textContent = message || '';
+    }
+
+    function renderQrCode(url) {
+        if (!qrContainer || !url || typeof QRCode === 'undefined') return;
+        qrContainer.innerHTML = '';
+        new QRCode(qrContainer, {
+            text: url,
+            width: 210,
+            height: 210,
+            colorDark: '#0f1c33',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+        });
+    }
+
+    function revealQrCard(shortUrl) {
+        if (!qrCard || !shortUrl) return;
+        qrCard.hidden = false;
+        if (qrLink) {
+            qrLink.href = shortUrl;
+            qrLink.textContent = shortUrl;
+        }
+        paymentLinkUrl = shortUrl;
+        renderQrCode(shortUrl);
+    }
+
+    async function postJson(url, payload) {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || 'Something went wrong.');
+        }
+
+        return result;
+    }
+
+    async function getJson(url) {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || 'Something went wrong.');
+        }
+
+        return result;
+    }
+
+    function stopPaymentLinkPolling() {
+        if (paymentStatusTimer) {
+            clearInterval(paymentStatusTimer);
+            paymentStatusTimer = null;
+        }
+    }
+
+    async function checkPaymentLinkStatus() {
+        if (!paymentLinkId) return;
+
+        try {
+            const result = await getJson(`/subscription/payment-link-status/${paymentLinkId}`);
+
+            if (result.status === 'paid') {
+                stopPaymentLinkPolling();
+                setQrStatus('Payment received successfully. Redirecting...');
+                setStatus('Scanner payment successful. Redirecting...', 'success');
+                window.location.href = result.redirectUrl || `/pricingForm?planId=${selectedPlan._id}&success=1`;
+                return;
+            }
+
+            if (result.status === 'cancelled' || result.status === 'expired') {
+                stopPaymentLinkPolling();
+                if (scannerButton) scannerButton.disabled = false;
+                setQrStatus(`Scan payment link is ${result.status}. Generate a new QR if needed.`);
+                return;
+            }
+
+            setQrStatus('Waiting for payment confirmation...');
+        } catch (error) {
+            setQrStatus(error.message || 'Unable to check scanner payment status right now.');
+        }
+    }
+
+    function startPaymentLinkPolling() {
+        if (!paymentLinkId) return;
+        stopPaymentLinkPolling();
+        checkPaymentLinkStatus();
+        paymentStatusTimer = window.setInterval(checkPaymentLinkStatus, 5000);
+    }
+
+    async function prepareScannerFallback() {
+        if (scannerButton) {
+            scannerButton.disabled = true;
+        }
+
+        if (customUpiPayload) {
+            stopPaymentLinkPolling();
+            paymentLinkId = '';
+            revealQrCard(customUpiPayload);
+            setQrStatus('Custom UPI QR ready. Pay in Paytm and share UTR with admin for manual verification.');
+            if (scannerButton) {
+                scannerButton.disabled = false;
+            }
+            return;
+        }
+
+        if (paymentLinkId && paymentLinkUrl) {
+            revealQrCard(paymentLinkUrl);
+            setQrStatus('Waiting for payment confirmation...');
+            startPaymentLinkPolling();
+            return;
+        }
+
+        setQrStatus('Generating secure Paytm / UPI scan link...');
+
+        try {
+            const result = await postJson('/subscription/create-payment-link', {
+                ...registration,
+                planId: selectedPlan._id,
+                preferredUpiApp: 'phonepe'
+            });
+
+            paymentLinkId = result.paymentLink.id;
+            revealQrCard(result.paymentLink.short_url);
+            setQrStatus('UPI QR ready. Open Paytm and scan to pay.');
+            startPaymentLinkPolling();
+        } catch (error) {
+            if (scannerButton) {
+                scannerButton.disabled = false;
+            }
+            setQrStatus(error.message || 'Unable to create Paytm / UPI scan QR right now.');
+        }
+    }
+
+    if (savedPaymentLink && savedPaymentLink.shortUrl) {
+        revealQrCard(savedPaymentLink.shortUrl);
+        startPaymentLinkPolling();
+    } else if (customUpiPayload) {
+        revealQrCard(customUpiPayload);
+        setQrStatus('Custom UPI QR ready. Pay in Paytm and share UTR with admin for manual verification.');
+    }
+
+    if (scannerButton) {
+        scannerButton.addEventListener('click', async function () {
+            setStatus('Opening Paytm / UPI scan payment...', 'info');
+            await prepareScannerFallback();
+        });
+    }
+
+    if (checkoutButton) {
+        checkoutButton.addEventListener('click', async function () {
+            if (typeof Razorpay === 'undefined') {
+                setStatus('Razorpay checkout could not load. Use Paytm / UPI scan option below to continue payment.', 'error');
+                await prepareScannerFallback();
+                return;
+            }
+
+            checkoutButton.disabled = true;
+            setStatus('Creating secure payment order...', '');
+
+            try {
+                const orderResponse = await postJson('/subscription/create-order', {
+                    ...registration,
+                    planId: selectedPlan._id
+                });
+                pendingRegistrationId = orderResponse.pendingRegistrationId || pendingRegistrationId;
+
+                const options = {
+                    key: orderResponse.keyId,
+                    amount: orderResponse.order.amount,
+                    currency: orderResponse.currency,
+                    name: 'REAL ERP SaaS',
+                    description: `${orderResponse.plan.title} Subscription`,
+                    order_id: orderResponse.order.id,
+                    theme: {
+                        color: '#d4a017'
+                    },
+                    prefill: {
+                        name: registration.name,
+                        email: registration.email,
+                        contact: registration.phone
+                    },
+                    notes: {
+                        business_name: registration.businessName,
+                        plan_name: orderResponse.plan.title
+                    },
+                    handler: async function (response) {
+                        try {
+                            stopPaymentLinkPolling();
+                            setStatus('Verifying payment and saving subscription...', '');
+                            const verifyResponse = await postJson('/subscription/verify-payment', {
+                                ...response,
+                                planId: selectedPlan._id,
+                                registration,
+                                pendingRegistrationId
+                            });
+
+                            setStatus('Payment successful. Redirecting...', 'success');
+                            window.location.href = verifyResponse.redirectUrl || `/pricingForm?planId=${selectedPlan._id}&success=1`;
+                        } catch (error) {
+                            checkoutButton.disabled = false;
+                            setStatus(error.message || 'Payment verification failed. Please contact support.', 'error');
+                        }
+                    },
+                    modal: {
+                        ondismiss: async function () {
+                            checkoutButton.disabled = false;
+                            setStatus('Payment popup closed. You can pay through Paytm / UPI scan below.', 'info');
+                            await prepareScannerFallback();
+                        }
+                    }
+                };
+
+                const razorpay = new Razorpay(options);
+                razorpay.on('payment.failed', async function (response) {
+                    checkoutButton.disabled = false;
+                    const message = response.error && response.error.description
+                        ? response.error.description
+                        : 'Payment failed. Please try again.';
+                    setStatus(message, 'error');
+                    await prepareScannerFallback();
+                });
+                razorpay.open();
+            } catch (error) {
+                checkoutButton.disabled = false;
+                setStatus(error.message || 'Unable to start payment right now.', 'error');
+                await prepareScannerFallback();
+            }
+        });
+    }
+</script>
+</body>
+</html>

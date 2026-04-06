@@ -1,6 +1,10 @@
 <%- include('../../partials/admin/header.ejs') %>
 
 <style>
+    :root {
+        --admin-sidebar-width: 350px;
+    }
+
     * {
         margin: 0;
         padding: 0;
@@ -26,7 +30,7 @@
 
     /* Sidebar fixed width */
     .main-wrapper .sidebar {
-        width: 280px;
+        width: var(--admin-sidebar-width);
         height: 100vh;
         background: white;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
@@ -41,8 +45,8 @@
     /* Content wrapper - matches sidebar width */
     .content-wrapper {
         flex: 1;
-        margin-left: 280px;
-        width: calc(100% - 280px);
+        margin-left: var(--admin-sidebar-width);
+        width: calc(100% - var(--admin-sidebar-width));
         min-height: 100vh;
         background: #f5f7fb;
         padding: 25px 30px;
@@ -630,6 +634,9 @@
 </style>
 
 <div class="main-wrapper">
+    <%
+        const hasAccess = (typeof canAccess === 'function') ? canAccess : (() => true);
+    %>
     <%- include('../../partials/admin/left.ejs') %>
 
     <div class="content-wrapper">
@@ -657,7 +664,7 @@
                     <div class="welcome-badge">
                         <i class="bi bi-stars"></i> Welcome Back!
                     </div>
-                    <h1>Hello, Vishakha Gehlot</h1>
+                    <h1>Hello, <%= userName || 'User' %></h1>
                     <p>Here's what's happening with your ERP system today.</p>
                 </div>
             </div>
@@ -745,7 +752,7 @@
                 <div class="activity-card">
                     <div class="card-header">
                         <h4><i class="bi bi-chat-text"></i> Recent Queries</h4>
-                        <a href="/querytable" class="view-all">View All →</a>
+                        <a href="/querytable" class="view-all">View All -></a>
                     </div>
                     <div class="activity-list" id="recentQueriesList"></div>
                 </div>
@@ -753,7 +760,7 @@
                 <div class="activity-card">
                     <div class="card-header">
                         <h4><i class="bi bi-person-plus"></i> New Users</h4>
-                        <a href="/usertable" class="view-all">View All →</a>
+                        <a href="/usertable" class="view-all">View All -></a>
                     </div>
                     <div class="activity-list" id="recentUsersList"></div>
                 </div>
@@ -763,14 +770,14 @@
             <div class="quick-actions">
                 <h4><i class="bi bi-lightning-charge"></i> Quick Actions</h4>
                 <div class="actions-grid">
-                    <a href="/querytable" class="action-btn"><i class="bi bi-chat-dots"></i><span>View Queries</span></a>
-                    <a href="/usertable" class="action-btn"><i class="bi bi-people"></i><span>Manage Users</span></a>
-                    <a href="/faqtable" class="action-btn"><i class="bi bi-question-circle"></i><span>Manage FAQ</span></a>
-                    <a href="/bannertable" class="action-btn"><i class="bi bi-image"></i><span>Banner</span></a>
-                    <a href="/servicetable" class="action-btn"><i class="bi bi-briefcase"></i><span>Services</span></a>
-                    <a href="/managetable" class="action-btn"><i class="bi bi-people"></i><span>HR</span></a>
-                    <a href="/leadstable" class="action-btn"><i class="bi bi-graph-up"></i><span>Leads & Deals</span></a>
-                    <a href="/settings" class="action-btn"><i class="bi bi-gear"></i><span>Settings</span></a>
+                    <% if (hasAccess('crm', 'view')) { %><a href="/addcontacttable" class="action-btn"><i class="bi bi-people"></i><span>All Contacts</span></a><% } %>
+                    <% if (hasAccess('crm', 'add')) { %><a href="/addcontactform" class="action-btn"><i class="bi bi-person-plus"></i><span>Add Contact</span></a><% } %>
+                    <% if (hasAccess('hrm', 'view')) { %><a href="/employees" class="action-btn"><i class="bi bi-person-badge"></i><span>Employees</span></a><% } %>
+                    <% if (hasAccess('hrm', 'add')) { %><a href="/AddNewEmployee" class="action-btn"><i class="bi bi-person-plus-fill"></i><span>Add Employee</span></a><% } %>
+                    <% if (hasAccess('queryManagement', 'view')) { %><a href="/querytable" class="action-btn"><i class="bi bi-chat-dots"></i><span>View Queries</span></a><% } %>
+                    <% if (hasAccess('frontendManagement', 'view')) { %><a href="/faqtable" class="action-btn"><i class="bi bi-window"></i><span>Frontend CMS</span></a><% } %>
+                    <% if (hasAccess('productManagement', 'view')) { %><a href="/producttable" class="action-btn"><i class="bi bi-box-seam"></i><span>Products</span></a><% } %>
+                    <% if (currentUserRole === 'SuperAdmin') { %><a href="/permissions" class="action-btn"><i class="bi bi-shield-check"></i><span>Permissions</span></a><% } %>
                 </div>
             </div>
         </div>
@@ -790,28 +797,17 @@
     updateDateTime();
     setInterval(updateDateTime, 1000);
 
-    // Dashboard Data (Enhanced realistic)
+    // Dashboard Data (from server)
     const dashboardData = {
-        totalQueries: 156,
-        repliedQueries: 124,
-        totalUsers: 2847,
-        activeNow: 342,
-        queryStats: [23, 28, 32, 29, 35, 42, 38],
-        userStats: [145, 162, 158, 175, 182, 198, 210],
-        recentQueries: [
-            { title: "How to reset password?", time: "5 minutes ago", status: "pending" },
-            { title: "Billing inquiry about subscription", time: "1 hour ago", status: "replied" },
-            { title: "Technical support needed", time: "3 hours ago", status: "pending" },
-            { title: "Feature request: Dark mode", time: "Yesterday", status: "replied" },
-            { title: "Account verification issue", time: "Yesterday", status: "pending" }
-        ],
-        recentUsers: [
-            { name: "John Doe", email: "john@example.com", status: "active" },
-            { name: "Sarah Johnson", email: "sarah@example.com", status: "active" },
-            { name: "Michael Chen", email: "michael@example.com", status: "pending" },
-            { name: "Emily Davis", email: "emily@example.com", status: "active" },
-            { name: "David Wilson", email: "david@example.com", status: "active" }
-        ]
+        totalQueries: <%= dashboardStats && typeof dashboardStats.totalQueries !== 'undefined' ? dashboardStats.totalQueries : 0 %>,
+        repliedQueries: <%= dashboardStats && typeof dashboardStats.repliedQueries !== 'undefined' ? dashboardStats.repliedQueries : 0 %>,
+        totalUsers: <%= dashboardStats && typeof dashboardStats.totalUsers !== 'undefined' ? dashboardStats.totalUsers : 0 %>,
+        activeNow: <%= dashboardStats && typeof dashboardStats.activeNow !== 'undefined' ? dashboardStats.activeNow : 0 %>,
+        queryStats: <%- JSON.stringify((dashboardData && dashboardData.queryStats) || [0, 0, 0, 0, 0, 0, 0]) %>,
+        userStats: <%- JSON.stringify((dashboardData && dashboardData.userStats) || [0, 0, 0, 0, 0, 0, 0]) %>,
+        dayLabels: <%- JSON.stringify((dashboardData && dashboardData.dayLabels) || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']) %>,
+        recentQueries: <%- JSON.stringify((dashboardData && dashboardData.recentQueries) || []) %>,
+        recentUsers: <%- JSON.stringify((dashboardData && dashboardData.recentUsers) || []) %>
     };
 
     // Update stats
@@ -825,7 +821,9 @@
         const container = document.getElementById(containerId);
         if (!container) return;
         const maxValue = Math.max(...data, 1);
-        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const days = Array.isArray(dashboardData.dayLabels) && dashboardData.dayLabels.length
+            ? dashboardData.dayLabels
+            : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         container.innerHTML = '';
         data.forEach((value, index) => {
             const heightPercent = (value / maxValue) * 160;
@@ -834,7 +832,7 @@
             barItem.className = 'bar-item';
             barItem.innerHTML = `
                 <div class="bar" style="height: ${height}px; background: linear-gradient(180deg, ${gradientStart}, ${gradientEnd}); border-radius: 8px 8px 0 0; width: 100%; transition: 0.2s;"></div>
-                <div class="bar-label">${days[index]}</div>
+                <div class="bar-label">${days[index] || ''}</div>
                 <div class="bar-value">${value}</div>
             `;
             container.appendChild(barItem);
@@ -855,6 +853,26 @@
         });
     }
 
+    function toTimeAgo(dateValue) {
+        if (!dateValue) return 'Just now';
+        const then = new Date(dateValue);
+        if (Number.isNaN(then.getTime())) return 'Just now';
+
+        const seconds = Math.floor((Date.now() - then.getTime()) / 1000);
+        if (seconds < 60) return `${seconds} sec ago`;
+
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes} min ago`;
+
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+
+        const days = Math.floor(hours / 24);
+        if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
+
+        return then.toLocaleDateString('en-US');
+    }
+
     // Load recent queries
     const recentQueriesList = document.getElementById('recentQueriesList');
     if (recentQueriesList) {
@@ -871,7 +889,7 @@
                     </div>
                     <div class="activity-content">
                         <div class="activity-title">${escapeHtml(query.title)}</div>
-                        <div class="activity-time"><i class="bi bi-clock"></i> ${escapeHtml(query.time)}</div>
+                        <div class="activity-time"><i class="bi bi-clock"></i> ${escapeHtml(toTimeAgo(query.createdAt))}</div>
                     </div>
                     <div class="activity-status ${statusClass}">${statusText}</div>
                 `;
@@ -898,6 +916,7 @@
                     <div class="activity-content">
                         <div class="activity-title">${escapeHtml(user.name)}</div>
                         <div class="activity-time"><i class="bi bi-envelope"></i> ${escapeHtml(user.email)}</div>
+                        <div class="activity-time"><i class="bi bi-clock"></i> ${escapeHtml(toTimeAgo(user.createdAt))}</div>
                     </div>
                     <div style="font-size: 11px; font-weight:500; color: ${statusColor}; display:flex; align-items:center; gap:4px;">
                         <i class="bi ${statusIcon}"></i> ${user.status === 'active' ? 'Active' : 'Pending'}

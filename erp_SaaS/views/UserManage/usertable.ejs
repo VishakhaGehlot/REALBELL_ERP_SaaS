@@ -1,6 +1,10 @@
 <%- include('../../partials/admin/header.ejs')%>
 
     <style>
+        :root {
+            --admin-sidebar-width: 350px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -26,7 +30,7 @@
 
         /* Sidebar fixed width */
         .main-wrapper .sidebar {
-            width: 280px;
+            width: var(--admin-sidebar-width);
             height: 100vh;
             background: white;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
@@ -41,8 +45,8 @@
         /* Content wrapper - matches sidebar width */
         .content-wrapper {
             flex: 1;
-            margin-left: 280px;
-            width: calc(100% - 280px);
+            margin-left: var(--admin-sidebar-width);
+            width: calc(100% - var(--admin-sidebar-width));
             min-height: 100vh;
             background: #f5f7fb;
             padding: 25px;
@@ -272,24 +276,33 @@
             white-space: nowrap;
         }
 
-        .role-badge.user {
+        .role-badge.employee {
             background: #e2e8f0;
             color: #475569;
         }
 
-        .role-badge.admin {
+        .role-badge.manager {
             background: #dcfce7;
             color: #166534;
+        }
+        .role-badge.admin {
+            background: #ccfbf1;
+            color: #115e59;
+        }
+
+        .role-badge.hr {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .role-badge.ceo {
+            background: #dbeafe;
+            color: #1d4ed8;
         }
 
         .role-badge.superadmin {
             background: #fee2e2;
             color: #b91c1c;
-        }
-
-        .role-badge.teacher {
-            background: #fef3c7;
-            color: #92400e;
         }
 
         .action-buttons {
@@ -610,10 +623,9 @@
                         <div class="stat-card green">
                             <div class="stat-header">
                                 <div>
-                                    <p class="stat-label">Admins</p>
+                                    <p class="stat-label">Leadership</p>
                                     <h3 class="stat-value">
-                                        <%= userdata ? userdata.filter(d=> d.role === 'Admin' || d.role ===
-                                            'SuperAdmin').length : 0 %>
+                                        <%= userdata ? userdata.filter(d=> ['CEO','Manager','Admin','SuperAdmin'].includes(d.role)).length : 0 %>
                                     </h3>
                                 </div>
                                 <i class="bi bi-shield-check stat-icon green"></i>
@@ -623,9 +635,9 @@
                         <div class="stat-card orange">
                             <div class="stat-header">
                                 <div>
-                                    <p class="stat-label">Teachers</p>
+                                    <p class="stat-label">Employees</p>
                                     <h3 class="stat-value">
-                                        <%= userdata ? userdata.filter(d=> d.role === 'teacher').length : 0 %>
+                                        <%= userdata ? userdata.filter(d=> ['Employee','User','Teacher','teacher'].includes(d.role)).length : 0 %>
                                     </h3>
                                 </div>
                                 <i class="bi bi-person-workspace stat-icon orange"></i>
@@ -647,10 +659,12 @@
                                         <th>#</th>
                                         <th>User</th>
                                         <th>Email</th>
+                                        <th>Mobile</th>
+                                        <th>DOB</th>
                                         <th>Status</th>
                                         <th>Current Role</th>
                                         <th>Change Role</th>
-                                        <th colspan="3" style="text-align: center;">Actions</th>
+                                        <th style="text-align: center;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -685,6 +699,16 @@
                                                     <%= val.email %>
                                                 </td>
 
+                                                <!-- MOBILE -->
+                                                <td>
+                                                    <%= val.mobile || '-' %>
+                                                </td>
+
+                                                <!-- DOB -->
+                                                <td>
+                                                    <%= val.dob || '-' %>
+                                                </td>
+
                                                 <!-- STATUS -->
                                                 <td>
                                                     <a href="/userstatus/<%= val._id %>/<%= val.status %>"
@@ -707,58 +731,64 @@
                                                         <span class="role-badge superadmin">
                                                             <i class="bi bi-shield-fill"></i> Super Admin
                                                         </span>
-                                                        <% } else if(val.role=="Admin" ) { %>
-                                                            <span class="role-badge admin">
-                                                                <i class="bi bi-shield"></i> Admin
+                                                        <% } else if(val.role=="CEO" ) { %>
+                                                            <span class="role-badge ceo">
+                                                                <i class="bi bi-briefcase-fill"></i> CEO
                                                             </span>
-                                                            <% } else if(val.role=="teacher" ) { %>
-                                                                <span class="role-badge teacher">
-                                                                    <i class="bi bi-person-workspace"></i> Teacher
+                                                            <% } else if(val.role=="Manager" ) { %>
+                                                                <span class="role-badge manager">
+                                                                    <i class="bi bi-shield"></i> Manager
+                                                                </span>
+                                                                <% } else if(val.role=="Admin" ) { %>
+                                                                <span class="role-badge admin">
+                                                                    <i class="bi bi-person-badge"></i> Admin
+                                                                </span>
+                                                                <% } else if(val.role=="HR" ) { %>
+                                                                <span class="role-badge hr">
+                                                                    <i class="bi bi-person-vcard"></i> HR
                                                                 </span>
                                                                 <% } else { %>
-                                                                    <span class="role-badge user">
-                                                                        <i class="bi bi-person"></i> User
+                                                                    <span class="role-badge employee">
+                                                                        <i class="bi bi-person"></i> <%= val.role || 'Employee' %>
                                                                     </span>
                                                                     <% } %>
                                                 </td>
 
                                                 <!-- ROLE CHANGE -->
                                                 <td>
-                                                    <form method="POST" action="/userrole/<%= val._id %>"
-                                                        style="display:flex; gap:10px;">
-                                                        <select name="role" class="form-select">
-                                                            <option value="User" <%=val.role=="User" ?"selected":"" %>
-                                                                >User</option>
-                                                            <option value="Admin" <%=val.role=="Admin" ?"selected":"" %>
-                                                                >Admin</option>
-                                                            <option value="SuperAdmin" <%=val.role=="SuperAdmin"
-                                                                ?"selected":"" %>>Super Admin</option>
-                                                            <option value="teacher" <%=val.role=="teacher"
-                                                                ?"selected":"" %>>Teacher</option>
-                                                        </select>
+                                                    <form id="roleForm-<%= val._id %>" method="POST" action="/userrole/<%= val._id %>">
+                                                        <input type="text"
+                                                               name="role"
+                                                               class="form-select"
+                                                               value="<%= val.role || 'Employee' %>"
+                                                               list="roleSuggestionsTable"
+                                                               maxlength="50"
+                                                               required>
+                                                    </form>
                                                 </td>
 
                                                 <!-- ACTIONS -->
                                                 <td style="text-align:center;">
-    <form method="POST" action="/userrole/<%= val._id %>" style="display:flex; gap:8px; justify-content:center; align-items:center;">
-        
-        <button type="submit" class="action-btn update">
-            <i class="bi bi-arrow-repeat"></i>
-        </button>
+                                                    <div class="action-buttons">
+                                                        <button type="submit" class="action-btn update" form="roleForm-<%= val._id %>" title="Update Role">
+                                                            <i class="bi bi-arrow-repeat"></i>
+                                                        </button>
 
-        <!-- DELETE -->
-        <a href="/userdelete/<%= val._id %>" class="action-btn delete"
-            onclick="return confirm('Are you sure?')" title="Delete">
-            <i class="bi bi-trash"></i>
-        </a>
+                                                        <a href="/useredit/<%= val._id %>" class="action-btn edit" title="Edit User">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                        </a>
 
-    </form>
-</td>
+                                                        <a href="/userdelete/<%= val._id %>" class="action-btn delete"
+                                                            onclick="return confirm('Are you sure?')" title="Delete User">
+                                                            <i class="bi bi-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
                                             </tr>
                                             <% }) %>
                                                 <% } else { %>
                                                     <tr>
-                                                        <td colspan="8">
+                                                        <td colspan="9">
                                                             <div class="empty-state">
                                                                 <i class="bi bi-inbox"></i>
                                                                 <h5>No Users Found</h5>
@@ -768,6 +798,14 @@
                                                     <% } %>
                                 </tbody>
                             </table>
+                            <datalist id="roleSuggestionsTable">
+                                <option value="Employee"></option>
+                                <option value="HR"></option>
+                                <option value="Manager"></option>
+                                <option value="Admin"></option>
+                                <option value="CEO"></option>
+                                <option value="SuperAdmin"></option>
+                            </datalist>
                         </div>
                     </div>
                 </div>

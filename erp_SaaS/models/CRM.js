@@ -25,6 +25,15 @@ const addcontactSchema = mongoose.Schema({
     status: {
         type: String,
         default: "Pending"
+    },
+    ownerUserId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "auth",
+        default: null
+    },
+    ownerEmail: {
+        type: String,
+        default: ""
     }
 }, {
     timestamps: true

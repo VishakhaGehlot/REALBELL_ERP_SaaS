@@ -27,8 +27,12 @@ const authSchema=mongoose.Schema({
      
     role:{
         type:String,
-        enum:["SuperAdmin","Admin","User","Teacher"],
-        default:"User"
+        default:"Employee"
+    },
+    reportsTo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "auth",
+        default: null
     },
      otp: {
         type: String

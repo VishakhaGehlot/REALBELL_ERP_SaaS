@@ -2,17 +2,36 @@ const router = require('express').Router();
 const upload = require('../middleware/multer');
 const EmployeesTable = require('../models/HRM/Employees');
 const mongoose = require('mongoose');
+const { requireAuth } = require('../middleware/roleAuth');
+const { requireModuleAccess } = require('../middleware/permissionAuth');
+const { getUserScope } = require('../middleware/dataScope');
+
+router.use(requireAuth);
+router.use(requireModuleAccess('hrm'));
+
+function buildEmployeeScopeFilter(scope) {
+    if (scope.fullAccess) return {}
+    return {
+        $or: [
+            { email: { $in: scope.emails } },
+            { createdByUserId: { $in: scope.userIds } },
+            { createdByEmail: { $in: scope.emails } }
+        ]
+    }
+}
 
 // ==================== EMPLOYEE ROUTES ====================
 
 // Get all employees
 router.get("/employees", async (req, res) => {
     try {
-        const record = await EmployeesTable.find().sort({ createdAt: -1 });
+        const scope = await getUserScope(req)
+        const employeeFilter = buildEmployeeScopeFilter(scope)
+        const record = await EmployeesTable.find(employeeFilter).sort({ createdAt: -1 });
         
-        const activeCount = await EmployeesTable.countDocuments({ status: 'Active' });
-        const onLeaveCount = await EmployeesTable.countDocuments({ status: 'On Leave' });
-        const departments = await EmployeesTable.distinct('department');
+        const activeCount = await EmployeesTable.countDocuments({ ...employeeFilter, status: 'Active' });
+        const onLeaveCount = await EmployeesTable.countDocuments({ ...employeeFilter, status: 'On Leave' });
+        const departments = await EmployeesTable.distinct('department', employeeFilter);
         const departmentCount = departments.length;
         const loginname = req.session.email;
 
@@ -33,7 +52,11 @@ router.get("/employees", async (req, res) => {
 // Get single employee
 router.get("/employees/:id", async (req, res) => {
     try {
-        const employee = await EmployeesTable.findById(req.params.id);
+        const scope = await getUserScope(req)
+        const employee = await EmployeesTable.findOne({
+            _id: req.params.id,
+            ...buildEmployeeScopeFilter(scope)
+        });
         if (!employee) return res.status(404).json({ error: 'Employee not found' });
         res.json(employee);
     } catch (error) {
@@ -50,6 +73,7 @@ router.get("/AddNewEmployee", (req, res) => {
 // Add new employee
 router.post("/AddNewEmployee", upload.single("image"), async (req, res) => {
     try {
+        const scope = await getUserScope(req)
         const fileName = req.file ? req.file.filename : null;
         const { name, email, phone, department, position, joiningDate, salary, address, status } = req.body;
         
@@ -62,6 +86,8 @@ router.post("/AddNewEmployee", upload.single("image"), async (req, res) => {
             joiningDate: joiningDate || new Date(),
             salary: salary || 0, address: address || '',
             status: status || 'Active', image: fileName,
+            createdByUserId: scope.userIds[0] || null,
+            createdByEmail: (req.session.email || '').toLowerCase(),
             attendanceRecords: [], payrollRecords: [], leaveRecords: [],
             leaveBalance: { sickLeave: 12, casualLeave: 10, earnedLeave: 15, emergencyLeave: 5 }
         };
@@ -78,7 +104,11 @@ router.post("/AddNewEmployee", upload.single("image"), async (req, res) => {
 // Show edit employee form
 router.get("/employees/edit/:id", async (req, res) => {
     try {
-        const employee = await EmployeesTable.findById(req.params.id);
+        const scope = await getUserScope(req)
+        const employee = await EmployeesTable.findOne({
+            _id: req.params.id,
+            ...buildEmployeeScopeFilter(scope)
+        });
         if (!employee) return res.status(404).send('Employee not found');
         res.render("HRM/EditEmployee", { employee });
     } catch (error) {
@@ -90,6 +120,7 @@ router.get("/employees/edit/:id", async (req, res) => {
 // Update employee
 router.post("/employees/update/:id", upload.single("image"), async (req, res) => {
     try {
+        const scope = await getUserScope(req)
         const updateData = {
             name: req.body.name, email: req.body.email, phone: req.body.phone,
             department: req.body.department, position: req.body.position,
@@ -97,7 +128,10 @@ router.post("/employees/update/:id", upload.single("image"), async (req, res) =>
             address: req.body.address, status: req.body.status
         };
         if (req.file) updateData.image = req.file.filename;
-        await EmployeesTable.findByIdAndUpdate(req.params.id, updateData);
+        await EmployeesTable.findOneAndUpdate({
+            _id: req.params.id,
+            ...buildEmployeeScopeFilter(scope)
+        }, updateData);
         res.redirect("/employees");
     } catch (error) {
         console.error(error);
@@ -108,7 +142,11 @@ router.post("/employees/update/:id", upload.single("image"), async (req, res) =>
 // Delete employee
 router.delete("/employees/delete/:id", async (req, res) => {
     try {
-        await EmployeesTable.findByIdAndDelete(req.params.id);
+        const scope = await getUserScope(req)
+        await EmployeesTable.findOneAndDelete({
+            _id: req.params.id,
+            ...buildEmployeeScopeFilter(scope)
+        });
         res.json({ success: true, message: 'Employee deleted successfully' });
     } catch (error) {
         console.error(error);
@@ -119,7 +157,8 @@ router.delete("/employees/delete/:id", async (req, res) => {
 // Export employees to CSV
 router.get("/employees/export", async (req, res) => {
     try {
-        const employees = await EmployeesTable.find();
+        const scope = await getUserScope(req)
+        const employees = await EmployeesTable.find(buildEmployeeScopeFilter(scope));
         let csv = "ID,Name,Email,Phone,Department,Position,Salary,Join Date,Address,Status\n";
         employees.forEach((emp, index) => {
             csv += `${index + 1},${emp.name},${emp.email},${emp.phone || ''},${emp.department},${emp.position},${emp.salary || 0},${emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString() : ''},${emp.address || ''},${emp.status || 'Active'}\n`;
@@ -138,7 +177,8 @@ router.get("/employees/export", async (req, res) => {
 // Get attendance page
 router.get("/attendance", async (req, res) => {
     try {
-        const employees = await EmployeesTable.find();
+        const scope = await getUserScope(req)
+        const employees = await EmployeesTable.find(buildEmployeeScopeFilter(scope));
         let attendanceList = [];
         
         employees.forEach(emp => {
@@ -190,7 +230,11 @@ router.get("/attendance", async (req, res) => {
 // Show add attendance form
 router.get('/addattendence', async (req, res) => {
     try {
-        const employees = await EmployeesTable.find({ status: 'Active' });
+        const scope = await getUserScope(req)
+        const employees = await EmployeesTable.find({
+            ...buildEmployeeScopeFilter(scope),
+            status: 'Active'
+        });
         res.render('HRM/addattendence', { employees, loginname: req.session.email });
     } catch (error) {
         console.log(error);
@@ -201,8 +245,12 @@ router.get('/addattendence', async (req, res) => {
 // Add new attendance record
 router.post('/addattendence', async (req, res) => {
     try {
+        const scope = await getUserScope(req)
         const { employeeId, date, checkIn, checkOut, workingHours, attendanceStatus } = req.body;
-        const employee = await EmployeesTable.findById(employeeId);
+        const employee = await EmployeesTable.findOne({
+            _id: employeeId,
+            ...buildEmployeeScopeFilter(scope)
+        });
         if (!employee) return res.send("Employee not found");
         
         const attendanceDate = new Date(date);
@@ -235,7 +283,8 @@ router.post('/addattendence', async (req, res) => {
 // Get leave management page
 router.get("/leave", async (req, res) => {
     try {
-        const employees = await EmployeesTable.find();
+        const scope = await getUserScope(req)
+        const employees = await EmployeesTable.find(buildEmployeeScopeFilter(scope));
         let leaveRecords = [];
         
         employees.forEach(emp => {
@@ -279,7 +328,8 @@ router.get("/leave", async (req, res) => {
 // Get add leave form (only absent employees)
 router.get('/addleave', async (req, res) => {
     try {
-        const employees = await EmployeesTable.find();
+        const scope = await getUserScope(req)
+        const employees = await EmployeesTable.find(buildEmployeeScopeFilter(scope));
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         let absentEmployees = [];
@@ -303,12 +353,16 @@ router.get('/addleave', async (req, res) => {
 // Add new leave record
 router.post('/addleave', async (req, res) => {
     try {
+        const scope = await getUserScope(req)
         const { employeeId, leaveType, fromDate, toDate, duration, reason, leaveStatus } = req.body;
         if (!employeeId || !leaveType || !fromDate || !toDate || !reason) {
             return res.status(400).send('Required fields missing');
         }
         
-        const employee = await EmployeesTable.findById(employeeId);
+        const employee = await EmployeesTable.findOne({
+            _id: employeeId,
+            ...buildEmployeeScopeFilter(scope)
+        });
         if (!employee) return res.status(404).send('Employee not found');
         
         const existingLeave = employee.leaveRecords?.find(record => 
@@ -335,7 +389,11 @@ router.post('/addleave', async (req, res) => {
 // Get single leave record
 router.get("/leave/:employeeId/:leaveId", async (req, res) => {
     try {
-        const employee = await EmployeesTable.findById(req.params.employeeId);
+        const scope = await getUserScope(req)
+        const employee = await EmployeesTable.findOne({
+            _id: req.params.employeeId,
+            ...buildEmployeeScopeFilter(scope)
+        });
         if (!employee) return res.status(404).json({ error: 'Employee not found' });
         
         const leaveRecord = employee.leaveRecords.id(req.params.leaveId);
@@ -359,7 +417,11 @@ router.get("/leave/:employeeId/:leaveId", async (req, res) => {
 // Approve leave
 router.put("/leave/approve/:employeeId/:leaveId", async (req, res) => {
     try {
-        const employee = await EmployeesTable.findById(req.params.employeeId);
+        const scope = await getUserScope(req)
+        const employee = await EmployeesTable.findOne({
+            _id: req.params.employeeId,
+            ...buildEmployeeScopeFilter(scope)
+        });
         if (!employee) return res.status(404).json({ error: 'Employee not found' });
         
         const leaveRecord = employee.leaveRecords.id(req.params.leaveId);
@@ -390,7 +452,11 @@ router.put("/leave/approve/:employeeId/:leaveId", async (req, res) => {
 // Reject leave
 router.put("/leave/reject/:employeeId/:leaveId", async (req, res) => {
     try {
-        const employee = await EmployeesTable.findById(req.params.employeeId);
+        const scope = await getUserScope(req)
+        const employee = await EmployeesTable.findOne({
+            _id: req.params.employeeId,
+            ...buildEmployeeScopeFilter(scope)
+        });
         if (!employee) return res.status(404).json({ error: 'Employee not found' });
         
         const leaveRecord = employee.leaveRecords.id(req.params.leaveId);
@@ -412,7 +478,11 @@ router.put("/leave/reject/:employeeId/:leaveId", async (req, res) => {
 // Delete leave record
 router.delete("/leave/delete/:employeeId/:leaveId", async (req, res) => {
     try {
-        const employee = await EmployeesTable.findById(req.params.employeeId);
+        const scope = await getUserScope(req)
+        const employee = await EmployeesTable.findOne({
+            _id: req.params.employeeId,
+            ...buildEmployeeScopeFilter(scope)
+        });
         if (!employee) return res.status(404).json({ error: 'Employee not found' });
         
         employee.leaveRecords = employee.leaveRecords.filter(record => record._id.toString() !== req.params.leaveId);
@@ -430,7 +500,8 @@ router.delete("/leave/delete/:employeeId/:leaveId", async (req, res) => {
 // Show all payroll records
 router.get("/payroll", async (req, res) => {
     try {
-        const employees = await EmployeesTable.find();
+        const scope = await getUserScope(req)
+        const employees = await EmployeesTable.find(buildEmployeeScopeFilter(scope));
         let allPayrollRecords = [];
         
         employees.forEach(emp => {
@@ -456,7 +527,11 @@ router.get("/payroll", async (req, res) => {
 // Show add payroll form
 router.get("/addpayroll", async (req, res) => {
     try {
-        const employees = await EmployeesTable.find({ status: 'Active' });
+        const scope = await getUserScope(req)
+        const employees = await EmployeesTable.find({
+            ...buildEmployeeScopeFilter(scope),
+            status: 'Active'
+        });
         res.render("HRM/addpayroll", { employees, loginname: req.session.email });
     } catch (error) {
         console.error(error);
@@ -467,10 +542,14 @@ router.get("/addpayroll", async (req, res) => {
 // Add new payroll record
 router.post("/addpayroll", async (req, res) => {
     try {
+        const scope = await getUserScope(req)
         const { employeeId, month, allowances, deductions, netSalary, payStatus, paymentDate, remarks } = req.body;
         if (!employeeId || !month || !netSalary) return res.status(400).send('Required fields missing');
         
-        const employee = await EmployeesTable.findById(employeeId);
+        const employee = await EmployeesTable.findOne({
+            _id: employeeId,
+            ...buildEmployeeScopeFilter(scope)
+        });
         if (!employee) return res.status(404).send('Employee not found');
         
         if (employee.payrollRecords.find(record => record.month === month)) {
@@ -494,7 +573,11 @@ router.post("/addpayroll", async (req, res) => {
 // Update payroll status
 router.put("/payroll/update/:employeeId/:month", async (req, res) => {
     try {
-        const employee = await EmployeesTable.findById(req.params.employeeId);
+        const scope = await getUserScope(req)
+        const employee = await EmployeesTable.findOne({
+            _id: req.params.employeeId,
+            ...buildEmployeeScopeFilter(scope)
+        });
         if (!employee) return res.status(404).json({ error: 'Employee not found' });
         
         const payrollRecord = employee.payrollRecords.find(record => record.month === req.params.month);
@@ -514,7 +597,11 @@ router.put("/payroll/update/:employeeId/:month", async (req, res) => {
 // Delete payroll record
 router.delete("/payroll/delete/:employeeId/:month", async (req, res) => {
     try {
-        const employee = await EmployeesTable.findById(req.params.employeeId);
+        const scope = await getUserScope(req)
+        const employee = await EmployeesTable.findOne({
+            _id: req.params.employeeId,
+            ...buildEmployeeScopeFilter(scope)
+        });
         if (!employee) return res.status(404).json({ error: 'Employee not found' });
         
         employee.payrollRecords = employee.payrollRecords.filter(record => record.month !== req.params.month);
@@ -530,7 +617,8 @@ router.delete("/payroll/delete/:employeeId/:month", async (req, res) => {
 // Export payroll to CSV
 router.get("/payroll/export", async (req, res) => {
     try {
-        const employees = await EmployeesTable.find();
+        const scope = await getUserScope(req)
+        const employees = await EmployeesTable.find(buildEmployeeScopeFilter(scope));
         let csv = "Employee Name,Department,Month,Basic Salary,Allowances,Deductions,Net Salary,Status,Payment Date,Remarks\n";
         
         employees.forEach(emp => {

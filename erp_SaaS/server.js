@@ -1,8 +1,10 @@
 const express = require('express')
 const app = express()
+const path = require('path')
 require('dotenv').config()
 require('./dbconnection/DBconnection')
 const session = require('express-session')
+const { attachRolePermissions } = require('./middleware/permissionAuth')
 
 app.use(session({
     secret: "Ravi",
@@ -13,6 +15,8 @@ app.use(session({
 // IMPORTANT: Add BOTH of these middleware
 app.use(express.json()); // This parses JSON data (what your frontend sends)
 app.use(express.urlencoded({ extended: true })); // This parses form data
+app.use(attachRolePermissions)
+app.use(express.static(path.join(__dirname, 'public')))
 
 const authRouter = require('./routers/auth')
 const HomeRouter = require('./routers/Home')
@@ -34,7 +38,8 @@ const smtpRouters = require('./routers/SmtpRouter')
 const profileRouter=require('./routers/profile')
 const zoomRouter=require("./routers/Zoom")
 const productRouter=require('./routers/Product')
-
+const permissionsRouter = require('./routers/permissions')
+const subsRouter = require('./routers/pricing')
 
 app.use('/', HomeRouter)
 app.use('/', authRouter)
@@ -56,8 +61,8 @@ app.use('/', smtpRouters)
 app.use('/',profileRouter)
 app.use('/',zoomRouter)
 app.use('/',productRouter)
-
-app.use(express.static('public'))
+app.use('/', permissionsRouter)
+app.use('/',subsRouter)
 app.set('view engine', 'ejs')
 
 app.listen(process.env.PORT, () => {

@@ -249,6 +249,42 @@
 
 <!-- Sidebar HTML -->
 <div class="sidebar">
+    <%
+        const perms = (typeof modulePermissions !== 'undefined' && modulePermissions)
+            ? modulePermissions
+            : {
+                subscription: { view: true, add: true, edit: true, delete: true },
+                crm: { view: true, add: true, edit: true, delete: true },
+                hrm: { view: true, add: true, edit: true, delete: true },
+                queryManagement: { view: true, add: true, edit: true, delete: true },
+                frontendManagement: { view: true, add: true, edit: true, delete: true },
+                productManagement: { view: true, add: true, edit: true, delete: true },
+                accounting: { view: true, add: true, edit: true, delete: true },
+                pos: { view: true, add: true, edit: true, delete: true },
+                salesManagement: { view: true, add: true, edit: true, delete: true },
+                projectManagement: { view: true, add: true, edit: true, delete: true },
+                leadManagement: { view: true, add: true, edit: true, delete: true },
+                dealManagement: { view: true, add: true, edit: true, delete: true },
+                smsManagement: { view: true, add: true, edit: true, delete: true },
+                emailNotification: { view: true, add: true, edit: true, delete: true },
+                eventsManagement: { view: true, add: true, edit: true, delete: true },
+                zoomMeeting: { view: true, add: true, edit: true, delete: true },
+                supportDeskManagement: { view: true, add: true, edit: true, delete: true }
+            };
+        const currentRole = (typeof currentUserRole !== 'undefined' && currentUserRole) ? currentUserRole : 'User';
+        const roleKey = String(currentRole || '').trim().toLowerCase();
+        const isSuperAdmin = roleKey === 'superadmin';
+        const hasModuleAccess = (moduleKey) => {
+            if (isSuperAdmin) return true;
+            return Boolean(perms[moduleKey] && perms[moduleKey].view);
+        };
+        const hasAccess = (typeof canAccess === 'function')
+            ? canAccess
+            : ((moduleKey, action) => {
+                if (isSuperAdmin) return true;
+                return Boolean(perms[moduleKey] && perms[moduleKey][action || 'view']);
+            });
+    %>
     <!-- Logo Section -->
     <div class="logo-section">
         <div class="logo">
@@ -285,19 +321,33 @@
 
         
         
+        <% if (hasModuleAccess('subscription')) { %>
         <!-- ==================== SUBSCRIPTION MANAGEMENT ==================== -->
+       <!-- ==================== SUBSCRIPTION MANAGEMENT ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-credit-card-2-front"></i>
-                <span>Subscription Management</span>
+                <span>Subscription</span>
                 <i class="bi bi-chevron-right chevron-icon"></i>
             </div>
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/plans" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                        <a href="/plan" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-tags"></i>
                             <span>Plans & Pricing</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/paymentStatus" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-tags"></i>
+                            <span>Pending Requests</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/subscription/settings" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-gear"></i>
+                            <span>Payment Settings</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
@@ -315,7 +365,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+<% if (hasModuleAccess('frontendManagement')) { %>
 <!-- Frontend Management Section (Original) -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -389,8 +441,10 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
 <!-- ==================== CRM SECTION ==================== -->
+<% if (hasModuleAccess('crm')) { %>
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-people-fill"></i>
@@ -400,25 +454,31 @@
 
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
+                    <% if (hasAccess('crm', 'view') || hasAccess('crm', 'edit') || hasAccess('crm', 'delete')) { %>
                     <li class="nav-sub-item">
                         <a href="/addcontacttable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-person-lines-fill"></i>
                             <span>All Contacts</span>
                         </a>
                     </li>
+                    <% } %>
+                    <% if (hasAccess('crm', 'add')) { %>
                     <li class="nav-sub-item">
                         <a href="/addcontactform" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-person-plus-fill"></i>
                             <span>Add Contact</span>
                         </a>
                     </li>
+                    <% } %>
                    
                    
                 </ul>
             </div>
         </li>
+<% } %>
 
 
+<% if (hasModuleAccess('productManagement')) { %>
           <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-briefcase-fill"></i>
@@ -439,8 +499,10 @@
                 </ul>
             </div>
         </li>
+<% } %>
 
         <!-- ==================== HRM (HUMAN RESOURCE MANAGEMENT) ==================== -->
+        <% if (hasModuleAccess('hrm')) { %>
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-briefcase-fill"></i>
@@ -476,7 +538,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+        <% if (hasModuleAccess('accounting')) { %>
         <!-- ==================== ACCOUNTING ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -507,7 +571,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+        <% if (hasModuleAccess('pos')) { %>
         <!-- ==================== POS (POINT OF SALE) ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -538,7 +604,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+        <% if (hasModuleAccess('salesManagement')) { %>
         <!-- ==================== SALES MANAGEMENT ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -569,7 +637,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+        <% if (hasModuleAccess('projectManagement')) { %>
         <!-- ==================== PROJECT MANAGEMENT ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -600,7 +670,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+        <% if (hasModuleAccess('leadManagement')) { %>
         <!-- ==================== LEAD MANAGEMENT ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -631,7 +703,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+        <% if (hasModuleAccess('dealManagement')) { %>
         <!-- ==================== DEAL MANAGEMENT ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -662,7 +736,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+        <% if (hasModuleAccess('smsManagement')) { %>
         <!-- ==================== SMS MANAGEMENT ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -693,7 +769,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+        <% if (hasModuleAccess('emailNotification')) { %>
         <!-- ==================== EMAIL NOTIFICATION ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -724,7 +802,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+        <% if (hasModuleAccess('eventsManagement')) { %>
         <!-- ==================== EVENTS MANAGEMENT ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -755,7 +835,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+        <% if (hasModuleAccess('zoomMeeting')) { %>
         <!-- ==================== ZOOM MEETING ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -786,7 +868,9 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
+        <% if (hasModuleAccess('supportDeskManagement')) { %>
         <!-- ==================== SUPPORT DESK MANAGEMENT ==================== -->
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
@@ -817,6 +901,7 @@
                 </ul>
             </div>
         </li>
+        <% } %>
 
         
 
@@ -824,6 +909,7 @@
         <li class="sidebar-divider"></li>
 
         <!-- User Management Section -->
+        <% if (hasModuleAccess('queryManagement')) { %>
         <li class="nav-main-item">
             <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
                 <i class="bi bi-person-gear"></i>
@@ -833,21 +919,34 @@
 
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
+                    <% if (isSuperAdmin) { %>
                     <li class="nav-sub-item">
                         <a href="/usertable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-person"></i>
                             <span>User Management</span>
                         </a>
                     </li>
+                    <% } %>
+                    <% if (hasModuleAccess('queryManagement')) { %>
                     <li class="nav-sub-item">
                         <a href="/querytable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-chat-dots"></i>
                             <span>Query Management</span>
                         </a>
                     </li>
+                    <% } %>
+                    <% if (isSuperAdmin) { %>
+                    <li class="nav-sub-item">
+                        <a href="/permissions" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-shield-check"></i>
+                            <span>Role Permissions</span>
+                        </a>
+                    </li>
+                    <% } %>
                 </ul>
             </div>
         </li>
+        <% } %>
 
         <!-- Additional Options -->
         <li class="nav-main-item mt-2">
@@ -871,6 +970,29 @@
 
 <!-- Perfect JavaScript - Dropdown stays open on submenu clicks -->
 <script>
+    function normalizePath(path) {
+        if (!path) return '/';
+        var cleanPath = path.split('?')[0].split('#')[0];
+        cleanPath = cleanPath.replace(/\/+$/, '');
+        return cleanPath === '' ? '/' : cleanPath.toLowerCase();
+    }
+
+    function openParentSubmenu(submenuLink) {
+        if (!submenuLink) return;
+        var submenuWrapper = submenuLink.closest('.submenu-wrapper');
+        if (!submenuWrapper) return;
+
+        submenuWrapper.style.display = 'block';
+        var parentMainLink = submenuWrapper.previousElementSibling;
+        if (parentMainLink) {
+            parentMainLink.classList.add('active');
+            var chevron = parentMainLink.querySelector('.chevron-icon');
+            if (chevron) {
+                chevron.classList.add('rotate-chevron');
+            }
+        }
+    }
+
     // Toggle submenu function - prevents event bubbling
     function toggleSubmenu(event, element) {
         // Stop event propagation to prevent any unwanted closing
@@ -910,6 +1032,9 @@
         
         // Add active class to clicked item
         element.classList.add('active');
+
+        // Ensure parent submenu remains open on this page before navigation
+        openParentSubmenu(element);
         
         // Here you can add your navigation logic
         // For example: window.location.href = element.getAttribute('href');
@@ -984,4 +1109,24 @@
     document.querySelectorAll('.chevron-icon').forEach(function(chevron) {
         chevron.classList.remove('rotate-chevron');
     });
+
+    // Keep current page's parent menu open after navigation/reload
+    var currentPath = normalizePath(window.location.pathname);
+    var matchedLink = null;
+    var matchedLength = -1;
+
+    document.querySelectorAll('.nav-sub-link[href]').forEach(function(link) {
+        var linkPath = normalizePath(link.getAttribute('href'));
+        var isMatch = currentPath === linkPath || (linkPath !== '/' && currentPath.indexOf(linkPath + '/') === 0);
+
+        if (isMatch && linkPath.length > matchedLength) {
+            matchedLink = link;
+            matchedLength = linkPath.length;
+        }
+    });
+
+    if (matchedLink) {
+        matchedLink.classList.add('active');
+        openParentSubmenu(matchedLink);
+    }
 </script>

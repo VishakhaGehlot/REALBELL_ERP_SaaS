@@ -132,10 +132,15 @@
     align-items:center;
     justify-content:center;
     background:#fff;
+    overflow: hidden;
+    padding: 10px;
 }
 
 .module-circle img{
-    width:40px;
+    width:100%;
+    height:100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .module-item h4{
@@ -178,7 +183,8 @@
 
         /* ACCOUNTING */
         .accounting-section { background: #f0f2f8; padding: 70px 0; }
-        .accounting-section .icon-circle { width:90px; height:90px; border-radius:50%; border: 2px solid #c8b96e; margin:auto; display:flex; align-items:center; justify-content:center; }
+        .accounting-section .icon-circle { width:90px; height:90px; border-radius:50%; border: 2px solid #c8b96e; margin:auto; display:flex; align-items:center; justify-content:center; overflow:hidden; padding:10px; background:#fffdf0; }
+        .accounting-section .icon-circle img { width:100%; height:100%; object-fit: cover; border-radius:50%; }
         .accounting-row { align-items: stretch; }
         .accounting-col { display: flex; flex-direction: column; align-items: center; padding: 20px 30px; }
 
@@ -198,15 +204,15 @@
 
         /* HR */
         .hr-section { background: #eaecf2; padding: 55px 0; }
-        .hr-icon-circle { width:52px; height:52px; border-radius:50%; background: var(--gold-pale); border:2px solid #c8b96e; display:flex; align-items:center; justify-content:center; z-index:2; flex-shrink:0; overflow: hidden; padding: 8px; }
-        .hr-icon-circle img { width: 100%; height: 100%; object-fit: contain; }
+        .hr-icon-circle { width:52px; height:52px; border-radius:50%; background: var(--gold-pale); border:2px solid #c8b96e; display:flex; align-items:center; justify-content:center; z-index:2; flex-shrink:0; overflow: hidden; padding: 6px; }
+        .hr-icon-circle img { width: 100%; height: 100%; object-fit: cover; border-radius:50%; }
         .hr-timeline-line { position:absolute; left:26px; top:0; bottom:0; border-left: 2px dotted var(--gold); }
 
         /* LEADS */
         .leads-section { background: #eaecf2; padding: 70px 0; }
         .leads-box { border: 2px solid var(--gold); border-radius: 60px; background: white; margin-bottom: 20px; padding: 22px 30px; }
         .leads-icon-circle { width: 90px; height: 90px; border-radius: 50%; border: 2px solid #c8b96e; display: flex; align-items: center; justify-content: center; margin: auto; background: #fffdf0; overflow: hidden; padding: 10px; }
-        .leads-icon-circle img { width: 100%; height: 100%; object-fit: contain; }
+        .leads-icon-circle img { width: 100%; height: 100%; object-fit: cover; border-radius:50%; }
         .leads-divider { height: 60px; border-left: 3px solid var(--gold); margin: auto; }
 
         /* TESTIMONIALS */
@@ -271,6 +277,59 @@ section p:last-child{
     color:#6c7a86;
     line-height:1.7;
 }
+
+.pricing-section {
+    padding: 60px 0;
+    background: #f4f6f9;
+    text-align: center;
+}
+
+.pricing-title {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 40px;
+}
+
+.pricing-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    transition: 0.3s;
+    height: 100%;
+}
+
+.pricing-card:hover {
+    transform: translateY(-8px);
+}
+
+.price {
+    font-size: 32px;
+    font-weight: bold;
+    color: #d4a017;
+    margin: 15px 0;
+}
+
+.pricing-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.pricing-card ul li {
+    margin: 10px 0;
+    color: #555;
+}
+
+.btn-plan {
+    background: #d4a017;
+    border: none;
+    padding: 10px 25px;
+    color: #fff;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+
     </style>
 </head>
 
@@ -649,6 +708,39 @@ let activeSlides = swiperdata.filter(s => s.status === "Active");
                 </div>
                 <% } %>
             </div>
+        </div>
+    </div>
+</section>
+
+<section class="pricing-section">
+    <h1 class="pricing-title">Simple & Transparent Pricing</h1>
+
+    <div class="container">
+        <div class="row g-4">
+
+            <% Data.forEach((val)=>{ %>
+            <div class="col-md-4">
+                <div class="pricing-card">
+
+                    <h3><%= val.title %></h3>
+
+                    <div class="price">₹<%= val.price %></div>
+
+                    <ul>
+                        <% val.features.forEach(function(f){ %>
+                            <li>✔ <%= f %></li>
+                        <% }) %>
+                    </ul>
+
+                    <!-- FORM -->
+                    <a href="/pricingForm?planId=<%= val._id %>" class="btn-plan d-inline-block text-decoration-none">
+                        Select Plan
+                    </a>
+
+                </div>
+            </div>
+            <% }) %>
+
         </div>
     </div>
 </section>

@@ -1,6 +1,8 @@
 const router=require('express').Router()
 const querytable=require('../models/query')
 const nodemailer=require('nodemailer')
+const { requireAuth } = require('../middleware/roleAuth')
+const { requireModuleAccess } = require('../middleware/permissionAuth')
 
 router.get('/contact',(req,res)=>{
     res.render("Home/contact.ejs")
@@ -11,6 +13,9 @@ router.post('/contact',async(req,res)=>{
    Record.save()
    console.log(Record)
 })
+
+router.use(requireAuth)
+router.use(requireModuleAccess('queryManagement'))
 
 router.get('/querytable',async(req,res)=>{
     const querydata = await querytable.find()

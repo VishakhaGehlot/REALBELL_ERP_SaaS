@@ -1,6 +1,21 @@
 const router = require('express').Router();
 const addcontactTable = require('../models/CRM');
 const nodemailer = require('nodemailer');
+const { requireAuth } = require('../middleware/roleAuth');
+const { requireModuleAccess } = require('../middleware/permissionAuth');
+const { getUserScope } = require('../middleware/dataScope');
+
+router.use(requireAuth);
+
+function buildScopedCRMFilter(scope) {
+    if (scope.fullAccess) return {}
+    return {
+        $or: [
+            { ownerUserId: { $in: scope.userIds } },
+            { ownerEmail: { $in: scope.emails } }
+        ]
+    }
+}
 
 // ========== EMAIL CONFIGURATION ==========
 const transporter = nodemailer.createTransport({
@@ -25,29 +40,30 @@ const transporter = nodemailer.createTransport({
 // ========== CRM ROUTES ==========
 
 // 📌 Show All CRM Records
-router.get('/addcontacttable', async (req, res) => {
+router.get('/addcontacttable', requireModuleAccess('crm'), async (req, res) => {
     try {
-        const data = await addcontactTable.find().sort({ createdAt: -1 });
-        const loginname = req.session.user ? req.session.user.name : 'Admin';
+        const scope = await getUserScope(req)
+        const data = await addcontactTable.find(buildScopedCRMFilter(scope)).sort({ createdAt: -1 });
+        const loginname = req.session.email || 'Admin';
         res.render("CRM/addcontacttable.ejs", { data, loginname });
     } catch (error) {
         console.error(error);
-        res.redirect('/dashboard');
+        res.status(500).send("Unable to load CRM contacts.");
     }
 });
 
 // 📌 Show Add Form - NO SESSION CHECK
-router.get('/addcontactform', (req, res) => {
-    // No session check - direct access
-    const loginname = req.session.user ? req.session.user.name : 'Admin';
+router.get('/addcontactform', requireModuleAccess('crm', 'add'), (req, res) => {
+    const loginname = req.session.email || 'Admin';
     res.render("CRM/addcontactform.ejs", { error: null, success: null, loginname });
 });
 
 // 📌 Add New Record
-router.post('/addcontactform', async (req, res) => {
+router.post('/addcontactform', requireModuleAccess('crm', 'add'), async (req, res) => {
     try {
         const { name, phoneno, whatsappno, email, note } = req.body;
-        const loginname = req.session.user ? req.session.user.name : 'Admin';
+        const loginname = req.session.email || 'Admin';
+        const scope = await getUserScope(req)
         
         if (!name || !phoneno || !email) {
             return res.render("CRM/addcontactform.ejs", { 
@@ -62,7 +78,9 @@ router.post('/addcontactform', async (req, res) => {
             phoneno,
             whatsappno: whatsappno || '',
             email,
-            note: note || ''
+            note: note || '',
+            ownerUserId: scope.userIds[0] || null,
+            ownerEmail: loginname.toLowerCase()
         });
         
         await newRecord.save();
@@ -72,7 +90,7 @@ router.post('/addcontactform', async (req, res) => {
         
     } catch (error) {
         console.error(error);
-        const loginname = req.session.user ? req.session.user.name : 'Admin';
+        const loginname = req.session.email || 'Admin';
         res.render("CRM/addcontactform.ejs", { 
             error: "Failed to add record", 
             success: null,
@@ -82,11 +100,15 @@ router.post('/addcontactform', async (req, res) => {
 });
 
 // 📌 Show Edit Form
-router.get('/addcontactedit/:id', async (req, res) => {
+router.get('/addcontactedit/:id', requireModuleAccess('crm', 'edit'), async (req, res) => {
     try {
-        const record = await addcontactTable.findById(req.params.id);
+        const scope = await getUserScope(req)
+        const record = await addcontactTable.findOne({
+            _id: req.params.id,
+            ...buildScopedCRMFilter(scope)
+        });
         if (!record) return res.redirect('/addcontacttable');
-        const loginname = req.session.user ? req.session.user.name : 'Admin';
+        const loginname = req.session.email || 'Admin';
         res.render("CRM/addcontactedit.ejs", { Record: record, error: null, success: null, loginname });
     } catch (error) {
         console.error(error);
@@ -95,11 +117,15 @@ router.get('/addcontactedit/:id', async (req, res) => {
 });
 
 // 📌 Update Record
-router.post('/addcontactedit/:id', async (req, res) => {
+router.post('/addcontactedit/:id', requireModuleAccess('crm', 'edit'), async (req, res) => {
     try {
         const { name, phoneno, whatsappno, email, note } = req.body;
+        const scope = await getUserScope(req)
         
-        await addcontactTable.findByIdAndUpdate(req.params.id, {
+        await addcontactTable.findOneAndUpdate({
+            _id: req.params.id,
+            ...buildScopedCRMFilter(scope)
+        }, {
             name,
             phoneno,
             whatsappno: whatsappno || '',
@@ -115,9 +141,13 @@ router.post('/addcontactedit/:id', async (req, res) => {
 });
 
 // 📌 Send Email
-router.post('/addcontactsend/:id', async (req, res) => {
+router.post('/addcontactsend/:id', requireModuleAccess('crm', 'edit'), async (req, res) => {
     try {
-        const record = await addcontactTable.findById(req.params.id);
+        const scope = await getUserScope(req)
+        const record = await addcontactTable.findOne({
+            _id: req.params.id,
+            ...buildScopedCRMFilter(scope)
+        });
         if (!record) return res.redirect('/addcontacttable');
         
         const { subject, message } = req.body;
@@ -157,8 +187,9 @@ router.post('/addcontactsend/:id', async (req, res) => {
 });
 
 // 📌 Update Status
-router.get('/addcontactstatus/:id/:status', async (req, res) => {
+router.get('/addcontactstatus/:id/:status', requireModuleAccess('crm', 'edit'), async (req, res) => {
     try {
+        const scope = await getUserScope(req)
         const currentStatus = req.params.status;
         let newStatus = "";
         if (currentStatus == "Pending") {
@@ -167,7 +198,10 @@ router.get('/addcontactstatus/:id/:status', async (req, res) => {
             newStatus = "Pending";
         }
         
-        await addcontactTable.findByIdAndUpdate(req.params.id, { status: newStatus });
+        await addcontactTable.findOneAndUpdate({
+            _id: req.params.id,
+            ...buildScopedCRMFilter(scope)
+        }, { status: newStatus });
         res.redirect('/addcontacttable');
     } catch (error) {
         console.error(error);
@@ -176,9 +210,13 @@ router.get('/addcontactstatus/:id/:status', async (req, res) => {
 });
 
 // 📌 Delete Record
-router.get('/addcontactdelete/:id', async (req, res) => {
+router.get('/addcontactdelete/:id', requireModuleAccess('crm', 'delete'), async (req, res) => {
     try {
-        await addcontactTable.findByIdAndDelete(req.params.id);
+        const scope = await getUserScope(req)
+        await addcontactTable.findOneAndDelete({
+            _id: req.params.id,
+            ...buildScopedCRMFilter(scope)
+        });
         res.redirect('/addcontacttable');
     } catch (error) {
         console.error(error);

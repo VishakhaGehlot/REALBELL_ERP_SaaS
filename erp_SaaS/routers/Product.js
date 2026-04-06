@@ -1,6 +1,14 @@
 const router = require('express').Router();
 const upload = require('../middleware/multer');
 const ProductTable = require('../models/product');
+const { requireAuth } = require('../middleware/roleAuth');
+const { requireModuleAccess } = require('../middleware/permissionAuth');
+
+router.use(
+    ['/producttable', '/addproduct', '/editproduct', '/updatestatus', '/deleteproduct'],
+    requireAuth,
+    requireModuleAccess('productManagement')
+);
 
 // Show table
 router.get("/producttable", async (req, res) => {

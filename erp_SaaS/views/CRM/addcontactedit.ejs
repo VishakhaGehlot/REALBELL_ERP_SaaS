@@ -360,6 +360,11 @@
 </style>
 
 <div class="main-wrapper">
+    <%
+        const hasAccess = (typeof canAccess === 'function')
+            ? canAccess
+            : (() => true);
+    %>
     <%- include('../../partials/admin/left.ejs')%>
 
     <div class="content-wrapper">
@@ -399,6 +404,7 @@
                         </div>
                     <% } %>
 
+                    <% if (hasAccess('crm', 'edit')) { %>
                     <form method="post" action="/addcontactedit/<%= Record._id %>">
                         <div class="form-group">
                             <label class="form-label">
@@ -468,8 +474,10 @@
                             </button>
                         </div>
                     </form>
+                    <% } %>
 
                     <!-- Send Email Form -->
+                    <% if (hasAccess('crm', 'edit')) { %>
                     <div class="send-form">
                         <h4>
                             <i class="bi bi-envelope-paper"></i>
@@ -505,6 +513,7 @@
                             </button>
                         </form>
                     </div>
+                    <% } %>
                 </div>
             </div>
         </div>

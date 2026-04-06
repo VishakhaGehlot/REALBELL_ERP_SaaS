@@ -3,6 +3,8 @@ const authTable = require('../models/auth')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const logincheck = require('../middleware/logincheck')
+const { normalizeRole, requireAuth } = require('../middleware/roleAuth')
+const queryTable = require('../models/query')
 
 // Helper function to get user data from session
 async function getUserData(email) {
@@ -58,18 +60,10 @@ router.post('/login', async (req, res) => {
         req.session.email = Email.email
         req.session.userId = Email._id
         req.session.userName = `${Email.firstName} ${Email.lastName}`
-        req.session.userRole = Email.role
+        req.session.userRole = normalizeRole(Email.role)
 
-        // Role Based Redirect
-        if (Email.role === "SuperAdmin") {
-            return res.redirect("/dashboard")
-        } else if (Email.role === "Admin") {
-            return res.redirect("/dashboard")
-        } else if (Email.role === "teacher") {
-            return res.redirect("/dashboard")
-        } else {
-            return res.redirect("/")
-        }
+        // Centralized role-based dashboard route
+        return res.redirect("/dashboard")
 
     } catch (error) {
         console.error('Login error:', error)
@@ -112,7 +106,7 @@ router.post('/register', async (req, res) => {
             mobile:mobile,
             dob:dob,
             status: "Inactive",
-            role: "Admin"
+            role: "Manager"
         })
         await Record.save()
         console.log(Record)
@@ -143,12 +137,7 @@ router.post('/register', async (req, res) => {
     res.render("Auth/signup.ejs", { mess })
 })
 
-router.get('/dashboard', async (req, res) => {
-    // Check if user is logged in
-    if (!req.session.isAuth) {
-        return res.redirect('/login')
-    }
-    
+router.get('/dashboard', requireAuth, async (req, res) => {
     try {
         // Get full user data from database
         const user = await authTable.findOne({ email: req.session.email })
@@ -156,26 +145,150 @@ router.get('/dashboard', async (req, res) => {
         if (!user) {
             return res.redirect('/login')
         }
+
+        const role = normalizeRole(user.role)
         
         // Prepare user data for header
         const userData = {
             userName: `${user.firstName} ${user.lastName}`,
             userEmail: user.email,
-            userRole: user.role,
+            userRole: role,
             userInitial: user.firstName ? user.firstName.charAt(0).toUpperCase() : 'U',
             userInitials: user.firstName && user.lastName ? 
                 `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase() : 
                 (user.firstName ? user.firstName.charAt(0).toUpperCase() : 'U')
         }
-        
-        res.render("Home/Dashboard.ejs", userData)
+
+        if (role === "SuperAdmin") {
+            const allUsersRaw = await authTable.find().sort({ firstName: 1, lastName: 1 })
+            const allUsers = allUsersRaw.map((u) => ({
+                ...u.toObject(),
+                role: normalizeRole(u.role)
+            }))
+            const stats = {
+                totalUsers: allUsers.length,
+                activeUsers: allUsers.filter(u => u.status === "Active").length,
+                leadershipUsers: allUsers.filter((u) => {
+                    return u.role === "SuperAdmin" || u.role === "CEO" || u.role === "Admin" || u.role === "Manager"
+                }).length,
+                employeeUsers: allUsers.filter((u) => u.role === "Employee").length
+            }
+
+            return res.render("Home/SuperAdminDashboard.ejs", {
+                ...userData,
+                allUsers,
+                stats
+            })
+        }
+
+        const totalQueries = await queryTable.countDocuments()
+        const repliedQueries = await queryTable.countDocuments({ replied: true })
+        const totalUsers = await authTable.countDocuments()
+        const activeUsers = await authTable.countDocuments({ status: "Active" })
+
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setHours(0, 0, 0, 0)
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
+
+        const weekDayLabels = []
+        const dayKeys = []
+        for (let i = 0; i < 7; i += 1) {
+            const day = new Date(sevenDaysAgo)
+            day.setDate(sevenDaysAgo.getDate() + i)
+            weekDayLabels.push(day.toLocaleDateString('en-US', { weekday: 'short' }))
+            dayKeys.push(day.toISOString().slice(0, 10))
+        }
+
+        const queriesLastWeek = await queryTable.find(
+            { createdDate: { $gte: sevenDaysAgo } },
+            { createdDate: 1 }
+        ).lean()
+        const queryCountByDay = Object.fromEntries(dayKeys.map((key) => [key, 0]))
+        queriesLastWeek.forEach((q) => {
+            const key = new Date(q.createdDate || Date.now()).toISOString().slice(0, 10)
+            if (Object.prototype.hasOwnProperty.call(queryCountByDay, key)) {
+                queryCountByDay[key] += 1
+            }
+        })
+        const queryStats = dayKeys.map((key) => queryCountByDay[key] || 0)
+
+        const usersForChart = await authTable.find({}, { _id: 1, status: 1 }).lean()
+        const userCountByDay = Object.fromEntries(dayKeys.map((key) => [key, 0]))
+        usersForChart.forEach((u) => {
+            const createdAt = u._id && typeof u._id.getTimestamp === 'function'
+                ? u._id.getTimestamp()
+                : new Date()
+            const key = new Date(createdAt).toISOString().slice(0, 10)
+            if (Object.prototype.hasOwnProperty.call(userCountByDay, key)) {
+                userCountByDay[key] += 1
+            }
+        })
+        const userStats = dayKeys.map((key) => userCountByDay[key] || 0)
+
+        const recentQueriesRaw = await queryTable
+            .find({}, { firstName: 1, lastName: 1, message: 1, createdDate: 1, replied: 1 })
+            .sort({ createdDate: -1 })
+            .limit(5)
+            .lean()
+
+        const recentQueries = recentQueriesRaw.map((q) => {
+            const msg = (q.message || '').trim()
+            const fallbackName = `${(q.firstName || '').trim()} ${(q.lastName || '').trim()}`.trim() || 'User'
+            const shortTitle = msg ? msg.slice(0, 80) : `Query from ${fallbackName}`
+            return {
+                title: shortTitle,
+                status: q.replied ? 'replied' : 'pending',
+                createdAt: q.createdDate || new Date()
+            }
+        })
+
+        const recentUsersRaw = await authTable
+            .find({}, { firstName: 1, lastName: 1, email: 1, status: 1, _id: 1 })
+            .sort({ _id: -1 })
+            .limit(5)
+            .lean()
+
+        const recentUsers = recentUsersRaw.map((u) => {
+            const createdAt = u._id && typeof u._id.getTimestamp === 'function'
+                ? u._id.getTimestamp()
+                : new Date()
+            return {
+                name: `${(u.firstName || '').trim()} ${(u.lastName || '').trim()}`.trim() || 'User',
+                email: u.email || '-',
+                status: u.status === 'Active' ? 'active' : 'pending',
+                createdAt
+            }
+        })
+
+        return res.render("Home/Dashboard.ejs", {
+            ...userData,
+            dashboardStats: {
+                totalQueries,
+                repliedQueries,
+                totalUsers,
+                activeNow: activeUsers
+            },
+            dashboardData: {
+                queryStats,
+                userStats,
+                dayLabels: weekDayLabels,
+                recentQueries,
+                recentUsers
+            }
+        })
     } catch (error) {
         console.error('Dashboard error:', error)
-        res.redirect('/login')
+        return res.redirect('/login')
     }
 })
 router.get('/hproducts',(req,res)=>{
     res.render("Home/HProduct")
+})
+
+router.get('/no-access', requireAuth, (req, res) => {
+    const moduleName = req.query.module || "This module"
+    const actionName = req.query.action || "requested action"
+    return res.render("Home/NoAccess.ejs", { moduleName, actionName })
 })
 // ================= GET =================
 router.get('/forgotpasswordform', (req, res) => {
@@ -304,7 +417,7 @@ router.use(async (req, res, next) => {
             if (user) {
                 res.locals.userName = `${user.firstName} ${user.lastName}`
                 res.locals.userEmail = user.email
-                res.locals.userRole = user.role
+                res.locals.userRole = normalizeRole(user.role)
                 res.locals.userInitial = user.firstName ? user.firstName.charAt(0).toUpperCase() : 'U'
                 res.locals.userInitials = user.firstName && user.lastName ? 
                     `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase() : 

@@ -262,10 +262,12 @@
         font-size: 12px;
     }
 
-    .role-option.user label i { color: #64748b; }
-    .role-option.admin label i { color: #10b981; }
+    .role-option.employee label i { color: #64748b; }
+    .role-option.hr label i { color: #f97316; }
+    .role-option.manager label i { color: #10b981; }
+    .role-option.admin label i { color: #14b8a6; }
+    .role-option.ceo label i { color: #3b82f6; }
     .role-option.superadmin label i { color: #ef4444; }
-    .role-option.teacher label i { color: #f59e0b; }
 
     /* Info Box */
     .info-box {
@@ -486,6 +488,36 @@
                                    maxlength="100">
                         </div>
 
+                        <!-- Contact Row -->
+                        <div class="name-row">
+                            <!-- Mobile -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-phone"></i>
+                                    Mobile Number
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="mobile"
+                                       placeholder="e.g., 9876543210"
+                                       required
+                                       pattern="[0-9]{10,15}"
+                                       title="Enter valid mobile number">
+                            </div>
+
+                            <!-- Date of Birth -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-calendar-date"></i>
+                                    Date of Birth
+                                </label>
+                                <input type="date"
+                                       class="form-control"
+                                       name="dob"
+                                       required>
+                            </div>
+                        </div>
+
                         <!-- Password Field with Toggle -->
                         <div class="form-group">
                             <label class="form-label">
@@ -515,53 +547,45 @@
                             </div>
                         </div>
 
-                        <!-- Role Selection -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-diagram-3"></i>
+                                Reports To
+                            </label>
+                            <select class="form-control" name="reportsTo">
+                                <option value="none">No Reporting Manager</option>
+                                <% if (managerOptions && managerOptions.length) { %>
+                                    <% managerOptions.forEach((mgr) => { %>
+                                        <option value="<%= mgr._id %>">
+                                            <%= mgr.firstName %> <%= mgr.lastName %> (<%= mgr.role %>)
+                                        </option>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                        </div>
+
+                        <!-- Role Input -->
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-shield-check"></i>
-                                Select Role
+                                User Role
                             </label>
-                            <div class="role-selector">
-                                <!-- User Role -->
-                                <div class="role-option user">
-                                    <input type="radio" name="role" id="roleUser" value="User" checked>
-                                    <label for="roleUser">
-                                        <i class="bi bi-person"></i>
-                                        <span>User</span>
-                                        <small>Basic access</small>
-                                    </label>
-                                </div>
-
-                                <!-- Teacher Role -->
-                                <div class="role-option teacher">
-                                    <input type="radio" name="role" id="roleTeacher" value="teacher">
-                                    <label for="roleTeacher">
-                                        <i class="bi bi-person-workspace"></i>
-                                        <span>Teacher</span>
-                                        <small>Educational access</small>
-                                    </label>
-                                </div>
-
-                                <!-- Admin Role -->
-                                <div class="role-option admin">
-                                    <input type="radio" name="role" id="roleAdmin" value="Admin">
-                                    <label for="roleAdmin">
-                                        <i class="bi bi-shield"></i>
-                                        <span>Admin</span>
-                                        <small>Management access</small>
-                                    </label>
-                                </div>
-
-                                <!-- SuperAdmin Role -->
-                                <div class="role-option superadmin">
-                                    <input type="radio" name="role" id="roleSuperAdmin" value="SuperAdmin">
-                                    <label for="roleSuperAdmin">
-                                        <i class="bi bi-shield-fill"></i>
-                                        <span>Super Admin</span>
-                                        <small>Full access</small>
-                                    </label>
-                                </div>
-                            </div>
+                            <input type="text"
+                                   class="form-control"
+                                   name="role"
+                                   list="roleSuggestions"
+                                   placeholder="Enter any role (e.g., Employee, Sales Lead, QA, Intern)"
+                                   value="Employee"
+                                   required
+                                   maxlength="50">
+                            <datalist id="roleSuggestions">
+                                <option value="Employee"></option>
+                                <option value="HR"></option>
+                                <option value="Manager"></option>
+                                <option value="Admin"></option>
+                                <option value="CEO"></option>
+                                <option value="SuperAdmin"></option>
+                            </datalist>
                         </div>
 
                         <!-- Button Group -->
