@@ -4,7 +4,12 @@ const bcrypt = require("bcrypt")
 const { requireAuth, allowRoles } = require("../middleware/roleAuth")
 
 const superAdminOnly = [requireAuth, allowRoles("SuperAdmin")]
+const ROLE_OPTIONS = ["SuperAdmin", "Company", "Employee", "Customer", "Vendor"]
 const reportingManagerRoles = ["SuperAdmin", "CEO", "Admin", "Manager", "HR"]
+
+async function getAllRoleOptions() {
+    return [...ROLE_OPTIONS]
+}
 
 async function getManagerOptions(excludeId) {
     const query = { role: { $in: reportingManagerRoles } }
@@ -24,7 +29,21 @@ function resolveReportsTo(reportsTo) {
 function sanitizeRole(role) {
     const cleaned = String(role || "").trim()
     if (!cleaned) return "Employee"
+
+    const value = cleaned.toLowerCase()
+    if (value === "superadmin" || value === "super_admin") return "SuperAdmin"
+    if (value === "company" || value === "organisation" || value === "organization" || value === "ceo" || value === "manager" || value === "admin" || value === "hr") return "Company"
+    if (value === "customer" || value === "client") return "Customer"
+    if (value === "vendor" || value === "vender" || value === "supplier") return "Vendor"
+    if (value === "teacher" || value === "user" || value === "employee" || value === "staff") return "Employee"
+
     return cleaned.slice(0, 50)
+}
+
+function resolveSubmittedRole(role, customRole) {
+    const custom = String(customRole || "").trim()
+    const selected = String(role || "").trim()
+    return sanitizeRole(custom || selected)
 }
 
 // ================= GET ALL USERS =================
@@ -34,20 +53,22 @@ router.get("/usertable", ...superAdminOnly, async (req, res) => {
         .populate("reportsTo", "firstName lastName email role")
         .sort({ firstName: 1, lastName: 1 })
     const loginname = req.session.email
-    res.render("UserManage/usertable.ejs", { userdata, loginname })
+    const roleOptions = await getAllRoleOptions()
+    res.render("UserManage/usertable.ejs", { userdata, loginname, roleOptions })
 })
 
 // ================= FORM =================
 router.get("/userform", ...superAdminOnly, async (req, res) => {
     const loginname = req.session.email
     const managerOptions = await getManagerOptions()
-    res.render("UserManage/userform.ejs", { loginname, managerOptions })
+    const roleOptions = await getAllRoleOptions()
+    res.render("UserManage/userform.ejs", { loginname, managerOptions, roleOptions })
 })
 
 // ================= CREATE USER (bcrypt added) =================
 router.post("/userform", ...superAdminOnly, async (req, res) => {
     try {
-        const { firstName, lastName, email, role, password, mobile, dob, reportsTo } = req.body
+        const { firstName, lastName, email, role, customRole, password, mobile, dob, reportsTo } = req.body
 
         if (!firstName || !lastName || !email || !password || !mobile || !dob) {
             throw new Error("All user fields are required.")
@@ -66,7 +87,7 @@ router.post("/userform", ...superAdminOnly, async (req, res) => {
             firstName: firstName.trim(),
             lastName: lastName.trim(),
             email: normalizedEmail,
-            role: sanitizeRole(role),
+            role: resolveSubmittedRole(role, customRole),
             password: hashPassword,
             mobile: mobile.trim(),
             dob,
@@ -97,17 +118,18 @@ router.get('/useredit/:id', ...superAdminOnly, async (req, res) => {
     const Record = await usertable.findById(id)
     const managerOptions = await getManagerOptions(id)
     const loginname = req.session.email
+    const roleOptions = await getAllRoleOptions()
 
-    res.render("UserManage/useredit.ejs", { Record, loginname, managerOptions })
+    res.render("UserManage/useredit.ejs", { Record, loginname, managerOptions, roleOptions })
 })
 
 // ================= UPDATE (NO PASSWORD CHANGE HERE) =================
 router.post('/useredit/:id', ...superAdminOnly, async (req, res) => {
-    const { firstName, lastName, email, role, mobile, dob, status, reportsTo } = req.body
+    const { firstName, lastName, email, role, customRole, mobile, dob, status, reportsTo } = req.body
     const id = req.params.id
 
     const updateData = {
-        role: sanitizeRole(role),
+        role: resolveSubmittedRole(role, customRole),
         reportsTo: resolveReportsTo(reportsTo)
     }
 
@@ -137,10 +159,10 @@ router.get('/userstatus/:id/:status', ...superAdminOnly, async (req, res) => {
 
 // ================= ROLE =================
 router.post('/userrole/:id', ...superAdminOnly, async (req, res) => {
-    const { role } = req.body
+    const { role, customRole } = req.body
     const id = req.params.id
 
-    await usertable.findByIdAndUpdate(id, { role: sanitizeRole(role) })
+    await usertable.findByIdAndUpdate(id, { role: resolveSubmittedRole(role, customRole) })
 
     res.redirect("/usertable")
 })

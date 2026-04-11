@@ -1,205 +1,146 @@
 <%- include('../../partials/admin/header.ejs') %>
-
 <style>
-    :root {
-        --admin-sidebar-width: 350px;
-    }
-
-    body {
-        margin: 0;
-        padding: 0;
-        background: #f5f7fb;
-        overflow-x: hidden;
-    }
-
-    .main-wrapper {
-        display: flex;
-        width: 100%;
-        min-height: 100vh;
-    }
-
-    .content-wrapper {
-        flex: 1;
-        margin-left: var(--admin-sidebar-width);
-        width: calc(100% - var(--admin-sidebar-width));
-        padding: 25px;
-        background: #f5f7fb;
-        min-height: 100vh;
-        box-sizing: border-box;
-    }
-
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .page-header h2 {
-        color: #1e293b;
-        font-weight: 700;
-        margin: 0;
-        font-size: 28px;
-    }
-
-    .page-header p {
-        color: #64748b;
-        margin: 6px 0 0;
-    }
-
-    .badge-role {
-        background: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-        border-radius: 20px;
-        padding: 8px 14px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 14px;
-        margin-bottom: 24px;
-    }
-
-    .stat-card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 16px;
-        border: 1px solid #e2e8f0;
-    }
-
-    .stat-card h4 {
-        margin: 0;
-        color: #64748b;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-    }
-
-    .stat-card p {
-        margin: 8px 0 0;
-        color: #0f172a;
-        font-size: 24px;
-        font-weight: 700;
-    }
-
-    .table-card {
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        overflow: hidden;
-    }
-
-    .table-header {
-        padding: 14px 16px;
-        border-bottom: 1px solid #e2e8f0;
-        background: #f8fafc;
-        font-weight: 700;
-        color: #1e293b;
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 950px;
-    }
-
-    th, td {
-        padding: 12px 14px;
-        border-bottom: 1px solid #e2e8f0;
-        text-align: left;
-        font-size: 14px;
-    }
-
-    th {
-        color: #64748b;
-        background: #f8fafc;
-        text-transform: uppercase;
-        font-size: 12px;
-        letter-spacing: 0.4px;
-    }
-
-    .status {
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .status.active {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .status.inactive {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .status.suspended {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    @media (max-width: 768px) {
-        .content-wrapper {
-            margin-left: 0;
-            width: 100%;
-            padding: 14px;
-        }
-
-        .stats-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-    }
+    :root { --admin-sidebar-width: 350px; }
+    body { margin: 0; padding: 0; background: #f5f7fb; overflow-x: hidden; }
+    .main-wrapper { display: flex; width: 100%; min-height: 100vh; }
+    .content-wrapper { flex: 1; margin-left: var(--admin-sidebar-width); width: calc(100% - var(--admin-sidebar-width)); padding: 25px; background: #f5f7fb; min-height: 100vh; box-sizing: border-box; }
+    .hero { background: linear-gradient(135deg, #111827, #1f2937); color: white; border-radius: 22px; padding: 26px; margin-bottom: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .hero h2 { margin: 0; font-size: 30px; }
+    .hero p { margin: 8px 0 0; color: #d1d5db; }
+    .badge-role { background: rgba(248, 113, 113, 0.15); color: #fecaca; border: 1px solid rgba(252, 165, 165, 0.4); border-radius: 999px; padding: 10px 16px; font-size: 12px; font-weight: 700; height: fit-content; }
+    .stats-grid, .spotlight-grid, .insight-grid { display: grid; gap: 16px; margin-bottom: 24px; }
+    .stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .spotlight-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .insight-grid { grid-template-columns: 1.2fr 1fr 1fr; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 20px; }
+    .metric-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }
+    .metric-value { font-size: 30px; font-weight: 800; color: #0f172a; margin-top: 10px; }
+    .metric-help { font-size: 12px; color: #64748b; margin-top: 8px; }
+    .spotlight-card { text-decoration: none; color: inherit; transition: 0.2s ease; }
+    .spotlight-card:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08); }
+    .spotlight-icon { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: #fff7ed; color: #ea580c; font-size: 24px; margin-bottom: 14px; }
+    .list-card h4, .table-card h4 { margin: 0 0 14px; font-size: 18px; color: #0f172a; }
+    .mini-list { display: grid; gap: 12px; }
+    .mini-item { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #eef2f6; }
+    .mini-item:last-child { border-bottom: none; }
+    .mini-title { font-weight: 700; color: #0f172a; }
+    .mini-subtitle { font-size: 12px; color: #64748b; margin-top: 4px; }
+    .mini-status { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; white-space: nowrap; height: fit-content; }
+    .table-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; overflow: hidden; }
+    .table-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 18px 20px; border-bottom: 1px solid #e2e8f0; }
+    .table-top a { color: #d97706; text-decoration: none; font-weight: 700; }
+    .table-responsive { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    th, td { padding: 13px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 14px; }
+    th { background: #f8fafc; color: #64748b; text-transform: uppercase; font-size: 12px; letter-spacing: 0.4px; }
+    .status { padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .status.active { background: #dcfce7; color: #166534; }
+    .status.inactive { background: #fef3c7; color: #92400e; }
+    .status.suspended { background: #fee2e2; color: #991b1b; }
+    @media (max-width: 1200px) { .stats-grid, .spotlight-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .insight-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .content-wrapper { margin-left: 0; width: 100%; padding: 14px; } .stats-grid, .spotlight-grid { grid-template-columns: 1fr; } }
 </style>
 
 <div class="main-wrapper">
     <%- include('../../partials/admin/left.ejs') %>
-
     <div class="content-wrapper">
-        <div class="page-header">
+        <div class="hero">
             <div>
                 <h2>SuperAdmin Dashboard</h2>
-                <p>Login user: <strong><%= userName %></strong> (<%= userEmail %>)</p>
-                <p style="margin-top:8px;">
-                    <a href="/permissions" style="text-decoration:none; font-weight:700; color:#d97706;">Manage Role Permissions</a>
-                </p>
+                <p><strong><%= userName %></strong> | <%= userEmail %></p>
+                <p><a href="/permissions" style="color:#fdba74; text-decoration:none; font-weight:700;">Manage role permissions</a></p>
             </div>
             <div class="badge-role"><%= userRole %></div>
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card">
-                <h4>Total Users</h4>
-                <p><%= stats.totalUsers %></p>
+            <% (stats || []).forEach((item) => { %>
+                <div class="card">
+                    <div class="metric-label"><%= item.label %></div>
+                    <div class="metric-value"><%= Number(item.value || 0).toLocaleString('en-IN') %></div>
+                    <div class="metric-help"><%= item.helpText %></div>
+                </div>
+            <% }) %>
+        </div>
+
+        <div class="spotlight-grid">
+            <% (spotlightCards || []).forEach((item) => { %>
+                <a class="card spotlight-card" href="<%= item.link %>">
+                    <div class="spotlight-icon"><i class="bi <%= item.icon %>"></i></div>
+                    <div class="metric-label"><%= item.label %></div>
+                    <div class="metric-value"><%= Number(item.value || 0).toLocaleString('en-IN') %></div>
+                    <div class="metric-help"><%= item.meta %></div>
+                </a>
+            <% }) %>
+        </div>
+
+        <div class="insight-grid">
+            <div class="card list-card">
+                <h4>Recent Users</h4>
+                <div class="mini-list">
+                    <% if (recentUsers && recentUsers.length) { %>
+                        <% recentUsers.forEach((user) => { %>
+                            <div class="mini-item">
+                                <div>
+                                    <div class="mini-title"><%= user.name %></div>
+                                    <div class="mini-subtitle"><%= user.email %> | <%= user.role %></div>
+                                </div>
+                                <div class="mini-status"><%= user.status %></div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="mini-subtitle">No users found.</div>
+                    <% } %>
+                </div>
             </div>
-            <div class="stat-card">
-                <h4>Active Users</h4>
-                <p><%= stats.activeUsers %></p>
+
+            <div class="card list-card">
+                <h4>Recent Plans</h4>
+                <div class="mini-list">
+                    <% if (recentPlans && recentPlans.length) { %>
+                        <% recentPlans.forEach((plan) => { %>
+                            <div class="mini-item">
+                                <div>
+                                    <div class="mini-title"><%= plan.planName || 'Plan' %></div>
+                                    <div class="mini-subtitle"><%= plan.businessName || plan.name || '-' %></div>
+                                </div>
+                                <div class="mini-status"><%= plan.subscriptionStatus || plan.paymentStatus || 'Pending' %></div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="mini-subtitle">No plan records found.</div>
+                    <% } %>
+                </div>
             </div>
-            <div class="stat-card">
-                <h4>Leadership</h4>
-                <p><%= stats.leadershipUsers %></p>
-            </div>
-            <div class="stat-card">
-                <h4>Employees</h4>
-                <p><%= stats.employeeUsers %></p>
+
+            <div class="card list-card">
+                <h4>Latest Queries</h4>
+                <div class="mini-list">
+                    <% if (recentQueries && recentQueries.length) { %>
+                        <% recentQueries.forEach((query) => { %>
+                            <div class="mini-item">
+                                <div>
+                                    <div class="mini-title"><%= ((query.message || '').slice(0, 48)) || 'Customer Query' %></div>
+                                    <div class="mini-subtitle"><%= ((query.firstName || '') + ' ' + (query.lastName || '')).trim() || query.email || '-' %></div>
+                                </div>
+                                <div class="mini-status"><%= query.replied ? 'Replied' : 'Pending' %></div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="mini-subtitle">No query records found.</div>
+                    <% } %>
+                </div>
             </div>
         </div>
 
         <div class="table-card">
-            <div class="table-header">Complete User Information</div>
+            <div class="table-top">
+                <div>
+                    <h4 style="margin:0;">Complete User Information</h4>
+                    <div class="mini-subtitle">Role and account health across the platform</div>
+                </div>
+                <a href="/usertable">Open full user management</a>
+            </div>
             <div class="table-responsive">
                 <table>
                     <thead>
@@ -216,22 +157,16 @@
                         <% if (allUsers && allUsers.length) { %>
                             <% allUsers.forEach((u) => { %>
                                 <tr>
-                                    <td><%= (u.firstName || '') + ' ' + (u.lastName || '') %></td>
+                                    <td><%= `${u.firstName || ''} ${u.lastName || ''}`.trim() || '-' %></td>
                                     <td><%= u.email || '-' %></td>
                                     <td><%= u.mobile || '-' %></td>
                                     <td><%= u.dob || '-' %></td>
-                                    <td><%= u.role || 'User' %></td>
-                                    <td>
-                                        <span class="status <%= (u.status || '').toLowerCase() %>">
-                                            <%= u.status || 'Inactive' %>
-                                        </span>
-                                    </td>
+                                    <td><%= u.normalizedRole || 'User' %></td>
+                                    <td><span class="status <%= String(u.status || '').toLowerCase() %>"><%= u.status || 'Inactive' %></span></td>
                                 </tr>
                             <% }) %>
                         <% } else { %>
-                            <tr>
-                                <td colspan="6">No users found.</td>
-                            </tr>
+                            <tr><td colspan="6">No users found.</td></tr>
                         <% } %>
                     </tbody>
                 </table>

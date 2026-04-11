@@ -305,6 +305,21 @@
             color: #b91c1c;
         }
 
+        .role-badge.company {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .role-badge.customer {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .role-badge.vendor {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -357,6 +372,27 @@
         }
 
         .form-select:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .role-edit-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .role-custom-input {
+            width: 140px;
+            padding: 8px 12px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #1e293b;
+        }
+
+        .role-custom-input:focus {
             outline: none;
             border-color: #f59e0b;
             box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
@@ -727,43 +763,41 @@
 
                                                 <!-- ROLE BADGE -->
                                                 <td>
-                                                    <% if(val.role=="SuperAdmin" ) { %>
-                                                        <span class="role-badge superadmin">
-                                                            <i class="bi bi-shield-fill"></i> Super Admin
-                                                        </span>
-                                                        <% } else if(val.role=="CEO" ) { %>
-                                                            <span class="role-badge ceo">
-                                                                <i class="bi bi-briefcase-fill"></i> CEO
-                                                            </span>
-                                                            <% } else if(val.role=="Manager" ) { %>
-                                                                <span class="role-badge manager">
-                                                                    <i class="bi bi-shield"></i> Manager
-                                                                </span>
-                                                                <% } else if(val.role=="Admin" ) { %>
-                                                                <span class="role-badge admin">
-                                                                    <i class="bi bi-person-badge"></i> Admin
-                                                                </span>
-                                                                <% } else if(val.role=="HR" ) { %>
-                                                                <span class="role-badge hr">
-                                                                    <i class="bi bi-person-vcard"></i> HR
-                                                                </span>
-                                                                <% } else { %>
-                                                                    <span class="role-badge employee">
-                                                                        <i class="bi bi-person"></i> <%= val.role || 'Employee' %>
-                                                                    </span>
-                                                                    <% } %>
+                                                    <% const roleClass = (val.role ? val.role.toLowerCase() : 'employee'); %>
+                                                    <span class="role-badge <%= ['superadmin', 'company', 'employee', 'customer', 'vendor'].includes(roleClass) ? roleClass : 'employee' %>">
+                                                        <i class="bi bi-person"></i> <%= val.role || 'Employee' %>
+                                                    </span>
                                                 </td>
 
                                                 <!-- ROLE CHANGE -->
                                                 <td>
                                                     <form id="roleForm-<%= val._id %>" method="POST" action="/userrole/<%= val._id %>">
-                                                        <input type="text"
-                                                               name="role"
-                                                               class="form-select"
-                                                               value="<%= val.role || 'Employee' %>"
-                                                               list="roleSuggestionsTable"
-                                                               maxlength="50"
-                                                               required>
+                                                        <% 
+                                                            const currentRole = String(val.role || 'Employee').trim();
+                                                            const isKnownRole = (roleOptions || []).includes(currentRole);
+                                                            const roleValue = currentRole.toLowerCase();
+                                                            const mappedDropdownRole =
+                                                                roleValue === 'superadmin' || roleValue === 'super_admin' ? 'SuperAdmin' :
+                                                                roleValue === 'company' || roleValue === 'organisation' || roleValue === 'organization' || roleValue === 'ceo' || roleValue === 'manager' || roleValue === 'admin' || roleValue === 'hr' ? 'Company' :
+                                                                roleValue === 'customer' || roleValue === 'client' ? 'Customer' :
+                                                                roleValue === 'vendor' || roleValue === 'vender' || roleValue === 'supplier' ? 'Vendor' :
+                                                                'Employee';
+                                                        %>
+                                                        <div class="role-edit-wrap">
+                                                            <select name="role" class="form-select">
+                                                                <% (roleOptions || ['SuperAdmin', 'Company', 'Employee', 'Customer', 'Vendor']).forEach((roleName) => { %>
+                                                                    <option value="<%= roleName %>" <%= mappedDropdownRole === roleName ? 'selected' : '' %>>
+                                                                        <%= roleName %>
+                                                                    </option>
+                                                                <% }) %>
+                                                            </select>
+                                                            <input type="text"
+                                                                   name="customRole"
+                                                                   class="role-custom-input"
+                                                                   placeholder="Custom role (optional)"
+                                                                   value="<%= isKnownRole ? '' : currentRole %>"
+                                                                   maxlength="50">
+                                                        </div>
                                                     </form>
                                                 </td>
 
@@ -798,14 +832,6 @@
                                                     <% } %>
                                 </tbody>
                             </table>
-                            <datalist id="roleSuggestionsTable">
-                                <option value="Employee"></option>
-                                <option value="HR"></option>
-                                <option value="Manager"></option>
-                                <option value="Admin"></option>
-                                <option value="CEO"></option>
-                                <option value="SuperAdmin"></option>
-                            </datalist>
                         </div>
                     </div>
                 </div>

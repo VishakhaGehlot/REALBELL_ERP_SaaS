@@ -40,6 +40,7 @@ const zoomRouter=require("./routers/Zoom")
 const productRouter=require('./routers/Product')
 const permissionsRouter = require('./routers/permissions')
 const subsRouter = require('./routers/pricing')
+const erpModulesRouter = require('./routers/erpModules')
 
 app.use('/', HomeRouter)
 app.use('/', authRouter)
@@ -63,6 +64,7 @@ app.use('/',zoomRouter)
 app.use('/',productRouter)
 app.use('/', permissionsRouter)
 app.use('/',subsRouter)
+app.use('/', erpModulesRouter)
 app.set('view engine', 'ejs')
 
 app.listen(process.env.PORT, () => {

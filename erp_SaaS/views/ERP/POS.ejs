@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS - New Sale</title>
+    <script>
+        (function applySavedTheme() {
+            try {
+                const savedTheme = localStorage.getItem("erp-theme");
+                if (savedTheme === "dark" || savedTheme === "light") {
+                    document.documentElement.setAttribute("data-theme", savedTheme);
+                }
+            } catch (themeReadError) {
+                // Ignore storage/theme read errors and continue with default styles.
+            }
+        })();
+    </script>
+    <style>
+        :root {
+            --page-bg-start: #f8fafc;
+            --page-bg-end: #eef2ff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --card-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+
+            --ghost-bg: #ffffff;
+            --ghost-text: #1e293b;
+            --ghost-border: #dbeafe;
+            --primary-bg-start: #2563eb;
+            --primary-bg-end: #1d4ed8;
+            --secondary-bg: #e0e7ff;
+            --secondary-text: #3730a3;
+            --remove-bg: #fee2e2;
+            --remove-text: #b91c1c;
+
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --input-placeholder: #94a3b8;
+            --focus-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+
+            --table-border: #e2e8f0;
+            --table-head-bg: #f8fafc;
+            --table-head-text: #64748b;
+
+            --chip-bg: #eff6ff;
+            --chip-text: #1d4ed8;
+
+            --summary-bg-start: #0f172a;
+            --summary-bg-end: #1e293b;
+            --summary-divider: rgba(255, 255, 255, 0.18);
+
+            --recent-bg: #f8fafc;
+            --empty-bg: #f8fafc;
+            --muted: #64748b;
+        }
+
+        [data-theme="dark"] {
+            --page-bg-start: #090f1f;
+            --page-bg-end: #121b2f;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9fb0cb;
+            --card-bg: #111a2e;
+            --card-border: #253454;
+            --card-shadow: 0 20px 40px rgba(2, 6, 23, 0.55);
+
+            --ghost-bg: #182540;
+            --ghost-text: #e5e7eb;
+            --ghost-border: #2b4064;
+            --primary-bg-start: #3b82f6;
+            --primary-bg-end: #2563eb;
+            --secondary-bg: #1f2f4a;
+            --secondary-text: #bfdbfe;
+            --remove-bg: #3f1b2e;
+            --remove-text: #fecaca;
+
+            --input-bg: #16233d;
+            --input-border: #2a3c61;
+            --input-placeholder: #8ea3c2;
+            --focus-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+
+            --table-border: #2a3c61;
+            --table-head-bg: #0d1427;
+            --table-head-text: #9fb0cb;
+
+            --chip-bg: #1e3a8a;
+            --chip-text: #dbeafe;
+
+            --summary-bg-start: #0b1220;
+            --summary-bg-end: #16223a;
+            --summary-divider: rgba(148, 163, 184, 0.28);
+
+            --recent-bg: #0f172a;
+            --empty-bg: #0f172a;
+            --muted: #9fb0cb;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, var(--page-bg-start) 0%, var(--page-bg-end) 100%);
+            color: var(--text-primary);
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .page { max-width: 1280px; margin: 0 auto; }
+
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 { margin: 0; font-size: 32px; font-weight: 800; color: var(--text-primary); }
+        .hero p { margin: 8px 0 0; color: var(--text-secondary); }
+        .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        .ghost-btn, .primary-btn, .secondary-btn, .remove-btn {
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 700;
+        }
+
+        .ghost-btn {
+            text-decoration: none;
+            background: var(--ghost-bg);
+            color: var(--ghost-text);
+            padding: 12px 16px;
+            border: 1px solid var(--ghost-border);
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, var(--primary-bg-start), var(--primary-bg-end));
+            color: #fff;
+            padding: 14px 18px;
+        }
+
+        .secondary-btn {
+            background: var(--secondary-bg);
+            color: var(--secondary-text);
+            padding: 12px 16px;
+        }
+
+        .remove-btn {
+            background: var(--remove-bg);
+            color: var(--remove-text);
+            padding: 10px 14px;
+        }
+
+        .ghost-btn:hover, .primary-btn:hover, .secondary-btn:hover, .remove-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .section-title { margin: 0 0 18px; font-size: 20px; font-weight: 800; color: var(--text-primary); }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .field { display: flex; flex-direction: column; gap: 8px; }
+        .field.full { grid-column: 1 / -1; }
+
+        label { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+
+        input, select, textarea {
+            width: 100%;
+            border: 1px solid var(--input-border);
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-size: 14px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        input::placeholder, textarea::placeholder { color: var(--input-placeholder); }
+
+        select option {
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-bg-start);
+            box-shadow: var(--focus-shadow);
+        }
+
+        textarea { min-height: 90px; resize: vertical; }
+
+        .error-box {
+            margin-bottom: 18px;
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 14px 16px;
+            border-radius: 16px;
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .error-box {
+            background: #3f1b2e;
+            color: #fecdd3;
+            border-color: #9f1239;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--table-border);
+            border-radius: 18px;
+        }
+
+        table { width: 100%; border-collapse: collapse; min-width: 720px; }
+
+        th, td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--table-border);
+            text-align: left;
+            vertical-align: middle;
+            color: var(--text-primary);
+        }
+
+        th {
+            background: var(--table-head-bg);
+            font-size: 12px;
+            color: var(--table-head-text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td input[type="number"] { min-width: 92px; }
+
+        .product-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--chip-bg);
+            color: var(--chip-text);
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+        }
+
+        .muted { color: var(--muted); font-size: 13px; }
+
+        .summary {
+            background: linear-gradient(135deg, var(--summary-bg-start), var(--summary-bg-end));
+            color: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 18px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-top: 14px;
+            border-top: 1px solid var(--summary-divider);
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .recent-list { display: grid; gap: 14px; }
+
+        .recent-item {
+            padding: 16px;
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            background: var(--recent-bg);
+        }
+
+        .recent-item h4 { margin: 0 0 6px; font-size: 15px; color: var(--text-primary); }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .status-paid { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-partial { background: #e0e7ff; color: #3730a3; }
+
+        [data-theme="dark"] .status-paid { background: #134e4a; color: #ccfbf1; }
+        [data-theme="dark"] .status-pending { background: #78350f; color: #fde68a; }
+        [data-theme="dark"] .status-partial { background: #312e81; color: #c7d2fe; }
+
+        .empty-state {
+            padding: 18px;
+            border-radius: 18px;
+            background: var(--empty-bg);
+            color: var(--muted);
+            text-align: center;
+            border: 1px dashed var(--card-border);
+        }
+
+        .inventory-hint {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        @media (max-width: 1024px) {
+            .layout { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 14px; }
+            .card { padding: 16px; border-radius: 18px; }
+            .grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 26px; }
+            .hero-actions { width: 100%; }
+            .hero-actions a, .hero-actions button { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<%
+    const productList = Array.isArray(products) ? products : [];
+    const recentOrders = Array.isArray(orders) ? orders : [];
+    const salesOwnerName = loginname || '';
+%>
+<div class="page">
+    <div class="hero">
+        <div>
+            <h1>New Sale Invoice</h1>
+            <p>POS invoice form ready hai. Product select karo, quantity dalo, total auto-calculate hoga aur order seedha save ho jayega.</p>
+        </div>
+        <div class="hero-actions">
+            <a href="/orders" class="ghost-btn">View Orders</a>
+            <a href="/inventory" class="ghost-btn">Inventory</a>
+        </div>
+    </div>
+
+    <div class="layout">
+        <div class="card">
+            <h2 class="section-title">Invoice Form</h2>
+
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="error-box"><%= error %></div>
+            <% } %>
+
+            <form action="/new-sale" method="POST" id="newSaleForm">
+                <div class="grid">
+                    <div class="field">
+                        <label for="customerName">Customer Name</label>
+                        <input type="text" id="customerName" name="customerName" placeholder="Enter customer name" required>
+                    </div>
+                    <div class="field">
+                        <label for="paymentStatus">Payment Status</label>
+                        <select id="paymentStatus" name="paymentStatus">
+                            <option value="Paid">Paid</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Partial">Partial</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="salesOwner">Sales Owner</label>
+                        <input type="text" id="salesOwner" name="salesOwner" value="<%= salesOwnerName %>" placeholder="Sales owner">
+                    </div>
+                    <div class="field">
+                        <label for="taxPercent">Tax Percent</label>
+                        <input type="number" id="taxPercent" name="taxPercent" value="0" min="0" step="0.01">
+                    </div>
+                    <div class="field full">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" name="notes" placeholder="Add invoice notes, delivery details, ya payment remarks"></textarea>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
+                    <div>
+                        <h3 style="margin:0; font-size:18px;">Sale Items</h3>
+                        <p class="muted" style="margin:6px 0 0;">Sirf quantity bharni hai. Price aur total product data se auto aayega.</p>
+                        <p class="inventory-hint">Available products: <strong><%= productList.length %></strong></p>
+                    </div>
+                    <button type="button" class="secondary-btn" id="addRowBtn">Add Item Row</button>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Available Stock</th>
+                                <th>Unit Price</th>
+                                <th>Qty</th>
+                                <th>Row Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="summary">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>Rs <span id="subtotalValue">0.00</span></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax</span>
+                        <span>Rs <span id="taxValue">0.00</span></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Grand Total</span>
+                        <span>Rs <span id="grandTotal">0.00</span></span>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px; flex-wrap:wrap;">
+                    <button type="button" class="ghost-btn" id="resetRowsBtn">Reset Items</button>
+                    <button type="submit" class="primary-btn">Generate Invoice</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Recent Orders</h2>
+            <% if (recentOrders.length) { %>
+                <div class="recent-list">
+                    <% recentOrders.forEach((order) => { 
+                        const paymentClass = String(order.paymentStatus || '').toLowerCase();
+                    %>
+                        <div class="recent-item">
+                            <div class="product-chip"><%= order.orderNumber || 'Order' %></div>
+                            <h4><%= order.customerName || 'Walk-in Customer' %></h4>
+                            <div class="muted">Items: <%= Array.isArray(order.items) ? order.items.length : 0 %></div>
+                            <div class="muted">Total: Rs <%= Number(order.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></div>
+                            <div class="status-badge status-<%= paymentClass === 'paid' ? 'paid' : paymentClass === 'partial' ? 'partial' : 'pending' %>">
+                                <%= order.paymentStatus || 'Pending' %>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">Abhi tak koi recent order nahi mila.</div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+    const products = <%- JSON.stringify(productList.map((product) => ({
+        id: String(product._id),
+        name: product.name || 'Product',
+        price: Number(product.price || 0),
+        stock: Number(product.stock || 0),
+        status: product.status || 'In Stock'
+    }))) %>;
+
+    const itemsBody = document.getElementById('itemsBody');
+    const addRowBtn = document.getElementById('addRowBtn');
+    const resetRowsBtn = document.getElementById('resetRowsBtn');
+    const taxPercentInput = document.getElementById('taxPercent');
+    let rowCounter = 0;
+
+    function formatCurrency(value) {
+        return Number(value || 0).toLocaleString('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function getSelectedProduct(selectElement) {
+        const productId = selectElement.value;
+        return products.find((product) => product.id === productId) || null;
+    }
+
+    function populateProductOptions(selectElement) {
+        selectElement.innerHTML = '';
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = products.length ? 'Select product' : 'No products available';
+        selectElement.appendChild(defaultOption);
+
+        products.forEach((product) => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = `${product.name} - Rs ${formatCurrency(product.price)} (${product.stock} in stock)`;
+            selectElement.appendChild(option);
+        });
+    }
+
+    function addRow(selectedProductId = '') {
+        rowCounter += 1;
+        const row = document.createElement('tr');
+        row.setAttribute('data-row-id', String(rowCounter));
+        row.innerHTML = `
+            <td>
+                <select name="productSelect[]" class="product-select" required></select>
+            </td>
+            <td class="stock-cell">0</td>
+            <td>
+                <span class="unit-price-text">Rs 0.00</span>
+            </td>
+            <td>
+                <input type="number" class="qty-input" min="0" step="1" value="0">
+            </td>
+            <td>
+                <strong class="row-total">Rs 0.00</strong>
+            </td>
+            <td>
+                <button type="button" class="remove-btn">Remove</button>
+            </td>
+        `;
+        itemsBody.appendChild(row);
+
+        const select = row.querySelector('.product-select');
+        const qtyInput = row.querySelector('.qty-input');
+        const removeBtn = row.querySelector('.remove-btn');
+        populateProductOptions(select);
+
+        if (selectedProductId) {
+            select.value = selectedProductId;
+            qtyInput.value = 1;
+        }
+
+        select.addEventListener('change', () => {
+            if (select.value && Number(qtyInput.value) <= 0) {
+                qtyInput.value = 1;
+            }
+            updateRow(row);
+            updateTotals();
+        });
+
+        qtyInput.addEventListener('input', () => {
+            if (Number(qtyInput.value) < 0) qtyInput.value = 0;
+            updateRow(row);
+            updateTotals();
+        });
+
+        removeBtn.addEventListener('click', () => {
+            row.remove();
+            if (!itemsBody.children.length) addRow();
+            updateTotals();
+        });
+
+        updateRow(row);
+        updateTotals();
+    }
+
+    function updateRow(row) {
+        const select = row.querySelector('.product-select');
+        const qtyInput = row.querySelector('.qty-input');
+        const stockCell = row.querySelector('.stock-cell');
+        const unitPriceText = row.querySelector('.unit-price-text');
+        const rowTotal = row.querySelector('.row-total');
+        const selectedProduct = getSelectedProduct(select);
+
+        const oldHidden = row.querySelector('input[type="hidden"][name^="quantities["]');
+        if (oldHidden) oldHidden.remove();
+
+        if (!selectedProduct) {
+            stockCell.textContent = '0';
+            unitPriceText.textContent = 'Rs 0.00';
+            rowTotal.textContent = 'Rs 0.00';
+            return;
+        }
+
+        const qty = Number(qtyInput.value || 0);
+        const clampedQty = Math.max(0, Math.min(qty, selectedProduct.stock > 0 ? selectedProduct.stock : qty));
+        if (String(clampedQty) !== String(qtyInput.value || 0)) {
+            qtyInput.value = clampedQty;
+        }
+
+        stockCell.textContent = `${selectedProduct.stock} (${selectedProduct.status})`;
+        unitPriceText.textContent = `Rs ${formatCurrency(selectedProduct.price)}`;
+        rowTotal.textContent = `Rs ${formatCurrency(clampedQty * selectedProduct.price)}`;
+
+        const hiddenQty = document.createElement('input');
+        hiddenQty.type = 'hidden';
+        hiddenQty.name = `quantities[${selectedProduct.id}]`;
+        hiddenQty.value = String(clampedQty);
+        row.appendChild(hiddenQty);
+    }
+
+    function updateTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('#itemsBody tr').forEach((row) => {
+            const select = row.querySelector('.product-select');
+            const qtyInput = row.querySelector('.qty-input');
+            const selectedProduct = getSelectedProduct(select);
+            if (!selectedProduct) return;
+            subtotal += Number(qtyInput.value || 0) * Number(selectedProduct.price || 0);
+        });
+
+        const taxPercent = Number(taxPercentInput.value || 0);
+        const taxAmount = subtotal * taxPercent / 100;
+        const grandTotal = subtotal + taxAmount;
+
+        document.getElementById('subtotalValue').textContent = formatCurrency(subtotal);
+        document.getElementById('taxValue').textContent = formatCurrency(taxAmount);
+        document.getElementById('grandTotal').textContent = formatCurrency(grandTotal);
+    }
+
+    addRowBtn.addEventListener('click', () => addRow());
+    resetRowsBtn.addEventListener('click', () => {
+        itemsBody.innerHTML = '';
+        addRow();
+    });
+    taxPercentInput.addEventListener('input', updateTotals);
+
+    if (products.length) {
+        addRow(products[0].id);
+    } else {
+        addRow();
+    }
+</script>
+
+</body>
+</html>

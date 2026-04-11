@@ -20,12 +20,12 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Header Styles - White Background */
+        /* Header Styles - Blue White Theme */
         .erp-header {
             background: white;
             padding: 0;
-            border-bottom: 3px solid #f0b90b;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-bottom: 3px solid #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -50,12 +50,12 @@
         .logo-icon {
             width: 45px;
             height: 45px;
-            background: linear-gradient(135deg, #f0b90b 0%, #d4a017 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(240, 185, 11, 0.2);
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
         }
 
         .logo-icon i {
@@ -80,7 +80,7 @@
         }
 
         .logo-main .erp {
-            color: #f0b90b;
+            color: #3b82f6;
             position: relative;
             display: inline-block;
             margin-left: 3px;
@@ -117,8 +117,8 @@
         }
 
         .theme-toggle:hover {
-            border-color: #f0b90b;
-            color: #f0b90b;
+            border-color: #3b82f6;
+            color: #3b82f6;
         }
 
         /* User Profile - Only Icon */
@@ -138,17 +138,17 @@
             border-radius: 50%;
             overflow: hidden;
             position: relative;
-            background: linear-gradient(135deg, #f0b90b, #d4a017);
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid rgba(240, 185, 11, 0.3);
+            border: 2px solid rgba(59, 130, 246, 0.3);
             transition: all 0.3s ease;
         }
 
         .user-avatar:hover {
             transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(240, 185, 11, 0.3);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .user-avatar .avatar-placeholder {
@@ -157,7 +157,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #f0b90b, #d4a017);
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
             font-size: 1.2rem;
             font-weight: 600;
@@ -195,12 +195,12 @@
         /* Profile Header in Dropdown */
         .dropdown-profile-header {
             padding: 20px;
-            background: linear-gradient(135deg, #fef9e6 0%, #fff6e0 100%);
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             border-radius: 16px 16px 0 0;
             display: flex;
             align-items: center;
             gap: 15px;
-            border-bottom: 1px solid #fde68a;
+            border-bottom: 1px solid #bfdbfe;
         }
 
         .dropdown-avatar {
@@ -208,7 +208,7 @@
             height: 60px;
             border-radius: 50%;
             overflow: hidden;
-            background: linear-gradient(135deg, #f0b90b, #d4a017);
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -222,7 +222,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #f0b90b, #d4a017);
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
             font-size: 1.5rem;
             font-weight: 600;
@@ -243,7 +243,7 @@
         }
 
         .dropdown-user-info .user-email {
-            color: #f0b90b;
+            color: #3b82f6;
             font-size: 0.75rem;
             font-weight: 500;
             margin-top: 4px;
@@ -270,19 +270,19 @@
         }
 
         .dropdown-item i {
-            color: #f0b90b;
+            color: #3b82f6;
             width: 22px;
             font-size: 1.1rem;
         }
 
         .dropdown-item:hover {
-            background: #fef9e6;
-            color: #f0b90b;
+            background: #eff6ff;
+            color: #3b82f6;
             transform: translateX(5px);
         }
 
         .dropdown-item:hover i {
-            color: #f0b90b;
+            color: #3b82f6;
         }
 
         .dropdown-divider {
@@ -386,7 +386,12 @@
             color: #e5e7eb !important;
         }
 
-        [data-theme="dark"] .erp-header,
+        [data-theme="dark"] .erp-header {
+            background: #111a2e !important;
+            border-bottom: 3px solid #3b82f6 !important;
+            color: #e5e7eb !important;
+        }
+
         [data-theme="dark"] .sidebar,
         [data-theme="dark"] .table-card,
         [data-theme="dark"] .card,
@@ -489,6 +494,103 @@
         [data-theme="dark"] .form-label i,
         [data-theme="dark"] .dropdown-item i {
             color: #facc15 !important;
+        }
+
+        /* Dark mode for table elements - fixes white rows */
+        [data-theme="dark"] table,
+        [data-theme="dark"] tbody,
+        [data-theme="dark"] tr {
+            background: #111a2e !important;
+        }
+
+        [data-theme="dark"] td {
+            background: #111a2e !important;
+            border-color: #253454 !important;
+        }
+
+        [data-theme="dark"] tr:hover {
+            background: #16233d !important;
+        }
+
+        [data-theme="dark"] tr:hover td {
+            background: #16233d !important;
+        }
+
+        /* Dark mode for feature badges */
+        [data-theme="dark"] .feature-badge {
+            background: #1e3a8a !important;
+            color: #dbeafe !important;
+        }
+
+        [data-theme="dark"] .feature-badge i {
+            color: #facc15 !important;
+        }
+
+        /* Dark mode for status badges */
+        [data-theme="dark"] .status-badge.pending {
+            background: #713f12 !important;
+            color: #fef3c7 !important;
+        }
+
+        [data-theme="dark"] .status-badge.active {
+            background: #14532d !important;
+            color: #dcfce7 !important;
+        }
+
+        [data-theme="dark"] .status-badge.inactive {
+            background: #7f1d1d !important;
+            color: #fee2e2 !important;
+        }
+
+        /* Dark mode for action buttons */
+        [data-theme="dark"] .action-btn {
+            background: #1e3a8a !important;
+            color: #e5e7eb !important;
+        }
+
+        [data-theme="dark"] .action-btn.edit {
+            background: #eab308 !important;
+            color: #0f172a !important;
+        }
+
+        [data-theme="dark"] .action-btn.delete {
+            background: #ef4444 !important;
+            color: white !important;
+        }
+
+        /* Dark mode for content wrapper backgrounds */
+        [data-theme="dark"] body,
+        [data-theme="dark"] .main-wrapper,
+        [data-theme="dark"] .content-wrapper {
+            background: #090f1f !important;
+        }
+
+        /* Dark mode for plan titles and price tags */
+        [data-theme="dark"] .plan-title {
+            color: #e5e7eb !important;
+        }
+
+        [data-theme="dark"] .price-tag {
+            color: #e5e7eb !important;
+        }
+
+        /* Dark mode for empty states */
+        [data-theme="dark"] .empty-state h5 {
+            color: #e5e7eb !important;
+        }
+
+        [data-theme="dark"] .empty-state p,
+        [data-theme="dark"] .empty-state i {
+            color: #9fb0cb !important;
+        }
+
+        /* Dark mode for stat cards */
+        [data-theme="dark"] .stat-card .stat-value {
+            color: #e5e7eb !important;
+        }
+
+        [data-theme="dark"] .stat-card .stat-icon {
+            opacity: 0.8 !important;
         }
     </style>
 </head>

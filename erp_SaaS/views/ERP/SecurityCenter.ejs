@@ -1,0 +1,64 @@
+<%- include('../../partials/admin/header.ejs') %>
+<%
+const rows = records || [];
+%>
+<link rel="stylesheet" href="/erp-module-theme.css">
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+    <main class="content-wrapper">
+        <section class="hero">
+            <h1><%= pageTitle %></h1>
+            <p>Security policies, system hardening aur admin settings ko structured control center me manage kijiye.</p>
+        </section>
+        <div class="tabs">
+            <a class="tab-link <%= activeTab === 'settings' ? 'active' : '' %>" href="/settings">System Settings</a>
+            <a class="tab-link <%= activeTab === 'security' ? 'active' : '' %>" href="/security">Security</a>
+            <a class="tab-link <%= activeTab === 'system-security' ? 'active' : '' %>" href="/system-security">System Security</a>
+        </div>
+        <section class="stats">
+            <div class="card"><div>Total Policies</div><div class="value"><%= rows.length %></div></div>
+            <div class="card"><div>Enabled/Active</div><div class="value"><%= rows.filter((row) => ['Enabled','Active'].includes(row.status)).length %></div></div>
+            <div class="card"><div>Needs Review</div><div class="value"><%= rows.filter((row) => row.status === 'Review').length %></div></div>
+        </section>
+        <section class="grid">
+            <div class="card">
+                <h3>Add <%= pageTitle %> Rule</h3>
+                <form method="POST" action="/<%= activeTab %>">
+                    <div class="form-grid">
+                        <input type="text" name="title" placeholder="Policy / Setting title" required>
+                        <input type="text" name="category" placeholder="Category">
+                        <input type="text" name="value" placeholder="Value / Threshold / Owner">
+                        <select name="status">
+                            <option value="Active">Active</option>
+                            <option value="Enabled">Enabled</option>
+                            <option value="Disabled">Disabled</option>
+                            <option value="Review">Review</option>
+                        </select>
+                        <textarea class="full" name="notes" rows="5" placeholder="Notes / implementation details"></textarea>
+                        <button class="full" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3><%= pageTitle %> Register</h3>
+                <table>
+                    <thead><tr><th>Title</th><th>Category</th><th>Value</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <% if (rows.length) { %>
+                            <% rows.forEach((row) => { %>
+                                <tr>
+                                    <td><%= row.title %></td>
+                                    <td><%= row.category || '-' %></td>
+                                    <td><%= row.value || '-' %></td>
+                                    <td><span class="badge"><%= row.status %></span></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="4">Abhi koi security/settings record add nahi hua.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>

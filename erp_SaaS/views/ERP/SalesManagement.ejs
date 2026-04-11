@@ -1,0 +1,145 @@
+<%- include('../../partials/admin/header.ejs') %>
+
+<%
+    const allTargets = targets || [];
+    const allTeam = team || [];
+    const allCommissions = commissions || [];
+    const targetTotal = allTargets.reduce((sum, item) => sum + (Number(item.targetAmount) || 0), 0);
+    const achievedTotal = allTargets.reduce((sum, item) => sum + (Number(item.achievedAmount) || 0), 0);
+%>
+<link rel="stylesheet" href="/erp-module-theme.css">
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+
+    <main class="content-wrapper">
+        <section class="hero">
+            <h1><%= pageTitle %></h1>
+            <p>Targets, team performance aur commission ko connected sales workflow me handle kijiye.</p>
+        </section>
+
+        <div class="tabs">
+            <a class="tab-link <%= activeTab === 'targets' ? 'active' : '' %>" href="/sales-targets">Sales Targets</a>
+            <a class="tab-link <%= activeTab === 'team' ? 'active' : '' %>" href="/sales-team">Sales Team</a>
+            <a class="tab-link <%= activeTab === 'commission' ? 'active' : '' %>" href="/commission">Commission</a>
+        </div>
+
+        <section class="stats">
+            <div class="card"><div>Target Pipeline</div><div class="value">₹<%= targetTotal.toLocaleString() %></div></div>
+            <div class="card"><div>Achieved</div><div class="value">₹<%= achievedTotal.toLocaleString() %></div></div>
+            <div class="card"><div>Sales Team</div><div class="value"><%= allTeam.length %></div></div>
+            <div class="card"><div>Commission Rows</div><div class="value"><%= allCommissions.length %></div></div>
+        </section>
+
+        <% if (activeTab === 'targets') { %>
+        <section class="grid">
+            <div class="card">
+                <h3>Add Sales Target</h3>
+                <form method="POST" action="/sales-targets">
+                    <div class="form-grid">
+                        <input type="text" name="title" placeholder="Target title" required>
+                        <input type="text" name="owner" placeholder="Owner name" required>
+                        <input type="text" name="period" placeholder="Apr 2026 / Q2 2026" required>
+                        <input type="number" name="targetAmount" placeholder="Target amount" min="0" required>
+                        <input type="number" name="achievedAmount" placeholder="Achieved amount" min="0">
+                        <select name="status">
+                            <option value="On Track">On Track</option>
+                            <option value="At Risk">At Risk</option>
+                            <option value="Achieved">Achieved</option>
+                        </select>
+                        <input class="full" type="text" name="category" placeholder="Category (Revenue, Upsell, New Clients)">
+                        <button class="full" type="submit">Save Target</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Current Target Board</h3>
+                <table>
+                    <thead><tr><th>Title</th><th>Owner</th><th>Period</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <% if (targets.length) { %>
+                            <% targets.forEach((item) => { %>
+                                <tr>
+                                    <td><%= item.title %></td>
+                                    <td><%= item.owner %></td>
+                                    <td><%= item.period %></td>
+                                    <td><span class="badge"><%= item.status %></span></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="4">Abhi tak koi sales target add nahi hua.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <% } %>
+
+        <% if (activeTab === 'team') { %>
+        <section class="grid">
+            <div class="card">
+                <h3>Add Sales Member</h3>
+                <form method="POST" action="/sales-team">
+                    <div class="form-grid">
+                        <input type="text" name="name" placeholder="Member name" required>
+                        <input type="email" name="email" placeholder="Email">
+                        <input type="text" name="region" placeholder="Region / Territory">
+                        <input type="number" name="monthlyTarget" placeholder="Monthly target" min="0">
+                        <input type="number" step="0.01" name="commissionRate" placeholder="Commission %" min="0">
+                        <select name="status">
+                            <option value="Active">Active</option>
+                            <option value="On Leave">On Leave</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                        <button class="full" type="submit">Add Team Member</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Sales Team</h3>
+                <table>
+                    <thead><tr><th>Name</th><th>Region</th><th>Target</th><th>Closed</th></tr></thead>
+                    <tbody>
+                        <% if (team.length) { %>
+                            <% team.forEach((member) => { %>
+                                <tr>
+                                    <td><%= member.name %></td>
+                                    <td><%= member.region || '-' %></td>
+                                    <td>₹<%= Number(member.monthlyTarget || 0).toLocaleString() %></td>
+                                    <td>₹<%= Number(member.closedRevenue || 0).toLocaleString() %></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="4">Sales team empty hai.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <% } %>
+
+        <% if (activeTab === 'commission') { %>
+        <section class="card">
+            <h3>Commission Tracking</h3>
+            <table>
+                <thead><tr><th>Member</th><th>Rate</th><th>Closed Revenue</th><th>Commission</th><th>Status</th></tr></thead>
+                <tbody>
+                    <% if (commissions.length) { %>
+                        <% commissions.forEach((row) => { %>
+                            <tr>
+                                <td><%= row.name %></td>
+                                <td><%= Number(row.commissionRate || 0) %>%</td>
+                                <td>₹<%= Number(row.closedRevenue || 0).toLocaleString() %></td>
+                                <td>₹<%= Number(row.commissionValue || 0).toLocaleString() %></td>
+                                <td><span class="badge"><%= row.status %></span></td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="5">Commission calculate karne ke liye pehle sales member aur POS orders add honge.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </section>
+        <% } %>
+    </main>
+</div>

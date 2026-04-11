@@ -570,22 +570,18 @@
                                 <i class="bi bi-shield-check"></i>
                                 User Role
                             </label>
+                            <select class="form-control" name="role">
+                                <% (roleOptions || ['SuperAdmin', 'Company', 'Employee', 'Customer', 'Vendor']).forEach((roleName) => { %>
+                                    <option value="<%= roleName %>" <%= roleName === 'Employee' ? 'selected' : '' %>>
+                                        <%= roleName %>
+                                    </option>
+                                <% }) %>
+                            </select>
                             <input type="text"
-                                   class="form-control"
-                                   name="role"
-                                   list="roleSuggestions"
-                                   placeholder="Enter any role (e.g., Employee, Sales Lead, QA, Intern)"
-                                   value="Employee"
-                                   required
+                                   class="form-control mt-2"
+                                   name="customRole"
+                                   placeholder="Custom role (optional)"
                                    maxlength="50">
-                            <datalist id="roleSuggestions">
-                                <option value="Employee"></option>
-                                <option value="HR"></option>
-                                <option value="Manager"></option>
-                                <option value="Admin"></option>
-                                <option value="CEO"></option>
-                                <option value="SuperAdmin"></option>
-                            </datalist>
                         </div>
 
                         <!-- Button Group -->

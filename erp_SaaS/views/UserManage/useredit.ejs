@@ -293,6 +293,9 @@
     .current-role-badge.admin { background: #ccfbf1; color: #115e59; }
     .current-role-badge.ceo { background: #dbeafe; color: #1d4ed8; }
     .current-role-badge.superadmin { background: #fee2e2; color: #b91c1c; }
+    .current-role-badge.company { background: #ede9fe; color: #5b21b6; }
+    .current-role-badge.customer { background: #fef3c7; color: #92400e; }
+    .current-role-badge.vendor { background: #dbeafe; color: #1d4ed8; }
 
     /* Info Box */
     .info-box {
@@ -471,7 +474,7 @@
                                 </span>
                                 <span>
                                     Current Role: 
-                                    <span class="current-role-badge <%= (Record.role === 'Teacher' || Record.role === 'teacher' || Record.role === 'User' ? 'employee' : (Record.role ? Record.role.toLowerCase() : 'employee')) %>">
+                                    <span class="current-role-badge <%= (Record.role ? Record.role.toLowerCase() : 'employee') %>">
                                         <%= Record.role || 'User' %>
                                     </span>
                                 </span>
@@ -587,22 +590,29 @@
                                 <i class="bi bi-shield-check"></i>
                                 User Role
                             </label>
+                            <% 
+                                const editRawRole = String(Record.role || '').trim().toLowerCase();
+                                const editSelectedRole =
+                                    editRawRole === 'superadmin' ? 'SuperAdmin' :
+                                    editRawRole === 'company' ? 'Company' :
+                                    editRawRole === 'customer' ? 'Customer' :
+                                    (editRawRole === 'vendor' || editRawRole === 'vender' || editRawRole === 'supplier') ? 'Vendor' :
+                                    ((roleOptions || []).includes(Record.role) ? Record.role : 'Employee');
+                                const editCustomRole = (roleOptions || []).includes(Record.role) ? '' : (Record.role || '');
+                            %>
+                            <select class="form-control" name="role">
+                                <% (roleOptions || ['SuperAdmin', 'Company', 'Employee', 'Customer', 'Vendor']).forEach((roleName) => { %>
+                                    <option value="<%= roleName %>" <%= editSelectedRole === roleName ? 'selected' : '' %>>
+                                        <%= roleName %>
+                                    </option>
+                                <% }) %>
+                            </select>
                             <input type="text"
-                                   class="form-control"
-                                   name="role"
-                                   list="roleSuggestions"
-                                   value="<%= Record.role || 'Employee' %>"
-                                   placeholder="Enter any role"
-                                   required
+                                   class="form-control mt-2"
+                                   name="customRole"
+                                   value="<%= editCustomRole %>"
+                                   placeholder="Custom role (optional)"
                                    maxlength="50">
-                            <datalist id="roleSuggestions">
-                                <option value="Employee"></option>
-                                <option value="HR"></option>
-                                <option value="Manager"></option>
-                                <option value="Admin"></option>
-                                <option value="CEO"></option>
-                                <option value="SuperAdmin"></option>
-                            </datalist>
                         </div>
 
                         <!-- Button Group -->

@@ -1,0 +1,142 @@
+<%- include('../../partials/admin/header.ejs') %>
+
+<%
+    const leadRows = leads || [];
+    const hotLeads = leadRows.filter((lead) => Number(lead.score || 0) >= 80).length;
+    const openLeads = leadRows.filter((lead) => lead.status === 'Open').length;
+%>
+<link rel="stylesheet" href="/erp-module-theme.css">
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+
+    <main class="content-wrapper">
+        <section class="hero">
+            <h1><%= pageTitle %></h1>
+            <p>Lead intake, pipeline visibility aur scoring ko ERP-style flow me organize kijiye.</p>
+        </section>
+
+        <div class="tabs">
+            <a class="tab-link <%= activeTab === 'leads' ? 'active' : '' %>" href="/leads">All Leads</a>
+            <a class="tab-link <%= activeTab === 'capture' ? 'active' : '' %>" href="/lead-capture">Lead Capture</a>
+            <a class="tab-link <%= activeTab === 'score' ? 'active' : '' %>" href="/lead-score">Lead Scoring</a>
+        </div>
+
+        <section class="stats">
+            <div class="card"><div>Total Leads</div><div class="value"><%= leadRows.length %></div></div>
+            <div class="card"><div>Open Leads</div><div class="value"><%= openLeads %></div></div>
+            <div class="card"><div>Hot Leads</div><div class="value"><%= hotLeads %></div></div>
+            <div class="card"><div>Pipeline Value</div><div class="value">₹<%= leadRows.reduce((sum, lead) => sum + (Number(lead.estimatedValue) || 0), 0).toLocaleString() %></div></div>
+        </section>
+
+        <% if (activeTab === 'capture') { %>
+        <section class="grid">
+            <div class="card">
+                <h3>Capture New Lead</h3>
+                <form method="POST" action="/lead-capture">
+                    <div class="form-grid">
+                        <input type="text" name="name" placeholder="Lead name" required>
+                        <input type="text" name="company" placeholder="Company name">
+                        <input type="email" name="email" placeholder="Email">
+                        <input type="text" name="phone" placeholder="Phone">
+                        <select name="source">
+                            <option value="Website">Website</option>
+                            <option value="Campaign">Campaign</option>
+                            <option value="Referral">Referral</option>
+                            <option value="Cold Call">Cold Call</option>
+                        </select>
+                        <select name="stage">
+                            <option value="New">New</option>
+                            <option value="Qualified">Qualified</option>
+                            <option value="Proposal">Proposal</option>
+                            <option value="Negotiation">Negotiation</option>
+                            <option value="Won">Won</option>
+                            <option value="Lost">Lost</option>
+                        </select>
+                        <input type="number" name="score" min="0" max="100" placeholder="Lead score">
+                        <input type="number" name="estimatedValue" min="0" placeholder="Estimated value">
+                        <input type="text" name="assignedTo" placeholder="Assigned to">
+                        <input type="date" name="nextFollowUp">
+                        <select name="status">
+                            <option value="Open">Open</option>
+                            <option value="Contacted">Contacted</option>
+                            <option value="Converted">Converted</option>
+                            <option value="Dormant">Dormant</option>
+                        </select>
+                        <textarea class="full" name="notes" rows="4" placeholder="Lead notes"></textarea>
+                        <button class="full" type="submit">Save Lead</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Recent Leads</h3>
+                <table>
+                    <thead><tr><th>Name</th><th>Stage</th><th>Score</th></tr></thead>
+                    <tbody>
+                        <% if (leads.length) { %>
+                            <% leads.forEach((lead) => { %>
+                                <tr>
+                                    <td><%= lead.name %></td>
+                                    <td><span class="badge"><%= lead.stage %></span></td>
+                                    <td><%= Number(lead.score || 0) %></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="3">Recent lead list abhi empty hai.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <% } %>
+
+        <% if (activeTab === 'leads') { %>
+        <section class="card">
+            <h3>Lead Pipeline</h3>
+            <table>
+                <thead><tr><th>Name</th><th>Company</th><th>Source</th><th>Stage</th><th>Score</th><th>Value</th></tr></thead>
+                <tbody>
+                    <% if (leads.length) { %>
+                        <% leads.forEach((lead) => { %>
+                            <tr>
+                                <td><%= lead.name %></td>
+                                <td><%= lead.company || '-' %></td>
+                                <td><%= lead.source || '-' %></td>
+                                <td><span class="badge"><%= lead.stage %></span></td>
+                                <td><%= Number(lead.score || 0) %></td>
+                                <td>₹<%= Number(lead.estimatedValue || 0).toLocaleString() %></td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="6">Lead management tab ke liye abhi koi business lead save nahi hua.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </section>
+        <% } %>
+
+        <% if (activeTab === 'score') { %>
+        <section class="card">
+            <h3>Lead Scoreboard</h3>
+            <table>
+                <thead><tr><th>Name</th><th>Assigned To</th><th>Status</th><th>Score</th><th>Next Follow-Up</th></tr></thead>
+                <tbody>
+                    <% if (leads.length) { %>
+                        <% leads.forEach((lead) => { %>
+                            <tr>
+                                <td><%= lead.name %></td>
+                                <td><%= lead.assignedTo || '-' %></td>
+                                <td><span class="badge"><%= lead.status %></span></td>
+                                <td><%= Number(lead.score || 0) %></td>
+                                <td><%= lead.nextFollowUp ? new Date(lead.nextFollowUp).toLocaleDateString() : '-' %></td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="5">Lead scoring list empty hai.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </section>
+        <% } %>
+    </main>
+</div>

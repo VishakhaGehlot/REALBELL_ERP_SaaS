@@ -1,0 +1,71 @@
+<%- include('../../partials/admin/header.ejs') %>
+<%
+const rows = records || [];
+%>
+<link rel="stylesheet" href="/erp-module-theme.css">
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+    <main class="content-wrapper">
+        <section class="hero">
+            <h1><%= pageTitle %></h1>
+            <p>Support tickets, knowledge articles aur live chat queue ko ek hi helpdesk workspace me manage kijiye.</p>
+        </section>
+        <div class="tabs">
+            <a class="tab-link <%= activeTab === 'tickets' ? 'active' : '' %>" href="/tickets">All Tickets</a>
+            <a class="tab-link <%= activeTab === 'knowledge' ? 'active' : '' %>" href="/knowledge-base">Knowledge Base</a>
+            <a class="tab-link <%= activeTab === 'chat' ? 'active' : '' %>" href="/live-chat">Live Chat</a>
+        </div>
+        <section class="stats">
+            <div class="card"><div>Total Records</div><div class="value"><%= rows.length %></div></div>
+            <div class="card"><div>Open/Active</div><div class="value"><%= rows.filter((row) => ['Open','In Progress','Active'].includes(row.status)).length %></div></div>
+            <div class="card"><div>Resolved/Published</div><div class="value"><%= rows.filter((row) => ['Resolved','Published'].includes(row.status)).length %></div></div>
+        </section>
+        <section class="grid">
+            <div class="card">
+                <h3>Add <%= pageTitle %></h3>
+                <form method="POST" action="/<%= activeTab === 'tickets' ? 'tickets' : activeTab === 'knowledge' ? 'knowledge-base' : 'live-chat' %>">
+                    <div class="form-grid">
+                        <input type="text" name="title" placeholder="Title" required>
+                        <input type="text" name="customerName" placeholder="Customer / User">
+                        <input type="text" name="category" placeholder="Category">
+                        <select name="priority">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                        <select name="status">
+                            <option value="Open">Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Published">Published</option>
+                            <option value="Active">Active</option>
+                        </select>
+                        <textarea class="full" name="content" rows="5" placeholder="Description / response / article content"></textarea>
+                        <button class="full" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3><%= pageTitle %></h3>
+                <table>
+                    <thead><tr><th>Title</th><th>User</th><th>Priority</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <% if (rows.length) { %>
+                            <% rows.forEach((row) => { %>
+                                <tr>
+                                    <td><%= row.title %></td>
+                                    <td><%= row.customerName || '-' %></td>
+                                    <td><%= row.priority %></td>
+                                    <td><span class="badge"><%= row.status %></span></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="4">Abhi koi support desk record nahi mila.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>

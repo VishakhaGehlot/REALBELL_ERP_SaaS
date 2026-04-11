@@ -12,6 +12,29 @@ function normalizeRole(role) {
     return "Employee"
 }
 
+async function resolveRequestRole(req) {
+    let role = normalizeRole(req.session && req.session.userRole)
+
+    if (!req.session || !req.session.email) {
+        return role
+    }
+
+    try {
+        const dbUser = await authTable.findOne({ email: req.session.email }, { role: 1 }).lean()
+        if (dbUser && dbUser.role) {
+            const dbRole = normalizeRole(dbUser.role)
+            if (req.session.userRole !== dbRole) {
+                req.session.userRole = dbRole
+            }
+            role = dbRole
+        }
+    } catch (error) {
+        console.error("Role resolve error:", error)
+    }
+
+    return role
+}
+
 function requireAuth(req, res, next) {
     if (req.session && req.session.isAuth) {
         return next()
@@ -24,15 +47,7 @@ function allowRoles(...allowedRoles) {
 
     return async (req, res, next) => {
         try {
-            let currentRole = normalizeRole(req.session && req.session.userRole)
-
-            if (req.session && !req.session.userRole && req.session.email) {
-                const dbUser = await authTable.findOne({ email: req.session.email }).lean()
-                if (dbUser && dbUser.role) {
-                    currentRole = normalizeRole(dbUser.role)
-                    req.session.userRole = currentRole
-                }
-            }
+            const currentRole = await resolveRequestRole(req)
     
             const hasRoleAccess = normalizedAllowed.includes(currentRole)
 
@@ -52,6 +67,7 @@ function allowRoles(...allowedRoles) {
 
 module.exports = {
     normalizeRole,
+    resolveRequestRole,
     requireAuth,
     allowRoles
 }

@@ -1,0 +1,66 @@
+<%- include('../../partials/admin/header.ejs') %>
+<%
+const rows = entries || [];
+const totalAmount = rows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+%>
+<link rel="stylesheet" href="/erp-module-theme.css">
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+    <main class="content-wrapper">
+        <section class="hero">
+            <h1><%= pageTitle %></h1>
+            <p>Ledger, expense aur tax records ko single accounting workflow me maintain kijiye.</p>
+        </section>
+        <div class="tabs">
+            <a class="tab-link <%= activeTab === 'ledger' ? 'active' : '' %>" href="/ledger">General Ledger</a>
+            <a class="tab-link <%= activeTab === 'expenses' ? 'active' : '' %>" href="/expenses">Expenses</a>
+            <a class="tab-link <%= activeTab === 'tax' ? 'active' : '' %>" href="/tax">Tax Management</a>
+        </div>
+        <section class="stats">
+            <div class="card"><div>Entries</div><div class="value"><%= rows.length %></div></div>
+            <div class="card"><div>Total Amount</div><div class="value">₹<%= totalAmount.toLocaleString() %></div></div>
+            <div class="card"><div>Posted/Paid</div><div class="value"><%= rows.filter((row) => ['Posted', 'Paid'].includes(row.status)).length %></div></div>
+        </section>
+        <section class="grid">
+            <div class="card">
+                <h3>Add Entry</h3>
+                <form method="POST" action="/<%= activeTab %>">
+                    <div class="form-grid">
+                        <input type="text" name="title" placeholder="Entry title" required>
+                        <input type="text" name="category" placeholder="Category">
+                        <input type="number" name="amount" min="0" placeholder="Amount" required>
+                        <input type="date" name="entryDate">
+                        <select name="status">
+                            <option value="Pending">Pending</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Posted">Posted</option>
+                            <option value="Paid">Paid</option>
+                        </select>
+                        <textarea class="full" name="notes" rows="4" placeholder="Notes"></textarea>
+                        <button class="full" type="submit">Save Entry</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3><%= pageTitle %> Records</h3>
+                <table>
+                    <thead><tr><th>Title</th><th>Category</th><th>Amount</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <% if (rows.length) { %>
+                            <% rows.forEach((row) => { %>
+                                <tr>
+                                    <td><%= row.title %></td>
+                                    <td><%= row.category || '-' %></td>
+                                    <td>₹<%= Number(row.amount || 0).toLocaleString() %></td>
+                                    <td><span class="badge"><%= row.status %></span></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="4">Abhi koi accounting entry add nahi hui.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>

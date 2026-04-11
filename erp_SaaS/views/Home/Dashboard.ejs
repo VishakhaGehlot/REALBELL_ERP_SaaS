@@ -56,12 +56,13 @@
 
     /* Welcome Section */
     .welcome-section {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
         border-radius: 24px;
         padding: 30px;
         margin-bottom: 30px;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
     }
 
     .welcome-section::before {
@@ -140,8 +141,8 @@
         background: white;
         border-radius: 20px;
         padding: 24px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        border: 1px solid #eef2f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+        border: 1px solid #dbeafe;
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
@@ -154,7 +155,7 @@
         left: 0;
         width: 100%;
         height: 3px;
-        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        background: linear-gradient(90deg, #3b82f6, #60a5fa);
         transform: scaleX(0);
         transition: transform 0.3s ease;
     }
@@ -182,10 +183,10 @@
         font-size: 28px;
     }
 
-    .stat-icon.queries { background: #fef3c7; color: #f59e0b; }
-    .stat-icon.replied { background: #d1fae5; color: #10b981; }
-    .stat-icon.users { background: #e0e7ff; color: #6366f1; }
-    .stat-icon.active { background: #ffe4e6; color: #ec489a; }
+    .stat-icon.queries { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+    .stat-icon.replied { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+    .stat-icon.users { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; }
+    .stat-icon.active { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
 
     .stat-info h3 {
         color: #64748b;
@@ -225,7 +226,8 @@
         background: white;
         border-radius: 20px;
         padding: 24px;
-        border: 1px solid #eef2f6;
+        border: 1px solid #dbeafe;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.06);
         transition: all 0.3s ease;
     }
 
@@ -253,7 +255,7 @@
     }
 
     .chart-header h4 i {
-        color: #f59e0b;
+        color: #3b82f6;
     }
 
     .chart-badge {
@@ -281,7 +283,8 @@
     .activity-card {
         background: white;
         border-radius: 20px;
-        border: 1px solid #eef2f6;
+        border: 1px solid #dbeafe;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.06);
         overflow: hidden;
         transition: all 0.3s ease;
     }
@@ -310,19 +313,19 @@
     }
 
     .card-header h4 i {
-        color: #f59e0b;
+        color: #3b82f6;
     }
 
     .view-all {
         font-size: 12px;
-        color: #f59e0b;
+        color: #3b82f6;
         text-decoration: none;
         font-weight: 500;
         transition: all 0.2s ease;
     }
 
     .view-all:hover {
-        color: #d97706;
+        color: #1d4ed8;
         text-decoration: underline;
     }
 
@@ -341,7 +344,7 @@
     }
 
     .activity-list::-webkit-scrollbar-thumb {
-        background: #f59e0b;
+        background: #3b82f6;
         border-radius: 10px;
     }
 
@@ -371,9 +374,9 @@
         flex-shrink: 0;
     }
 
-    .activity-icon.pending { background: #fef3c7; color: #f59e0b; }
-    .activity-icon.replied { background: #d1fae5; color: #10b981; }
-    .activity-icon.user { background: #e0e7ff; color: #6366f1; }
+    .activity-icon.pending { background: #dbeafe; color: #3b82f6; }
+    .activity-icon.replied { background: #dbeafe; color: #3b82f6; }
+    .activity-icon.user { background: #dbeafe; color: #3b82f6; }
 
     .activity-content {
         flex: 1;
@@ -549,7 +552,7 @@
     }
 
     .page-header h2 i {
-        color: #f59e0b;
+        color: #3b82f6;
         font-size: 32px;
     }
 
@@ -631,6 +634,108 @@
             font-size: 26px;
         }
     }
+
+    /* Dark mode styles for dashboard */
+    [data-theme="dark"] body {
+        background: #090f1f !important;
+    }
+
+    [data-theme="dark"] .main-wrapper {
+        background: #090f1f !important;
+    }
+
+    [data-theme="dark"] .main-wrapper .sidebar {
+        background: #111a2e !important;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    [data-theme="dark"] .content-wrapper {
+        background: #090f1f !important;
+    }
+
+    [data-theme="dark"] .page-header h2 {
+        color: #e5e7eb !important;
+    }
+
+    [data-theme="dark"] .page-header p {
+        color: #9fb0cb !important;
+    }
+
+    [data-theme="dark"] .date-time {
+        background: #111a2e !important;
+        color: #e5e7eb !important;
+    }
+
+    [data-theme="dark"] .stat-card {
+        background: #111a2e !important;
+        border-color: #253454 !important;
+    }
+
+    [data-theme="dark"] .stat-info h3 {
+        color: #9fb0cb !important;
+    }
+
+    [data-theme="dark"] .stat-number {
+        color: #e5e7eb !important;
+    }
+
+    [data-theme="dark"] .chart-card,
+    [data-theme="dark"] .activity-card {
+        background: #111a2e !important;
+        border-color: #253454 !important;
+    }
+
+    [data-theme="dark"] .chart-header h4,
+    [data-theme="dark"] .card-header h4 {
+        color: #e5e7eb !important;
+    }
+
+    [data-theme="dark"] .chart-badge {
+        background: #16233d !important;
+        color: #9fb0cb !important;
+    }
+
+    [data-theme="dark"] .card-header {
+        background: #0d1427 !important;
+        border-color: #253454 !important;
+    }
+
+    [data-theme="dark"] .activity-item {
+        border-color: #253454 !important;
+    }
+
+    [data-theme="dark"] .activity-item:hover {
+        background: #16233d !important;
+    }
+
+    [data-theme="dark"] .activity-title {
+        color: #e5e7eb !important;
+    }
+
+    [data-theme="dark"] .activity-time {
+        color: #9fb0cb !important;
+    }
+
+    [data-theme="dark"] .empty-state {
+        color: #9fb0cb !important;
+    }
+
+    [data-theme="dark"] .action-btn {
+        background: #111a2e !important;
+        border-color: #253454 !important;
+    }
+
+    [data-theme="dark"] .action-btn:hover {
+        background: #16233d !important;
+    }
+
+    [data-theme="dark"] .activity-list::-webkit-scrollbar-track {
+        background: #0d1427 !important;
+    }
+
+    [data-theme="dark"] .activity-list::-webkit-scrollbar-thumb {
+        background: #253454 !important;
+    }
 </style>
 
 <div class="main-wrapper">
@@ -671,79 +776,44 @@
 
             <!-- Stats Cards -->
             <div class="stats-grid">
+                <% 
+                    const summaryCards = Array.isArray(dashboardStats) ? dashboardStats : [];
+                    const statIcons = ['queries', 'replied', 'users', 'active'];
+                    const statIconNames = ['bi-grid', 'bi-database-check', 'bi-bell', 'bi-clock-history'];
+                    for (let i = 0; i < 4; i += 1) {
+                        const card = summaryCards[i] || { label: 'Metric', value: 0, helpText: 'No data available yet' };
+                %>
                 <div class="stat-card">
-                    <div class="stat-icon queries">
-                        <i class="bi bi-chat-dots"></i>
+                    <div class="stat-icon <%= statIcons[i] %>">
+                        <i class="bi <%= statIconNames[i] %>"></i>
                     </div>
                     <div class="stat-info">
-                        <h3>Total Queries</h3>
-                        <div class="stat-number" id="totalQueries">156</div>
+                        <h3><%= card.label %></h3>
+                        <div class="stat-number"><%= Number(card.value || 0).toLocaleString('en-IN') %></div>
                         <div class="stat-trend up">
-                            <i class="bi bi-arrow-up"></i> 12% this week
+                            <i class="bi bi-info-circle"></i> <%= card.helpText %>
                         </div>
                     </div>
                 </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon replied">
-                        <i class="bi bi-check-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Replied</h3>
-                        <div class="stat-number" id="repliedQueries">124</div>
-                        <div class="stat-trend up">
-                            <i class="bi bi-arrow-up"></i> 8% this week
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon users">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Total Users</h3>
-                        <div class="stat-number" id="totalUsers">2,847</div>
-                        <div class="stat-trend up">
-                            <i class="bi bi-arrow-up"></i> 156 new
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon active">
-                        <i class="bi bi-person-check"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Active Now</h3>
-                        <div class="stat-number" id="activeNow">342</div>
-                        <div class="stat-trend up">
-                            <i class="bi bi-arrow-up"></i> 23 online
-                        </div>
-                    </div>
-                </div>
+                <% } %>
             </div>
 
             <!-- Charts Row -->
             <div class="charts-row">
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h4><i class="bi bi-graph-up"></i> Query Statistics</h4>
-                        <span class="chart-badge">Last 7 days</span>
+                        <h4><i class="bi bi-grid-1x2"></i> Module Overview</h4>
+                        <span class="chart-badge"><%= (dashboardData && dashboardData.moduleCards ? dashboardData.moduleCards.length : 0) %> modules</span>
                     </div>
-                    <div class="chart-container">
-                        <div class="bar-chart" id="queryChart"></div>
-                    </div>
+                    <div id="moduleOverviewGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;"></div>
                 </div>
 
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h4><i class="bi bi-person-circle"></i> User Activity</h4>
-                        <span class="chart-badge">vs last week</span>
+                        <h4><i class="bi bi-exclamation-triangle"></i> Priority Focus</h4>
+                        <span class="chart-badge">Attention queue</span>
                     </div>
-                    <div class="chart-container">
-                        <div class="bar-chart" id="userChart"></div>
-                    </div>
+                    <div class="activity-list" id="priorityFocusList" style="padding:0; max-height:250px;"></div>
                 </div>
             </div>
 
@@ -751,18 +821,18 @@
             <div class="activity-section">
                 <div class="activity-card">
                     <div class="card-header">
-                        <h4><i class="bi bi-chat-text"></i> Recent Queries</h4>
-                        <a href="/querytable" class="view-all">View All -></a>
+                        <h4><i class="bi bi-activity"></i> Recent Activity</h4>
+                        <span class="view-all">Live from your modules</span>
                     </div>
-                    <div class="activity-list" id="recentQueriesList"></div>
+                    <div class="activity-list" id="recentActivityList"></div>
                 </div>
 
                 <div class="activity-card">
                     <div class="card-header">
-                        <h4><i class="bi bi-person-plus"></i> New Users</h4>
-                        <a href="/usertable" class="view-all">View All -></a>
+                        <h4><i class="bi bi-folder2-open"></i> Access Summary</h4>
+                        <span class="view-all">Role-based modules</span>
                     </div>
-                    <div class="activity-list" id="recentUsersList"></div>
+                    <div class="activity-list" id="accessSummaryList"></div>
                 </div>
             </div>
 
@@ -797,50 +867,7 @@
     updateDateTime();
     setInterval(updateDateTime, 1000);
 
-    // Dashboard Data (from server)
-    const dashboardData = {
-        totalQueries: <%= dashboardStats && typeof dashboardStats.totalQueries !== 'undefined' ? dashboardStats.totalQueries : 0 %>,
-        repliedQueries: <%= dashboardStats && typeof dashboardStats.repliedQueries !== 'undefined' ? dashboardStats.repliedQueries : 0 %>,
-        totalUsers: <%= dashboardStats && typeof dashboardStats.totalUsers !== 'undefined' ? dashboardStats.totalUsers : 0 %>,
-        activeNow: <%= dashboardStats && typeof dashboardStats.activeNow !== 'undefined' ? dashboardStats.activeNow : 0 %>,
-        queryStats: <%- JSON.stringify((dashboardData && dashboardData.queryStats) || [0, 0, 0, 0, 0, 0, 0]) %>,
-        userStats: <%- JSON.stringify((dashboardData && dashboardData.userStats) || [0, 0, 0, 0, 0, 0, 0]) %>,
-        dayLabels: <%- JSON.stringify((dashboardData && dashboardData.dayLabels) || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']) %>,
-        recentQueries: <%- JSON.stringify((dashboardData && dashboardData.recentQueries) || []) %>,
-        recentUsers: <%- JSON.stringify((dashboardData && dashboardData.recentUsers) || []) %>
-    };
-
-    // Update stats
-    document.getElementById('totalQueries').textContent = dashboardData.totalQueries;
-    document.getElementById('repliedQueries').textContent = dashboardData.repliedQueries;
-    document.getElementById('totalUsers').textContent = dashboardData.totalUsers.toLocaleString();
-    document.getElementById('activeNow').textContent = dashboardData.activeNow;
-
-    // Create bar chart
-    function createBarChart(containerId, data, gradientStart, gradientEnd) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        const maxValue = Math.max(...data, 1);
-        const days = Array.isArray(dashboardData.dayLabels) && dashboardData.dayLabels.length
-            ? dashboardData.dayLabels
-            : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        container.innerHTML = '';
-        data.forEach((value, index) => {
-            const heightPercent = (value / maxValue) * 160;
-            const height = Math.max(heightPercent, 6);
-            const barItem = document.createElement('div');
-            barItem.className = 'bar-item';
-            barItem.innerHTML = `
-                <div class="bar" style="height: ${height}px; background: linear-gradient(180deg, ${gradientStart}, ${gradientEnd}); border-radius: 8px 8px 0 0; width: 100%; transition: 0.2s;"></div>
-                <div class="bar-label">${days[index] || ''}</div>
-                <div class="bar-value">${value}</div>
-            `;
-            container.appendChild(barItem);
-        });
-    }
-    
-    createBarChart('queryChart', dashboardData.queryStats, '#f59e0b', '#fbbf24');
-    createBarChart('userChart', dashboardData.userStats, '#6366f1', '#8b5cf6');
+    const dashboardData = <%- JSON.stringify(dashboardData || { moduleCards: [], recentActivity: [] }) %>;
 
     // Escape HTML helper
     function escapeHtml(str) {
@@ -873,67 +900,99 @@
         return then.toLocaleDateString('en-US');
     }
 
-    // Load recent queries
-    const recentQueriesList = document.getElementById('recentQueriesList');
-    if (recentQueriesList) {
-        if (dashboardData.recentQueries.length) {
-            dashboardData.recentQueries.forEach(query => {
-                const statusClass = query.status === 'pending' ? 'pending' : 'replied';
-                const statusIcon = query.status === 'pending' ? 'bi-question-circle' : 'bi-check-circle';
-                const statusText = query.status === 'pending' ? 'Pending' : 'Replied';
-                const item = document.createElement('div');
-                item.className = 'activity-item';
-                item.innerHTML = `
-                    <div class="activity-icon ${statusClass}">
-                        <i class="bi ${statusIcon}"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">${escapeHtml(query.title)}</div>
-                        <div class="activity-time"><i class="bi bi-clock"></i> ${escapeHtml(toTimeAgo(query.createdAt))}</div>
-                    </div>
-                    <div class="activity-status ${statusClass}">${statusText}</div>
+    const moduleOverviewGrid = document.getElementById('moduleOverviewGrid');
+    const priorityFocusList = document.getElementById('priorityFocusList');
+    const recentActivityList = document.getElementById('recentActivityList');
+    const accessSummaryList = document.getElementById('accessSummaryList');
+    const moduleCards = Array.isArray(dashboardData.moduleCards) ? dashboardData.moduleCards : [];
+    const recentActivity = Array.isArray(dashboardData.recentActivity) ? dashboardData.recentActivity : [];
+
+    if (moduleOverviewGrid) {
+        if (moduleCards.length) {
+            moduleCards.forEach((card) => {
+                const cardNode = document.createElement('a');
+                cardNode.href = card.link || '/dashboard';
+                cardNode.className = 'action-btn';
+                cardNode.style.textAlign = 'left';
+                cardNode.innerHTML = `
+                    <i class="bi ${escapeHtml(card.icon || 'bi-grid')}"></i>
+                    <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:6px;">${escapeHtml(card.label || 'Module')}</div>
+                    <div style="font-size:24px;font-weight:800;color:#111827;">${Number(card.total || 0).toLocaleString('en-IN')}</div>
+                    <div style="font-size:12px;color:#475569;margin-top:8px;">${escapeHtml(card.primaryText || '')}</div>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:4px;">${escapeHtml(card.secondaryText || '')}</div>
                 `;
-                recentQueriesList.appendChild(item);
+                moduleOverviewGrid.appendChild(cardNode);
             });
         } else {
-            recentQueriesList.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><p>No recent queries</p></div>`;
+            moduleOverviewGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="bi bi-shield-lock"></i><p>No modules are assigned to this role yet.</p></div>`;
         }
     }
 
-    // Load recent users
-    const recentUsersList = document.getElementById('recentUsersList');
-    if (recentUsersList) {
-        if (dashboardData.recentUsers.length) {
-            dashboardData.recentUsers.forEach(user => {
-                const statusColor = user.status === 'active' ? '#10b981' : '#f59e0b';
-                const statusIcon = user.status === 'active' ? 'bi-check-circle-fill' : 'bi-hourglass-split';
-                const item = document.createElement('div');
+    if (priorityFocusList) {
+        const focusItems = moduleCards.filter(card => Number(card.alertCount || 0) > 0).slice(0, 5);
+        if (focusItems.length) {
+            focusItems.forEach((card) => {
+                const item = document.createElement('a');
+                item.href = card.link || '/dashboard';
                 item.className = 'activity-item';
+                item.style.textDecoration = 'none';
                 item.innerHTML = `
-                    <div class="activity-icon user">
-                        <i class="bi bi-person-badge"></i>
-                    </div>
+                    <div class="activity-icon pending"><i class="bi bi-exclamation-circle"></i></div>
                     <div class="activity-content">
-                        <div class="activity-title">${escapeHtml(user.name)}</div>
-                        <div class="activity-time"><i class="bi bi-envelope"></i> ${escapeHtml(user.email)}</div>
-                        <div class="activity-time"><i class="bi bi-clock"></i> ${escapeHtml(toTimeAgo(user.createdAt))}</div>
+                        <div class="activity-title">${escapeHtml(card.label)}</div>
+                        <div class="activity-time"><i class="bi bi-flag"></i> ${escapeHtml(card.secondaryText || card.primaryText || '')}</div>
                     </div>
-                    <div style="font-size: 11px; font-weight:500; color: ${statusColor}; display:flex; align-items:center; gap:4px;">
-                        <i class="bi ${statusIcon}"></i> ${user.status === 'active' ? 'Active' : 'Pending'}
-                    </div>
+                    <div class="activity-status pending">${Number(card.alertCount || 0)}</div>
                 `;
-                recentUsersList.appendChild(item);
+                priorityFocusList.appendChild(item);
             });
         } else {
-            recentUsersList.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><p>No new users</p></div>`;
+            priorityFocusList.innerHTML = `<div class="empty-state"><i class="bi bi-check2-circle"></i><p>No urgent follow-ups right now.</p></div>`;
         }
     }
 
-    // bar hover effects
-    document.querySelectorAll('.bar').forEach(bar => {
-        bar.addEventListener('mouseenter', function() { this.style.opacity = '0.85'; });
-        bar.addEventListener('mouseleave', function() { this.style.opacity = '1'; });
-    });
+    if (recentActivityList) {
+        if (recentActivity.length) {
+            recentActivity.forEach((entry) => {
+                const item = document.createElement(entry.link ? 'a' : 'div');
+                if (entry.link) item.href = entry.link;
+                item.className = 'activity-item';
+                item.style.textDecoration = 'none';
+                item.innerHTML = `
+                    <div class="activity-icon user"><i class="bi bi-lightning-charge"></i></div>
+                    <div class="activity-content">
+                        <div class="activity-title">${escapeHtml(entry.title || 'Update')}</div>
+                        <div class="activity-time"><i class="bi bi-info-circle"></i> ${escapeHtml(entry.subtitle || '')}</div>
+                        <div class="activity-time"><i class="bi bi-clock"></i> ${escapeHtml(toTimeAgo(entry.createdAt))}</div>
+                    </div>
+                    <div class="activity-status replied">${escapeHtml(entry.status || 'Updated')}</div>
+                `;
+                recentActivityList.appendChild(item);
+            });
+        } else {
+            recentActivityList.innerHTML = `<div class="empty-state"><i class="bi bi-activity"></i><p>No recent activity found yet.</p></div>`;
+        }
+    }
+
+    if (accessSummaryList) {
+        if (moduleCards.length) {
+            moduleCards.forEach((card) => {
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                item.innerHTML = `
+                    <div class="activity-icon replied"><i class="bi ${escapeHtml(card.icon || 'bi-grid')}"></i></div>
+                    <div class="activity-content">
+                        <div class="activity-title">${escapeHtml(card.label || 'Module')}</div>
+                        <div class="activity-time"><i class="bi bi-bar-chart"></i> ${escapeHtml(card.primaryText || '')}</div>
+                    </div>
+                    <div class="activity-status replied">${Number(card.total || 0).toLocaleString('en-IN')}</div>
+                `;
+                accessSummaryList.appendChild(item);
+            });
+        } else {
+            accessSummaryList.innerHTML = `<div class="empty-state"><i class="bi bi-folder-x"></i><p>Ask SuperAdmin to assign module permissions for this role.</p></div>`;
+        }
+    }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

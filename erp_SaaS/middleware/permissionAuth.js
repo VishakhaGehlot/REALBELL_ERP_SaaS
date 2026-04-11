@@ -1,6 +1,5 @@
 const RolePermission = require("../models/RolePermission")
-const authTable = require("../models/auth")
-const { normalizeRole } = require("./roleAuth")
+const { normalizeRole, resolveRequestRole } = require("./roleAuth")
 
 const PERMISSION_KEYS = [
     "subscription",
@@ -235,14 +234,7 @@ async function attachRolePermissions(req, res, next) {
             return next()
         }
 
-        let role = normalizeRole(req.session.userRole)
-        if (!req.session.userRole && req.session.email) {
-            const dbUser = await authTable.findOne({ email: req.session.email }).lean()
-            if (dbUser && dbUser.role) {
-                role = normalizeRole(dbUser.role)
-                req.session.userRole = role
-            }
-        }
+        const role = await resolveRequestRole(req)
         const permissions = await getPermissionsForRole(role)
 
         req.modulePermissions = permissions
@@ -292,14 +284,7 @@ function requireModuleAccess(moduleKey, forcedAction) {
                 return res.redirect("/login")
             }
 
-            let role = normalizeRole(req.session.userRole)
-            if (!req.session.userRole && req.session.email) {
-                const dbUser = await authTable.findOne({ email: req.session.email }).lean()
-                if (dbUser && dbUser.role) {
-                    role = normalizeRole(dbUser.role)
-                    req.session.userRole = role
-                }
-            }
+            const role = await resolveRequestRole(req)
             if (role === "SuperAdmin") {
                 return next()
             }

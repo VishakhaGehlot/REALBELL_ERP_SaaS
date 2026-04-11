@@ -1,0 +1,71 @@
+<%- include('../../partials/admin/header.ejs') %>
+<%
+const rows = events || [];
+%>
+<link rel="stylesheet" href="/erp-module-theme.css">
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+    <main class="content-wrapper">
+        <section class="hero">
+            <h1><%= pageTitle %></h1>
+            <p>Calendar, upcoming schedule aur event registrations ko same events hub se manage kijiye.</p>
+        </section>
+        <div class="tabs">
+            <a class="tab-link <%= activeTab === 'calendar' ? 'active' : '' %>" href="/calendar">Calendar View</a>
+            <a class="tab-link <%= activeTab === 'upcoming' ? 'active' : '' %>" href="/upcoming-events">Upcoming Events</a>
+            <a class="tab-link <%= activeTab === 'registrations' ? 'active' : '' %>" href="/event-registration">Registrations</a>
+        </div>
+        <section class="stats">
+            <div class="card"><div>Total Events</div><div class="value"><%= rows.length %></div></div>
+            <div class="card"><div>Upcoming</div><div class="value"><%= rows.filter((row) => ['Scheduled','Upcoming'].includes(row.status)).length %></div></div>
+            <div class="card"><div>Registered</div><div class="value"><%= rows.filter((row) => row.status === 'Registered').length %></div></div>
+        </section>
+        <section class="grid">
+            <div class="card">
+                <h3>Add <%= pageTitle %></h3>
+                <form method="POST" action="/<%= activeTab === 'calendar' ? 'calendar' : 'event-registration' %>">
+                    <div class="form-grid">
+                        <input type="text" name="title" placeholder="Event title" required>
+                        <select name="type">
+                            <option value="Meeting">Meeting</option>
+                            <option value="Webinar">Webinar</option>
+                            <option value="Launch">Launch</option>
+                            <option value="Training">Training</option>
+                        </select>
+                        <input type="text" name="venue" placeholder="Venue / Platform">
+                        <input type="text" name="attendeeName" placeholder="Attendee name">
+                        <input type="datetime-local" name="startDate">
+                        <input type="datetime-local" name="endDate">
+                        <select name="status">
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="Upcoming">Upcoming</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        <textarea class="full" name="notes" rows="4" placeholder="Event notes"></textarea>
+                        <button class="full" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3><%= pageTitle %></h3>
+                <table>
+                    <thead><tr><th>Title</th><th>Type</th><th>Status</th><th>Date</th></tr></thead>
+                    <tbody>
+                        <% if (rows.length) { %>
+                            <% rows.forEach((row) => { %>
+                                <tr>
+                                    <td><%= row.title %></td>
+                                    <td><%= row.type %></td>
+                                    <td><span class="badge"><%= row.status %></span></td>
+                                    <td><%= row.startDate ? new Date(row.startDate).toLocaleString() : '-' %></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="4">Abhi koi event record nahi mila.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>

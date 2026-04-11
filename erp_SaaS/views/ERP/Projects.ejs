@@ -1,0 +1,134 @@
+<%- include('../../partials/admin/header.ejs') %>
+
+<%
+    const activeProjects = projects || [];
+    const projectBudget = activeProjects.reduce((sum, item) => sum + (Number(item.budget) || 0), 0);
+%>
+<link rel="stylesheet" href="/erp-module-theme.css">
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+
+    <main class="content-wrapper">
+        <section class="hero">
+            <h1><%= pageTitle %></h1>
+            <p>Project board, task overview aur timeline milestones ko ek jagah organize kijiye.</p>
+        </section>
+
+        <div class="tabs">
+            <a class="tab-link <%= activeTab === 'projects' ? 'active' : '' %>" href="/projects">Projects</a>
+            <a class="tab-link <%= activeTab === 'tasks' ? 'active' : '' %>" href="/tasks">Tasks</a>
+            <a class="tab-link <%= activeTab === 'timeline' ? 'active' : '' %>" href="/timeline">Timeline</a>
+        </div>
+
+        <section class="stats">
+            <div class="card"><div>Total Projects</div><div class="value"><%= activeProjects.length %></div></div>
+            <div class="card"><div>Budget Pipeline</div><div class="value">₹<%= projectBudget.toLocaleString() %></div></div>
+            <div class="card"><div>Task Rows</div><div class="value"><%= (flattenedTasks || []).length %></div></div>
+            <div class="card"><div>Milestones</div><div class="value"><%= (flattenedMilestones || []).length %></div></div>
+        </section>
+
+        <% if (activeTab === 'projects') { %>
+        <section class="grid">
+            <div class="card">
+                <h3>Create Project</h3>
+                <form method="POST" action="/projects">
+                    <div class="form-grid">
+                        <input type="text" name="title" placeholder="Project title" required>
+                        <input type="text" name="client" placeholder="Client / Account">
+                        <select name="status">
+                            <option value="Planning">Planning</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="On Hold">On Hold</option>
+                        </select>
+                        <input type="number" name="budget" placeholder="Budget" min="0">
+                        <input type="number" name="progress" placeholder="Progress %" min="0" max="100">
+                        <input type="date" name="dueDate">
+                        <input class="full" type="text" name="teamMembers" placeholder="Team members comma separated">
+                        <input type="text" name="taskTitle" placeholder="Starter task title">
+                        <input type="text" name="taskAssignee" placeholder="Starter task assignee">
+                        <select name="taskPriority">
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Low">Low</option>
+                        </select>
+                        <input type="date" name="taskDueDate">
+                        <input type="text" name="milestoneTitle" placeholder="Milestone title">
+                        <input type="date" name="milestoneDueDate">
+                        <button class="full" type="submit">Save Project</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Project Board</h3>
+                <table>
+                    <thead><tr><th>Project</th><th>Client</th><th>Status</th><th>Progress</th></tr></thead>
+                    <tbody>
+                        <% if (projects.length) { %>
+                            <% projects.forEach((project) => { %>
+                                <tr>
+                                    <td><%= project.title %></td>
+                                    <td><%= project.client || '-' %></td>
+                                    <td><span class="badge"><%= project.status %></span></td>
+                                    <td><%= Number(project.progress || 0) %>%</td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="4">Abhi koi project board item create nahi hua.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <% } %>
+
+        <% if (activeTab === 'tasks') { %>
+        <section class="card">
+            <h3>All Tasks</h3>
+            <table>
+                <thead><tr><th>Task</th><th>Project</th><th>Assignee</th><th>Priority</th><th>Status</th></tr></thead>
+                <tbody>
+                    <% if (flattenedTasks.length) { %>
+                        <% flattenedTasks.forEach((task) => { %>
+                            <tr>
+                                <td><%= task.title %></td>
+                                <td><%= task.projectTitle %></td>
+                                <td><%= task.assignee || '-' %></td>
+                                <td><%= task.priority %></td>
+                                <td><span class="badge"><%= task.status %></span></td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="5">Tasks project create hote hi auto list me aa jayenge.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </section>
+        <% } %>
+
+        <% if (activeTab === 'timeline') { %>
+        <section class="card">
+            <h3>Project Timeline</h3>
+            <table>
+                <thead><tr><th>Milestone</th><th>Project</th><th>Client</th><th>Due Date</th><th>Status</th></tr></thead>
+                <tbody>
+                    <% if (flattenedMilestones.length) { %>
+                        <% flattenedMilestones.forEach((milestone) => { %>
+                            <tr>
+                                <td><%= milestone.title %></td>
+                                <td><%= milestone.projectTitle %></td>
+                                <td><%= milestone.client || '-' %></td>
+                                <td><%= milestone.dueDate ? new Date(milestone.dueDate).toLocaleDateString() : '-' %></td>
+                                <td><span class="badge"><%= milestone.status %></span></td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="5">Timeline populate karne ke liye project milestone add kijiye.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </section>
+        <% } %>
+    </main>
+</div>

@@ -1,0 +1,92 @@
+<%- include('../../partials/admin/header.ejs') %>
+<%
+const rows = deals || [];
+const pipelineValue = rows.reduce((sum, row) => sum + (Number(row.value) || 0), 0);
+%>
+<link rel="stylesheet" href="/erp-module-theme.css">
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+    <main class="content-wrapper">
+        <section class="hero">
+            <h1><%= pageTitle %></h1>
+            <p>Deal pipeline, negotiation stages aur won business ko track karne ke liye dedicated board.</p>
+        </section>
+        <div class="tabs">
+            <a class="tab-link <%= activeTab === 'deals' ? 'active' : '' %>" href="/deals">Active Deals</a>
+            <a class="tab-link <%= activeTab === 'negotiation' ? 'active' : '' %>" href="/negotiation">Negotiation Logs</a>
+            <a class="tab-link <%= activeTab === 'closed-won' ? 'active' : '' %>" href="/closed-won">Closed Won</a>
+        </div>
+        <section class="stats">
+            <div class="card"><div>Deals</div><div class="value"><%= rows.length %></div></div>
+            <div class="card"><div>Pipeline Value</div><div class="value">₹<%= pipelineValue.toLocaleString() %></div></div>
+            <div class="card"><div>Negotiation</div><div class="value"><%= rows.filter((row) => ['Proposal','Negotiation'].includes(row.stage)).length %></div></div>
+        </section>
+        <% if (activeTab === 'deals') { %>
+        <section class="grid">
+            <div class="card">
+                <h3>Add Deal</h3>
+                <form method="POST" action="/deals">
+                    <div class="form-grid">
+                        <input type="text" name="title" placeholder="Deal title" required>
+                        <input type="text" name="company" placeholder="Company">
+                        <input type="text" name="owner" placeholder="Owner">
+                        <input type="number" name="value" min="0" placeholder="Deal value">
+                        <select name="stage">
+                            <option value="Discovery">Discovery</option>
+                            <option value="Proposal">Proposal</option>
+                            <option value="Negotiation">Negotiation</option>
+                            <option value="Closed Won">Closed Won</option>
+                            <option value="Closed Lost">Closed Lost</option>
+                        </select>
+                        <input type="date" name="expectedCloseDate">
+                        <textarea class="full" name="notes" rows="4" placeholder="Notes"></textarea>
+                        <button class="full" type="submit">Save Deal</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Current Deals</h3>
+                <table>
+                    <thead><tr><th>Title</th><th>Company</th><th>Stage</th><th>Value</th></tr></thead>
+                    <tbody>
+                        <% if (rows.length) { %>
+                            <% rows.forEach((row) => { %>
+                                <tr>
+                                    <td><%= row.title %></td>
+                                    <td><%= row.company || '-' %></td>
+                                    <td><span class="badge"><%= row.stage %></span></td>
+                                    <td>₹<%= Number(row.value || 0).toLocaleString() %></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="4">Abhi deal pipeline empty hai.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <% } else { %>
+        <section class="card">
+            <h3><%= pageTitle %></h3>
+            <table>
+                <thead><tr><th>Title</th><th>Owner</th><th>Company</th><th>Stage</th><th>Close Date</th></tr></thead>
+                <tbody>
+                    <% if (rows.length) { %>
+                        <% rows.forEach((row) => { %>
+                            <tr>
+                                <td><%= row.title %></td>
+                                <td><%= row.owner || '-' %></td>
+                                <td><%= row.company || '-' %></td>
+                                <td><span class="badge"><%= row.stage %></span></td>
+                                <td><%= row.expectedCloseDate ? new Date(row.expectedCloseDate).toLocaleDateString() : '-' %></td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="5">Is section ke liye abhi matching deal records nahi mile.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </section>
+        <% } %>
+    </main>
+</div>

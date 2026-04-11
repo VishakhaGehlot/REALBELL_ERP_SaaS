@@ -1,0 +1,65 @@
+<%- include('../../partials/admin/header.ejs') %>
+<%
+const rows = campaigns || [];
+%>
+<link rel="stylesheet" href="/erp-module-theme.css">
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+    <main class="content-wrapper">
+        <section class="hero">
+            <h1><%= pageTitle %></h1>
+            <p>Template library, campaigns aur delivery logs ke liye complete SMS workspace.</p>
+        </section>
+        <div class="tabs">
+            <a class="tab-link <%= activeTab === 'templates' ? 'active' : '' %>" href="/sms-templates">Templates</a>
+            <a class="tab-link <%= activeTab === 'campaigns' ? 'active' : '' %>" href="/sms-campaigns">Campaigns</a>
+            <a class="tab-link <%= activeTab === 'logs' ? 'active' : '' %>" href="/sms-logs">Delivery Logs</a>
+        </div>
+        <section class="stats">
+            <div class="card"><div>Total Rows</div><div class="value"><%= rows.length %></div></div>
+            <div class="card"><div>Sent/Delivered</div><div class="value"><%= rows.filter((row) => ['Sent','Delivered'].includes(row.status)).length %></div></div>
+            <div class="card"><div>Draft/Scheduled</div><div class="value"><%= rows.filter((row) => ['Draft','Scheduled'].includes(row.status)).length %></div></div>
+        </section>
+        <section class="grid">
+            <div class="card">
+                <h3>Add <%= pageTitle %></h3>
+                <form method="POST" action="/sms-<%= activeTab === 'templates' ? 'templates' : activeTab === 'campaigns' ? 'campaigns' : 'logs' %>">
+                    <div class="form-grid">
+                        <input type="text" name="name" placeholder="Name / Title" required>
+                        <input type="text" name="audience" placeholder="Audience / Segment">
+                        <select name="status">
+                            <option value="Draft">Draft</option>
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="Sent">Sent</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Failed">Failed</option>
+                        </select>
+                        <input type="datetime-local" name="scheduledAt">
+                        <textarea class="full" name="content" rows="5" placeholder="SMS content"></textarea>
+                        <button class="full" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3><%= pageTitle %></h3>
+                <table>
+                    <thead><tr><th>Name</th><th>Audience</th><th>Status</th><th>When</th></tr></thead>
+                    <tbody>
+                        <% if (rows.length) { %>
+                            <% rows.forEach((row) => { %>
+                                <tr>
+                                    <td><%= row.name %></td>
+                                    <td><%= row.audience || '-' %></td>
+                                    <td><span class="badge"><%= row.status %></span></td>
+                                    <td><%= row.scheduledAt ? new Date(row.scheduledAt).toLocaleString() : '-' %></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="4">Abhi koi SMS record nahi mila.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
