@@ -1,9 +1,10 @@
+<%- include('../../partials/admin/header.ejs') %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS - New Sale</title>
+    <title>POS - <%= pageTitle || 'Point of Sale' %></title>
     <script>
         (function applySavedTheme() {
             try {
@@ -11,9 +12,7 @@
                 if (savedTheme === "dark" || savedTheme === "light") {
                     document.documentElement.setAttribute("data-theme", savedTheme);
                 }
-            } catch (themeReadError) {
-                // Ignore storage/theme read errors and continue with default styles.
-            }
+            } catch (themeReadError) {}
         })();
     </script>
     <style>
@@ -25,7 +24,6 @@
             --card-bg: #ffffff;
             --card-border: #e2e8f0;
             --card-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
-
             --ghost-bg: #ffffff;
             --ghost-text: #1e293b;
             --ghost-border: #dbeafe;
@@ -35,26 +33,24 @@
             --secondary-text: #3730a3;
             --remove-bg: #fee2e2;
             --remove-text: #b91c1c;
-
             --input-bg: #ffffff;
             --input-border: #cbd5e1;
             --input-placeholder: #94a3b8;
             --focus-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-
             --table-border: #e2e8f0;
             --table-head-bg: #f8fafc;
             --table-head-text: #64748b;
-
             --chip-bg: #eff6ff;
             --chip-text: #1d4ed8;
-
             --summary-bg-start: #0f172a;
             --summary-bg-end: #1e293b;
             --summary-divider: rgba(255, 255, 255, 0.18);
-
             --recent-bg: #f8fafc;
             --empty-bg: #f8fafc;
             --muted: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
 
         [data-theme="dark"] {
@@ -65,7 +61,6 @@
             --card-bg: #111a2e;
             --card-border: #253454;
             --card-shadow: 0 20px 40px rgba(2, 6, 23, 0.55);
-
             --ghost-bg: #182540;
             --ghost-text: #e5e7eb;
             --ghost-border: #2b4064;
@@ -75,41 +70,111 @@
             --secondary-text: #bfdbfe;
             --remove-bg: #3f1b2e;
             --remove-text: #fecaca;
-
             --input-bg: #16233d;
             --input-border: #2a3c61;
             --input-placeholder: #8ea3c2;
             --focus-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-
             --table-border: #2a3c61;
             --table-head-bg: #0d1427;
             --table-head-text: #9fb0cb;
-
             --chip-bg: #1e3a8a;
             --chip-text: #dbeafe;
-
             --summary-bg-start: #0b1220;
             --summary-bg-end: #16223a;
             --summary-divider: rgba(148, 163, 184, 0.28);
-
             --recent-bg: #0f172a;
             --empty-bg: #0f172a;
             --muted: #9fb0cb;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(180deg, var(--page-bg-start) 0%, var(--page-bg-end) 100%);
             color: var(--text-primary);
-            padding: 24px;
-            min-height: 100vh;
+            overflow-x: hidden;
+            width: 100%;
         }
 
-        .page { max-width: 1280px; margin: 0 auto; }
+        .main-wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+        }
 
+        .main-wrapper .sidebar {
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            padding: 0;
+            z-index: 100;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--page-bg-start) 0%, var(--page-bg-end) 100%);
+            padding: 25px;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper { margin-left: 0; width: 100%; padding: 15px 20px; }
+            .main-wrapper .sidebar { width: 100%; height: auto; position: relative; }
+        }
+
+        [data-theme="dark"] .main-wrapper .sidebar {
+            background: #111a2e !important;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .page { max-width: 1400px; margin: 0 auto; }
+
+        /* Navigation Tabs */
+        .pos-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--card-border);
+            flex-wrap: wrap;
+        }
+
+        .pos-nav a {
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pos-nav a:hover {
+            background: var(--secondary-bg);
+            color: var(--secondary-text);
+        }
+
+        .pos-nav a.active {
+            background: linear-gradient(135deg, var(--primary-bg-start), var(--primary-bg-end));
+            color: #fff;
+        }
+
+        /* Hero Section */
         .hero {
             display: flex;
             justify-content: space-between;
@@ -120,19 +185,69 @@
         }
 
         .hero h1 { margin: 0; font-size: 32px; font-weight: 800; color: var(--text-primary); }
-        .hero p { margin: 8px 0 0; color: var(--text-secondary); }
-        .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .hero p { margin: 8px 0 0; color: var(--text-secondary); font-size: 14px; }
 
-        .ghost-btn, .primary-btn, .secondary-btn, .remove-btn {
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .stat-card .stat-label {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .stat-card .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .stat-icon.blue { background: #dbeafe; color: #1d4ed8; }
+        .stat-icon.green { background: #dcfce7; color: #166534; }
+        .stat-icon.orange { background: #fef3c7; color: #92400e; }
+        .stat-icon.red { background: #fee2e2; color: #b91c1c; }
+
+        /* Buttons */
+        .ghost-btn, .primary-btn, .secondary-btn, .remove-btn, .success-btn {
             border: none;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
             font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .ghost-btn {
-            text-decoration: none;
             background: var(--ghost-bg);
             color: var(--ghost-text);
             padding: 12px 16px;
@@ -151,23 +266,24 @@
             padding: 12px 16px;
         }
 
+        .success-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            padding: 12px 16px;
+        }
+
         .remove-btn {
             background: var(--remove-bg);
             color: var(--remove-text);
             padding: 10px 14px;
         }
 
-        .ghost-btn:hover, .primary-btn:hover, .secondary-btn:hover, .remove-btn:hover {
+        .ghost-btn:hover, .primary-btn:hover, .secondary-btn:hover, .remove-btn:hover, .success-btn:hover {
             transform: translateY(-1px);
             filter: brightness(1.05);
         }
 
-        .layout {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 24px;
-        }
-
+        /* Cards */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -178,6 +294,7 @@
 
         .section-title { margin: 0 0 18px; font-size: 20px; font-weight: 800; color: var(--text-primary); }
 
+        /* Forms */
         .grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -201,12 +318,6 @@
         }
 
         input::placeholder, textarea::placeholder { color: var(--input-placeholder); }
-
-        select option {
-            background: var(--input-bg);
-            color: var(--text-primary);
-        }
-
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary-bg-start);
@@ -225,19 +336,14 @@
             font-weight: 600;
         }
 
-        [data-theme="dark"] .error-box {
-            background: #3f1b2e;
-            color: #fecdd3;
-            border-color: #9f1239;
-        }
-
+        /* Tables */
         .table-wrap {
             overflow-x: auto;
             border: 1px solid var(--table-border);
             border-radius: 18px;
         }
 
-        table { width: 100%; border-collapse: collapse; min-width: 720px; }
+        table { width: 100%; border-collapse: collapse; }
 
         th, td {
             padding: 14px 12px;
@@ -255,22 +361,306 @@
             letter-spacing: 0.05em;
         }
 
-        td input[type="number"] { min-width: 92px; }
+        /* Product Grid for Inventory */
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
 
-        .product-chip {
-            display: inline-flex;
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding-left: 44px;
+        }
+
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .category-tab {
+            padding: 10px 20px;
+            border-radius: 999px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .category-tab:hover, .category-tab.active {
+            background: linear-gradient(135deg, var(--primary-bg-start), var(--primary-bg-end));
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        }
+
+        .product-info {
+            padding: 16px;
+        }
+
+        .product-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-sku {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-bg-start);
+        }
+
+        .product-stock {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .stock-in { background: #dcfce7; color: #166534; }
+        .stock-low { background: #fef3c7; color: #92400e; }
+        .stock-out { background: #fee2e2; color: #b91c1c; }
+
+        /* Cart Sidebar */
+        .cart-sidebar {
+            position: sticky;
+            top: 25px;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .cart-item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .cart-item-price {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .cart-item-qty {
+            display: flex;
             align-items: center;
             gap: 8px;
-            background: var(--chip-bg);
-            color: var(--chip-text);
-            font-size: 12px;
-            padding: 6px 10px;
-            border-radius: 999px;
+            margin-top: 8px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 700;
         }
 
-        .muted { color: var(--muted); font-size: 13px; }
+        .cart-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted);
+        }
 
+        .cart-empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Order Cards */
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .order-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.2s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .order-number {
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--primary-bg-start);
+        }
+
+        .order-date {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .order-customer {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .order-items {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-total {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            background: var(--remove-bg);
+            color: var(--remove-text);
+            border-color: var(--remove-text);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-paid { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-partial { background: #e0e7ff; color: #3730a3; }
+
+        /* Summary Box */
         .summary {
             background: linear-gradient(135deg, var(--summary-bg-start), var(--summary-bg-end));
             color: #fff;
@@ -295,6 +685,33 @@
             font-weight: 800;
         }
 
+        /* Empty State */
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Layout */
+        .layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .layout-full {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        /* Recent List */
         .recent-list { display: grid; gap: 14px; }
 
         .recent-item {
@@ -306,346 +723,577 @@
 
         .recent-item h4 { margin: 0 0 6px; font-size: 15px; color: var(--text-primary); }
 
-        .status-badge {
+        .muted { color: var(--muted); font-size: 13px; }
+
+        .product-chip {
             display: inline-flex;
             align-items: center;
+            gap: 8px;
+            background: var(--chip-bg);
+            color: var(--chip-text);
+            font-size: 12px;
             padding: 6px 10px;
             border-radius: 999px;
-            font-size: 12px;
             font-weight: 700;
-            margin-top: 8px;
         }
 
-        .status-paid { background: #dcfce7; color: #166534; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-partial { background: #e0e7ff; color: #3730a3; }
-
-        [data-theme="dark"] .status-paid { background: #134e4a; color: #ccfbf1; }
-        [data-theme="dark"] .status-pending { background: #78350f; color: #fde68a; }
-        [data-theme="dark"] .status-partial { background: #312e81; color: #c7d2fe; }
-
-        .empty-state {
-            padding: 18px;
-            border-radius: 18px;
-            background: var(--empty-bg);
-            color: var(--muted);
-            text-align: center;
-            border: 1px dashed var(--card-border);
-        }
-
-        .inventory-hint {
-            margin-top: 10px;
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        @media (max-width: 1024px) {
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .layout { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 640px) {
-            body { padding: 14px; }
-            .card { padding: 16px; border-radius: 18px; }
-            .grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
             .hero h1 { font-size: 26px; }
-            .hero-actions { width: 100%; }
-            .hero-actions a, .hero-actions button { width: 100%; text-align: center; }
+            .product-grid { grid-template-columns: repeat(2, 1fr); }
+            .pos-nav { justify-content: center; }
+            .pos-nav a { padding: 10px 16px; font-size: 14px; }
         }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title { font-size: 20px; font-weight: 800; }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--secondary-bg);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Order Detail View */
+        .order-detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .order-detail-item:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
-<%
-    const productList = Array.isArray(products) ? products : [];
-    const recentOrders = Array.isArray(orders) ? orders : [];
-    const salesOwnerName = loginname || '';
-%>
-<div class="page">
-    <div class="hero">
-        <div>
-            <h1>New Sale Invoice</h1>
-            <p>POS invoice form ready hai. Product select karo, quantity dalo, total auto-calculate hoga aur order seedha save ho jayega.</p>
-        </div>
-        <div class="hero-actions">
-            <a href="/orders" class="ghost-btn">View Orders</a>
-            <a href="/inventory" class="ghost-btn">Inventory</a>
-        </div>
-    </div>
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+    <div class="content-wrapper">
+        <%
+            const productList = Array.isArray(products) ? products : [];
+            const allOrders = Array.isArray(orders) ? orders : [];
+            const recentOrdersList = allOrders.slice(0, 5);
+            const salesOwnerName = loginname || '';
+            const currentTab = typeof activeTab !== 'undefined' ? activeTab : 'new-sale';
+            const stats = typeof posStats !== 'undefined' ? posStats : { totalOrders: 0, totalRevenue: 0, pendingOrders: 0, lowStockItems: 0 };
+        %>
 
-    <div class="layout">
-        <div class="card">
-            <h2 class="section-title">Invoice Form</h2>
+        <div class="page">
+            <!-- Stats Row -->
+            <% if (currentTab !== 'new-sale') { %>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">📊</div>
+                    <div class="stat-label">Total Orders</div>
+                    <div class="stat-value"><%= stats.totalOrders %></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">💰</div>
+                    <div class="stat-label">Total Revenue</div>
+                    <div class="stat-value">Rs <%= Number(stats.totalRevenue).toLocaleString('en-IN', {maximumFractionDigits: 0}) %></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">⏳</div>
+                    <div class="stat-label">Pending Orders</div>
+                    <div class="stat-value"><%= stats.pendingOrders %></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">⚠️</div>
+                    <div class="stat-label">Low Stock Items</div>
+                    <div class="stat-value"><%= stats.lowStockItems %></div>
+                </div>
+            </div>
+            <% } %>
 
+            <!-- Error Message -->
             <% if (typeof error !== 'undefined' && error) { %>
                 <div class="error-box"><%= error %></div>
             <% } %>
 
-            <form action="/new-sale" method="POST" id="newSaleForm">
-                <div class="grid">
-                    <div class="field">
-                        <label for="customerName">Customer Name</label>
-                        <input type="text" id="customerName" name="customerName" placeholder="Enter customer name" required>
-                    </div>
-                    <div class="field">
-                        <label for="paymentStatus">Payment Status</label>
-                        <select id="paymentStatus" name="paymentStatus">
-                            <option value="Paid">Paid</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Partial">Partial</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="salesOwner">Sales Owner</label>
-                        <input type="text" id="salesOwner" name="salesOwner" value="<%= salesOwnerName %>" placeholder="Sales owner">
-                    </div>
-                    <div class="field">
-                        <label for="taxPercent">Tax Percent</label>
-                        <input type="number" id="taxPercent" name="taxPercent" value="0" min="0" step="0.01">
-                    </div>
-                    <div class="field full">
-                        <label for="notes">Notes</label>
-                        <textarea id="notes" name="notes" placeholder="Add invoice notes, delivery details, ya payment remarks"></textarea>
-                    </div>
+            <!-- Success Message -->
+            <% if (typeof message !== 'undefined' && message) { %>
+                <div class="error-box" style="background: #dcfce7; color: #166534; border-color: #86efac;">
+                    <%= message %>
                 </div>
+            <% } %>
 
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
+            <!-- INVENTORY VIEW -->
+            <% if (currentTab === 'inventory') { %>
+                <div class="hero">
                     <div>
-                        <h3 style="margin:0; font-size:18px;">Sale Items</h3>
-                        <p class="muted" style="margin:6px 0 0;">Sirf quantity bharni hai. Price aur total product data se auto aayega.</p>
-                        <p class="inventory-hint">Available products: <strong><%= productList.length %></strong></p>
-                    </div>
-                    <button type="button" class="secondary-btn" id="addRowBtn">Add Item Row</button>
-                </div>
-
-                <div class="table-wrap">
-                    <table id="itemsTable">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Available Stock</th>
-                                <th>Unit Price</th>
-                                <th>Qty</th>
-                                <th>Row Total</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="itemsBody"></tbody>
-                    </table>
-                </div>
-
-                <div class="summary">
-                    <div class="summary-row">
-                        <span>Subtotal</span>
-                        <span>Rs <span id="subtotalValue">0.00</span></span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Tax</span>
-                        <span>Rs <span id="taxValue">0.00</span></span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Grand Total</span>
-                        <span>Rs <span id="grandTotal">0.00</span></span>
+                        <h1>Inventory Management</h1>
+                        <p>Manage all your products, check stock levels, and update inventory.</p>
                     </div>
                 </div>
 
-                <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px; flex-wrap:wrap;">
-                    <button type="button" class="ghost-btn" id="resetRowsBtn">Reset Items</button>
-                    <button type="submit" class="primary-btn">Generate Invoice</button>
-                </div>
-            </form>
-        </div>
+                <div class="card">
+                    <div class="inventory-header">
+                        <div class="search-box">
+                            <input type="text" id="inventorySearch" placeholder="Search products by name..." onkeyup="filterInventory()">
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <span class="muted">Total: <strong><%= productList.length %></strong> products</span>
+                        </div>
+                    </div>
 
-        <div class="card">
-            <h2 class="section-title">Recent Orders</h2>
-            <% if (recentOrders.length) { %>
-                <div class="recent-list">
-                    <% recentOrders.forEach((order) => { 
-                        const paymentClass = String(order.paymentStatus || '').toLowerCase();
-                    %>
-                        <div class="recent-item">
-                            <div class="product-chip"><%= order.orderNumber || 'Order' %></div>
-                            <h4><%= order.customerName || 'Walk-in Customer' %></h4>
-                            <div class="muted">Items: <%= Array.isArray(order.items) ? order.items.length : 0 %></div>
-                            <div class="muted">Total: Rs <%= Number(order.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></div>
-                            <div class="status-badge status-<%= paymentClass === 'paid' ? 'paid' : paymentClass === 'partial' ? 'partial' : 'pending' %>">
-                                <%= order.paymentStatus || 'Pending' %>
+                    <% if (productList.length) { %>
+                        <div class="product-grid" id="inventoryGrid">
+                            <% productList.forEach((product) => { 
+                                const stockClass = product.stock <= 0 ? 'stock-out' : product.stock <= 5 ? 'stock-low' : 'stock-in';
+                                const stockText = product.stock <= 0 ? 'Out of Stock' : product.stock <= 5 ? 'Low Stock' : product.stock + ' in stock';
+                            %>
+                                <div class="product-card" data-name="<%= (product.name || '').toLowerCase().replace(/"/g, '&quot;') %>">
+                                    <img src="/uploads/<%= product.image || 'default.jpg' %>" alt="<%= product.name %>" class="product-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f1f5f9%22 width=%22100%22 height=%22100%22/><text fill=%22%2394a3b8%22 x=%2250%22 y=%2255%22 font-size=%2235%22 text-anchor=%22middle%22>📦</text></svg>'">
+                                    <div class="product-info">
+                                        <div class="product-name"><%= product.name || 'Unnamed Product' %></div>
+                                        <div class="product-sku">SKU: PROD-<%= String(product._id).slice(-6).toUpperCase() %></div>
+                                        <div class="product-footer">
+                                            <div class="product-price">Rs <%= Number(product.price || 0).toLocaleString('en-IN', {minimumFractionDigits: 2}) %></div>
+                                            <span class="product-stock <%= stockClass %>"><%= stockText %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <h3>No Products Found</h3>
+                            <p>Add products to see them here.</p>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+
+            <!-- ORDERS VIEW -->
+            <% if (currentTab === 'orders') { %>
+                <div class="hero">
+                    <div>
+                        <h1>Order History</h1>
+                        <p>View and manage all your sales orders.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <% if (allOrders.length) { %>
+                        <div class="orders-grid">
+                            <% allOrders.forEach((order) => { 
+                                const paymentClass = String(order.paymentStatus || '').toLowerCase();
+                                const paymentBadgeClass = paymentClass === 'paid' ? 'status-paid' : paymentClass === 'partial' ? 'status-partial' : 'status-pending';
+                                const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'}) : 'N/A';
+                            %>
+                                <div class="order-card">
+                                    <div class="order-header">
+                                        <div>
+                                            <div class="order-number"><%= order.orderNumber || 'Order' %></div>
+                                            <div class="order-date"><%= orderDate %></div>
+                                        </div>
+                                        <span class="status-badge <%= paymentBadgeClass %>">
+                                            <%= order.paymentStatus || 'Pending' %>
+                                        </span>
+                                    </div>
+                                    <div class="order-customer"><%= order.customerName || 'Walk-in Customer' %></div>
+                                    <div class="order-items">
+                                        <%= Array.isArray(order.items) ? order.items.length : 0 %> items • 
+                                        Sold by <%= order.salesOwner || 'System' %>
+                                    </div>
+                                    <div class="order-footer">
+                                        <div class="order-total">Rs <%= Number(order.total || 0).toLocaleString('en-IN', {minimumFractionDigits: 2}) %></div>
+                                        <div class="order-actions">
+                                            <button class="btn-icon" onclick="viewOrder('<%= order._id %>')" title="View Details">👁️</button>
+                                            <form action="/orders/delete/<%= order._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Delete this order? Inventory will be restored.');">
+                                                <button type="submit" class="btn-icon" title="Delete Order">🗑️</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <h3>No Orders Yet</h3>
+                            <p>Create your first sale to see orders here.</p>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+
+            <!-- NEW SALE VIEW -->
+            <% if (currentTab === 'new-sale') { %>
+                <div class="hero">
+                    <div>
+                        <h1>New Sale Invoice</h1>
+                        <p>Select products from catalog or add manually. Cart totals calculate automatically.</p>
+                    </div>
+                </div>
+
+                <div class="layout">
+                    <!-- Left Column - Product Catalog -->
+                    <div>
+                        <div class="card" style="margin-bottom: 24px;">
+                            <div class="inventory-header">
+                                <div class="search-box">
+                                    <input type="text" id="catalogSearch" placeholder="Search products..." onkeyup="filterCatalog()">
+                                </div>
+                                <span class="muted"><%= productList.length %> products available</span>
+                            </div>
+
+                            <% if (productList.length) { %>
+                                <div class="product-grid" id="catalogGrid" style="max-height: 500px; overflow-y: auto; padding-right: 8px;">
+                                    <% productList.forEach((product) => { 
+                                        if (product.stock > 0) {
+                                    %>
+                                        <div class="product-card catalog-item" 
+                                             data-id="<%= product._id %>"
+                                             data-name="<%= (product.name || '').toLowerCase().replace(/"/g, '&quot;') %>"
+                                             data-price="<%= product.price %>"
+                                             data-stock="<%= product.stock %>"
+                                             onclick='addToCart("<%= product._id %>", "<%= (product.name || '').replace(/"/g, '\\"') %>", <%= product.price %>, <%= product.stock %>, "<%= product.image || 'default.jpg' %>")'>
+                                            <img src="/uploads/<%= product.image || 'default.jpg' %>" alt="<%= product.name %>" class="product-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f1f5f9%22 width=%22100%22 height=%22100%22/><text fill=%22%2394a3b8%22 x=%2250%22 y=%2255%22 font-size=%2235%22 text-anchor=%22middle%22>📦</text></svg>'">
+                                            <div class="product-info">
+                                                <div class="product-name"><%= product.name || 'Unnamed Product' %></div>
+                                                <div class="product-sku">Stock: <%= product.stock %></div>
+                                                <div class="product-footer">
+                                                    <div class="product-price">Rs <%= Number(product.price || 0).toLocaleString('en-IN', {minimumFractionDigits: 2}) %></div>
+                                                    <span class="success-btn" style="padding: 6px 12px; font-size: 12px;">+ Add</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% } }) %>
+                                </div>
+                            <% } else { %>
+                                <div class="empty-state" style="padding: 40px;">
+                                    <div class="empty-state-icon">📦</div>
+                                    <p>No products in stock</p>
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <!-- Invoice Form -->
+                        <div class="card">
+                            <h2 class="section-title">Customer Details</h2>
+                            <form id="saleForm" action="/new-sale" method="POST">
+                                <div class="grid">
+                                    <div class="field">
+                                        <label for="customerName">Customer Name *</label>
+                                        <input type="text" id="customerName" name="customerName" placeholder="Enter customer name" required>
+                                    </div>
+                                    <div class="field">
+                                        <label for="paymentStatus">Payment Status</label>
+                                        <select id="paymentStatus" name="paymentStatus">
+                                            <option value="Paid">Paid</option>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Partial">Partial</option>
+                                        </select>
+                                    </div>
+                                    <div class="field">
+                                        <label for="salesOwner">Sales Owner</label>
+                                        <input type="text" id="salesOwner" name="salesOwner" value="<%= salesOwnerName %>">
+                                    </div>
+                                    <div class="field">
+                                        <label for="taxPercent">Tax Percent (%)</label>
+                                        <input type="number" id="taxPercent" name="taxPercent" value="0" min="0" step="0.01" onchange="updateCartTotals()">
+                                    </div>
+                                    <div class="field full">
+                                        <label for="notes">Notes</label>
+                                        <textarea id="notes" name="notes" placeholder="Add any special instructions or notes..."></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Hidden inputs for cart items -->
+                                <div id="cartInputs"></div>
+
+                                <div class="summary">
+                                    <div class="summary-row">
+                                        <span>Subtotal</span>
+                                        <span>Rs <span id="cartSubtotal">0.00</span></span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span>Tax</span>
+                                        <span>Rs <span id="cartTax">0.00</span></span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span>Grand Total</span>
+                                        <span>Rs <span id="cartTotal">0.00</span></span>
+                                    </div>
+                                </div>
+
+                                <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+                                    <button type="button" class="ghost-btn" onclick="clearCart()">Clear Cart</button>
+                                    <button type="submit" class="primary-btn" id="checkoutBtn" disabled>Generate Invoice</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Cart -->
+                    <div class="cart-sidebar">
+                        <div class="card">
+                            <h2 class="section-title">🛒 Shopping Cart <span id="cartCount" class="product-chip" style="float:right;">0 items</span></h2>
+                            
+                            <div id="cartItems">
+                                <div class="cart-empty">
+                                    <div class="cart-empty-icon">🛒</div>
+                                    <p>Your cart is empty</p>
+                                    <p style="font-size: 12px; margin-top: 8px;">Click on products to add them</p>
+                                </div>
                             </div>
                         </div>
-                    <% }) %>
+
+                        <!-- Recent Orders Mini -->
+                        <div class="card" style="margin-top: 20px;">
+                            <h2 class="section-title">Recent Orders</h2>
+                            <% if (recentOrdersList.length) { %>
+                                <div class="recent-list">
+                                    <% recentOrdersList.slice(0, 3).forEach((order) => { %>
+                                        <div class="recent-item">
+                                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                                <span class="product-chip"><%= order.orderNumber %></span>
+                                                <span class="status-badge status-<%= String(order.paymentStatus).toLowerCase() === 'paid' ? 'paid' : 'pending' %>"><%= order.paymentStatus %></span>
+                                            </div>
+                                            <h4 style="margin-top:8px;"><%= order.customerName || 'Walk-in' %></h4>
+                                            <div class="muted">Rs <%= Number(order.total).toLocaleString('en-IN', {minimumFractionDigits: 2}) %></div>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            <% } else { %>
+                                <div class="empty-state" style="padding: 20px;">No recent orders</div>
+                            <% } %>
+                        </div>
+                    </div>
                 </div>
-            <% } else { %>
-                <div class="empty-state">Abhi tak koi recent order nahi mila.</div>
             <% } %>
         </div>
     </div>
 </div>
 
+<!-- Order Detail Modal -->
+<div class="modal-overlay" id="orderModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">Order Details</div>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
 <script>
-    const products = <%- JSON.stringify(productList.map((product) => ({
-        id: String(product._id),
-        name: product.name || 'Product',
-        price: Number(product.price || 0),
-        stock: Number(product.stock || 0),
-        status: product.status || 'In Stock'
-    }))) %>;
+    // Cart functionality
+    let cart = [];
 
-    const itemsBody = document.getElementById('itemsBody');
-    const addRowBtn = document.getElementById('addRowBtn');
-    const resetRowsBtn = document.getElementById('resetRowsBtn');
-    const taxPercentInput = document.getElementById('taxPercent');
-    let rowCounter = 0;
-
-    function formatCurrency(value) {
-        return Number(value || 0).toLocaleString('en-IN', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-    }
-
-    function getSelectedProduct(selectElement) {
-        const productId = selectElement.value;
-        return products.find((product) => product.id === productId) || null;
-    }
-
-    function populateProductOptions(selectElement) {
-        selectElement.innerHTML = '';
-
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = products.length ? 'Select product' : 'No products available';
-        selectElement.appendChild(defaultOption);
-
-        products.forEach((product) => {
-            const option = document.createElement('option');
-            option.value = product.id;
-            option.textContent = `${product.name} - Rs ${formatCurrency(product.price)} (${product.stock} in stock)`;
-            selectElement.appendChild(option);
-        });
-    }
-
-    function addRow(selectedProductId = '') {
-        rowCounter += 1;
-        const row = document.createElement('tr');
-        row.setAttribute('data-row-id', String(rowCounter));
-        row.innerHTML = `
-            <td>
-                <select name="productSelect[]" class="product-select" required></select>
-            </td>
-            <td class="stock-cell">0</td>
-            <td>
-                <span class="unit-price-text">Rs 0.00</span>
-            </td>
-            <td>
-                <input type="number" class="qty-input" min="0" step="1" value="0">
-            </td>
-            <td>
-                <strong class="row-total">Rs 0.00</strong>
-            </td>
-            <td>
-                <button type="button" class="remove-btn">Remove</button>
-            </td>
-        `;
-        itemsBody.appendChild(row);
-
-        const select = row.querySelector('.product-select');
-        const qtyInput = row.querySelector('.qty-input');
-        const removeBtn = row.querySelector('.remove-btn');
-        populateProductOptions(select);
-
-        if (selectedProductId) {
-            select.value = selectedProductId;
-            qtyInput.value = 1;
-        }
-
-        select.addEventListener('change', () => {
-            if (select.value && Number(qtyInput.value) <= 0) {
-                qtyInput.value = 1;
+    function addToCart(id, name, price, stock, image) {
+        const existingItem = cart.find(item => item.id === id);
+        if (existingItem) {
+            if (existingItem.quantity < stock) {
+                existingItem.quantity++;
+            } else {
+                alert('Maximum stock reached!');
+                return;
             }
-            updateRow(row);
-            updateTotals();
-        });
-
-        qtyInput.addEventListener('input', () => {
-            if (Number(qtyInput.value) < 0) qtyInput.value = 0;
-            updateRow(row);
-            updateTotals();
-        });
-
-        removeBtn.addEventListener('click', () => {
-            row.remove();
-            if (!itemsBody.children.length) addRow();
-            updateTotals();
-        });
-
-        updateRow(row);
-        updateTotals();
+        } else {
+            cart.push({ id, name, price, stock, image: image || 'default.jpg', quantity: 1 });
+        }
+        renderCart();
+        updateCartTotals();
     }
 
-    function updateRow(row) {
-        const select = row.querySelector('.product-select');
-        const qtyInput = row.querySelector('.qty-input');
-        const stockCell = row.querySelector('.stock-cell');
-        const unitPriceText = row.querySelector('.unit-price-text');
-        const rowTotal = row.querySelector('.row-total');
-        const selectedProduct = getSelectedProduct(select);
+    function updateQuantity(id, delta) {
+        const item = cart.find(item => item.id === id);
+        if (item) {
+            const newQty = item.quantity + delta;
+            if (newQty > 0 && newQty <= item.stock) {
+                item.quantity = newQty;
+            } else if (newQty <= 0) {
+                cart = cart.filter(i => i.id !== id);
+            } else {
+                alert('Maximum stock reached!');
+                return;
+            }
+        }
+        renderCart();
+        updateCartTotals();
+    }
 
-        const oldHidden = row.querySelector('input[type="hidden"][name^="quantities["]');
-        if (oldHidden) oldHidden.remove();
+    function removeFromCart(id) {
+        cart = cart.filter(item => item.id !== id);
+        renderCart();
+        updateCartTotals();
+    }
 
-        if (!selectedProduct) {
-            stockCell.textContent = '0';
-            unitPriceText.textContent = 'Rs 0.00';
-            rowTotal.textContent = 'Rs 0.00';
+    function clearCart() {
+        cart = [];
+        renderCart();
+        updateCartTotals();
+    }
+
+    function renderCart() {
+        const cartContainer = document.getElementById('cartItems');
+        const cartCount = document.getElementById('cartCount');
+        
+        cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0) + ' items';
+        
+        if (cart.length === 0) {
+            cartContainer.innerHTML = `
+                <div class="cart-empty">
+                    <div class="cart-empty-icon">🛒</div>
+                    <p>Your cart is empty</p>
+                    <p style="font-size: 12px; margin-top: 8px;">Click on products to add them</p>
+                </div>
+            `;
+            document.getElementById('checkoutBtn').disabled = true;
             return;
         }
 
-        const qty = Number(qtyInput.value || 0);
-        const clampedQty = Math.max(0, Math.min(qty, selectedProduct.stock > 0 ? selectedProduct.stock : qty));
-        if (String(clampedQty) !== String(qtyInput.value || 0)) {
-            qtyInput.value = clampedQty;
-        }
+        cartContainer.innerHTML = cart.map(item => `
+            <div class="cart-item">
+                <img src="/uploads/${item.image}" class="cart-item-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f1f5f9%22 width=%22100%22 height=%22100%22/><text fill=%22%2394a3b8%22 x=%2250%22 y=%2255%22 font-size=%2235%22 text-anchor=%22middle%22>📦</text></svg>'">
+                <div class="cart-item-info">
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-price">Rs ${item.price.toLocaleString('en-IN', {minimumFractionDigits: 2})} each</div>
+                    <div class="cart-item-qty">
+                        <button class="qty-btn" onclick="updateQuantity('${item.id}', -1)">-</button>
+                        <span style="font-weight: 700; min-width: 30px; text-align: center;">${item.quantity}</span>
+                        <button class="qty-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
+                        <button class="qty-btn" style="margin-left: auto; color: var(--remove-text);" onclick="removeFromCart('${item.id}')">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
 
-        stockCell.textContent = `${selectedProduct.stock} (${selectedProduct.status})`;
-        unitPriceText.textContent = `Rs ${formatCurrency(selectedProduct.price)}`;
-        rowTotal.textContent = `Rs ${formatCurrency(clampedQty * selectedProduct.price)}`;
-
-        const hiddenQty = document.createElement('input');
-        hiddenQty.type = 'hidden';
-        hiddenQty.name = `quantities[${selectedProduct.id}]`;
-        hiddenQty.value = String(clampedQty);
-        row.appendChild(hiddenQty);
+        document.getElementById('checkoutBtn').disabled = cart.length === 0;
     }
 
-    function updateTotals() {
-        let subtotal = 0;
-        document.querySelectorAll('#itemsBody tr').forEach((row) => {
-            const select = row.querySelector('.product-select');
-            const qtyInput = row.querySelector('.qty-input');
-            const selectedProduct = getSelectedProduct(select);
-            if (!selectedProduct) return;
-            subtotal += Number(qtyInput.value || 0) * Number(selectedProduct.price || 0);
+    function updateCartTotals() {
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const taxPercent = parseFloat(document.getElementById('taxPercent')?.value || 0);
+        const tax = subtotal * (taxPercent / 100);
+        const total = subtotal + tax;
+
+        document.getElementById('cartSubtotal').textContent = subtotal.toLocaleString('en-IN', {minimumFractionDigits: 2});
+        document.getElementById('cartTax').textContent = tax.toLocaleString('en-IN', {minimumFractionDigits: 2});
+        document.getElementById('cartTotal').textContent = total.toLocaleString('en-IN', {minimumFractionDigits: 2});
+
+        // Update hidden inputs
+        const inputsContainer = document.getElementById('cartInputs');
+        inputsContainer.innerHTML = cart.map(item => `
+            <input type="hidden" name="productIds[]" value="${item.id}">
+            <input type="hidden" name="quantities[]" value="${item.quantity}">
+        `).join('');
+    }
+
+    function filterCatalog() {
+        const search = document.getElementById('catalogSearch').value.toLowerCase();
+        document.querySelectorAll('.catalog-item').forEach(item => {
+            const name = item.getAttribute('data-name');
+            item.style.display = name.includes(search) ? 'block' : 'none';
         });
-
-        const taxPercent = Number(taxPercentInput.value || 0);
-        const taxAmount = subtotal * taxPercent / 100;
-        const grandTotal = subtotal + taxAmount;
-
-        document.getElementById('subtotalValue').textContent = formatCurrency(subtotal);
-        document.getElementById('taxValue').textContent = formatCurrency(taxAmount);
-        document.getElementById('grandTotal').textContent = formatCurrency(grandTotal);
     }
 
-    addRowBtn.addEventListener('click', () => addRow());
-    resetRowsBtn.addEventListener('click', () => {
-        itemsBody.innerHTML = '';
-        addRow();
+    function filterInventory() {
+        const search = document.getElementById('inventorySearch').value.toLowerCase();
+        document.querySelectorAll('#inventoryGrid .product-card').forEach(item => {
+            const name = item.getAttribute('data-name');
+            item.style.display = name.includes(search) ? 'block' : 'none';
+        });
+    }
+
+    function viewOrder(orderId) {
+        const orders = JSON.parse(`<%- JSON.stringify(allOrders || []).replace(/\\/g, '\\\\').replace(/`/g, '\\`') %>`);
+        const order = orders.find(o => o._id === orderId);
+        if (!order) return;
+
+        const content = document.getElementById('modalContent');
+        content.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <strong>Customer:</strong> ${order.customerName || 'Walk-in'}<br>
+                <strong>Date:</strong> ${order.createdAt ? new Date(order.createdAt).toLocaleString('en-IN') : 'N/A'}<br>
+                <strong>Status:</strong> <span class="status-badge status-${(order.paymentStatus || 'pending').toLowerCase()}">${order.paymentStatus || 'Pending'}</span><br>
+                <strong>Sales Owner:</strong> ${order.salesOwner || 'System'}
+            </div>
+            <h4 style="margin-bottom: 12px;">Items:</h4>
+            ${(order.items || []).map(item => `
+                <div class="order-detail-item">
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        <small>Qty: ${item.quantity} x Rs ${item.price.toLocaleString('en-IN', {minimumFractionDigits: 2})}</small>
+                    </div>
+                    <strong>Rs ${(item.quantity * item.price).toLocaleString('en-IN', {minimumFractionDigits: 2})}</strong>
+                </div>
+            `).join('')}
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--card-border);">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Subtotal:</span>
+                    <span>Rs ${Number(order.subtotal || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Tax (${order.taxPercent || 0}%):</span>
+                    <span>Rs ${Number(order.taxAmount || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 800;">
+                    <span>Total:</span>
+                    <span>Rs ${Number(order.total || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
+                </div>
+            </div>
+        `;
+        document.getElementById('orderModal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('orderModal').classList.remove('active');
+    }
+
+    // Close modal on outside click
+    document.getElementById('orderModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
     });
-    taxPercentInput.addEventListener('input', updateTotals);
 
-    if (products.length) {
-        addRow(products[0].id);
-    } else {
-        addRow();
-    }
+    // Initialize
+    renderCart();
+    updateCartTotals();
 </script>
 
 </body>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice <%= invoice.invoiceNumber %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; color: #1e293b; line-height: 1.6; }
+        
+        .invoice-container { max-width: 800px; margin: 0 auto; padding: 40px; }
+        
+        .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #3b82f6; }
+        .company-info h1 { color: #3b82f6; font-size: 32px; margin: 0; }
+        .company-info p { color: #64748b; margin: 5px 0; }
+        
+        .invoice-details { text-align: right; }
+        .invoice-details h2 { color: #1e293b; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px; }
+        .invoice-number { font-size: 24px; font-weight: 700; color: #3b82f6; }
+        .invoice-meta { margin-top: 10px; font-size: 14px; color: #64748b; }
+        
+        .billing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+        .billing-block h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin: 0 0 10px; }
+        .billing-block p { margin: 4px 0; font-size: 14px; }
+        .billing-block .name { font-size: 18px; font-weight: 700; color: #1e293b; }
+        
+        .items-table { width: 100%; border-collapse: collapse; margin: 30px 0; }
+        .items-table thead { background: #f8fafc; }
+        .items-table th { padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; border-bottom: 2px solid #e2e8f0; }
+        .items-table td { padding: 14px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .items-table td:last-child, .items-table th:last-child { text-align: right; }
+        .items-table .product-name { font-weight: 600; }
+        .items-table .product-desc { font-size: 12px; color: #64748b; }
+        
+        .summary-section { width: 300px; margin-left: auto; margin-top: 30px; }
+        .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
+        .summary-row.total { border-top: 2px solid #3b82f6; padding-top: 12px; margin-top: 8px; font-size: 20px; font-weight: 700; color: #3b82f6; }
+        
+        .status-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+        .status-paid { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-overdue { background: #fee2e2; color: #991b1b; }
+        .status-draft { background: #f1f5f9; color: #475569; }
+        
+        .payment-status { text-align: center; margin-top: 30px; padding: 20px; background: #f8fafc; border-radius: 8px; }
+        .payment-status h3 { margin: 0 0 10px; font-size: 16px; }
+        
+        .notes-section { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; }
+        .notes-section h4 { font-size: 14px; margin: 0 0 10px; color: #64748b; }
+        .notes-section p { font-size: 13px; color: #64748b; margin: 0; }
+        
+        .footer { margin-top: 60px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; }
+        
+        @media print {
+            body { background: #fff; }
+            .no-print { display: none; }
+            .invoice-container { padding: 20px; }
+        }
+        
+        .print-actions { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-print { background: #3b82f6; color: white; }
+        .btn-close { background: #f1f5f9; color: #475569; }
+    </style>
+</head>
+<body>
+    <div class="print-actions no-print">
+        <button class="btn btn-print" onclick="window.print()">
+            <i class="bi bi-printer"></i> Print Invoice
+        </button>
+        <button class="btn btn-close" onclick="window.close()">
+            <i class="bi bi-x-lg"></i> Close
+        </button>
+    </div>
+    
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <div class="company-info">
+                <h1>REAL ERP</h1>
+                <p>Enterprise Resource Planning</p>
+                <p style="margin-top: 10px; font-size: 13px;">
+                    <i class="bi bi-geo-alt"></i> Your Company Address<br>
+                    <i class="bi bi-envelope"></i> info@realerp.com<br>
+                    <i class="bi bi-telephone"></i> +91 98765 43210
+                </p>
+            </div>
+            <div class="invoice-details">
+                <h2>Tax Invoice</h2>
+                <div class="invoice-number"><%= invoice.invoiceNumber %></div>
+                <div class="invoice-meta">
+                    <strong>Date:</strong> <%= invoice.invoiceDate ? new Date(invoice.invoiceDate).toLocaleDateString('en-IN') : '-' %><br>
+                    <strong>Due Date:</strong> <%= invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-IN') : '-' %>
+                </div>
+                <div style="margin-top: 15px;">
+                    <span class="status-badge status-<%= invoice.paymentStatus.toLowerCase() %>">
+                        <%= invoice.paymentStatus %>
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="billing-grid">
+            <div class="billing-block">
+                <h3>Bill To</h3>
+                <p class="name"><%= invoice.customerName %></p>
+                <% if (invoice.customerAddress) { %>
+                    <p><%= invoice.customerAddress %></p>
+                <% } %>
+                <% if (invoice.customerEmail) { %>
+                    <p><i class="bi bi-envelope"></i> <%= invoice.customerEmail %></p>
+                <% } %>
+                <% if (invoice.customerPhone) { %>
+                    <p><i class="bi bi-telephone"></i> <%= invoice.customerPhone %></p>
+                <% } %>
+                <% if (invoice.customerGstNumber) { %>
+                    <p style="margin-top: 10px;"><strong>GSTIN:</strong> <%= invoice.customerGstNumber %></p>
+                <% } %>
+            </div>
+            <div class="billing-block">
+                <h3>Payment Details</h3>
+                <p><strong>Status:</strong> <%= invoice.paymentStatus %></p>
+                <% if (invoice.paymentMethod && invoice.paymentMethod !== 'Other') { %>
+                    <p><strong>Method:</strong> <%= invoice.paymentMethod %></p>
+                <% } %>
+                <% if (invoice.paidAmount > 0) { %>
+                    <p><strong>Paid:</strong> ₹<%= invoice.paidAmount.toLocaleString() %></p>
+                    <p><strong>Balance:</strong> ₹<%= invoice.balanceAmount.toLocaleString() %></p>
+                <% } %>
+            </div>
+        </div>
+        
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th style="width: 40%;">Item Description</th>
+                    <th class="text-center">Qty</th>
+                    <th class="text-right">Unit Price</th>
+                    <th class="text-right">Discount</th>
+                    <th class="text-right">Tax</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% invoice.items.forEach((item, index) => { %>
+                    <tr>
+                        <td>
+                            <div class="product-name"><%= index + 1 %>. <%= item.name %></div>
+                            <% if (item.description) { %>
+                                <div class="product-desc"><%= item.description %></div>
+                            <% } %>
+                        </td>
+                        <td class="text-center"><%= item.quantity %></td>
+                        <td class="text-right">₹<%= item.unitPrice.toLocaleString() %></td>
+                        <td class="text-right"><%= item.discount %>%</td>
+                        <td class="text-right"><%= item.taxPercent %>%</td>
+                        <td class="text-right"><strong>₹<%= item.total.toLocaleString() %></strong></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+        
+        <div class="summary-section">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>₹<%= invoice.subtotal.toLocaleString() %></span>
+            </div>
+            <div class="summary-row">
+                <span>Total Discount</span>
+                <span>- ₹<%= invoice.totalDiscount.toLocaleString() %></span>
+            </div>
+            <div class="summary-row">
+                <span>Total Tax</span>
+                <span>+ ₹<%= invoice.totalTax.toLocaleString() %></span>
+            </div>
+            <div class="summary-row total">
+                <span>Total Amount</span>
+                <span>₹<%= invoice.totalAmount.toLocaleString() %></span>
+            </div>
+        </div>
+        
+        <% if (invoice.notes || invoice.termsAndConditions) { %>
+            <div class="notes-section">
+                <% if (invoice.notes) { %>
+                    <h4>Notes</h4>
+                    <p><%= invoice.notes %></p>
+                <% } %>
+                <% if (invoice.termsAndConditions) { %>
+                    <h4 style="margin-top: 20px;">Terms & Conditions</h4>
+                    <p><%= invoice.termsAndConditions %></p>
+                <% } %>
+            </div>
+        <% } %>
+        
+        <div class="payment-status">
+            <h3>Payment Status: <strong style="color: #3b82f6;"><%= invoice.paymentStatus %></strong></h3>
+            <p>Thank you for your business!</p>
+        </div>
+        
+        <div class="footer">
+            <p>This is a computer-generated invoice and does not require a signature.</p>
+            <p style="margin-top: 10px;">REAL ERP - Enterprise Resource Planning System</p>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-trigger print dialog after page load
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                // Don't auto-print, let user click the button
+                // window.print();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

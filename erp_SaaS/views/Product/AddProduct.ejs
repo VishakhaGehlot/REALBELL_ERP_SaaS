@@ -48,7 +48,7 @@
         .sidebar-brand h3 {
             font-weight: 700;
             font-size: 22px;
-            background: linear-gradient(135deg, #d4a017, #f5c542);
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -60,7 +60,7 @@
         .sidebar-brand h3 i {
             background: none;
             -webkit-background-clip: unset;
-            color: #d4a017;
+            color: #3b82f6;
             font-size: 28px;
         }
         .sidebar-nav {
@@ -88,18 +88,18 @@
             color: #7e8b9c;
         }
         .sidebar-nav li.active a {
-            background: #fef3c7;
-            color: #d4a017;
+            background: #dbeafe;
+            color: #3b82f6;
         }
         .sidebar-nav li.active a i {
-            color: #d4a017;
+            color: #3b82f6;
         }
         .sidebar-nav li a:hover:not(.active) {
-            background: #fef9e6;
-            color: #b8860b;
+            background: #eff6ff;
+            color: #2563eb;
         }
         .sidebar-nav li a:hover i {
-            color: #d4a017;
+            color: #3b82f6;
         }
 
         /* ========= CONTENT WRAPPER ========= */
@@ -177,7 +177,7 @@
             gap: 12px;
         }
         .form-header i {
-            color: #d4a017;
+            color: #3b82f6;
             font-size: 28px;
         }
         .form-header h2 {
@@ -200,7 +200,7 @@
             margin-bottom: 8px;
         }
         .form-group label i {
-            color: #d4a017;
+            color: #3b82f6;
             margin-right: 8px;
         }
         .form-group input, .form-group select, .form-group textarea {
@@ -214,8 +214,8 @@
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
-            border-color: #d4a017;
-            box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.1);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         .form-group input[type="file"] {
             padding: 10px;
@@ -240,11 +240,11 @@
             transition: all 0.2s ease;
         }
         .star.selected {
-            color: #f5c542;
+            color: #60a5fa;
         }
         .star:hover {
             transform: scale(1.1);
-            color: #f5c542;
+            color: #60a5fa;
         }
         .rating-label {
             margin-left: 16px;
@@ -254,7 +254,7 @@
         .btn-submit {
             width: 100%;
             padding: 14px;
-            background: #d4a017;
+            background: #3b82f6;
             color: white;
             border: none;
             border-radius: 40px;
@@ -269,9 +269,9 @@
             cursor: pointer;
         }
         .btn-submit:hover {
-            background: #b8860b;
+            background: #2563eb;
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(212, 160, 23, 0.25);
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.25);
         }
         .btn-submit i {
             font-size: 18px;
@@ -317,7 +317,7 @@
         <!-- TOP HEADER -->
         <div class="top-header">
             <div class="header-title">
-                <h1><i class="bi bi-plus-circle me-2" style="color:#d4a017;"></i> Add New Product</h1>
+                <h1><i class="bi bi-plus-circle me-2" style="color:#3b82f6;"></i> Add New Product</h1>
                 <p>Fill in the details to add a new product to your inventory</p>
             </div>
             <div class="header-actions">
@@ -426,7 +426,7 @@
 
             const ratingTexts = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
             ratingLabel.innerHTML = ratingTexts[val] + ' (' + val + '/5)';
-            ratingLabel.style.color = '#d4a017';
+            ratingLabel.style.color = '#3b82f6';
             ratingLabel.style.fontWeight = 'bold';
 
             stars.forEach((s, index) => {
@@ -442,7 +442,7 @@
             let val = parseInt(this.getAttribute('data-value'));
             stars.forEach((s, index) => {
                 if(index < val) {
-                    s.style.color = '#f5c542';
+                    s.style.color = '#60a5fa';
                 } else {
                     s.style.color = '#cbd5e1';
                 }
@@ -453,7 +453,7 @@
             let currentRating = parseInt(ratingValue.value) || 0;
             stars.forEach((s, index) => {
                 if(currentRating > 0 && index < currentRating) {
-                    s.style.color = '#f5c542';
+                    s.style.color = '#60a5fa';
                 } else {
                     s.style.color = '#cbd5e1';
                 }

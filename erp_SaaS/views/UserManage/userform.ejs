@@ -74,8 +74,8 @@
 
     .back-btn:hover {
         background: #f8fafc;
-        color: #f59e0b;
-        border-color: #f59e0b;
+        color: #3b82f6;
+        border-color: #3b82f6;
     }
 
     /* Form Card */
@@ -99,7 +99,7 @@
     }
 
     .form-header i {
-        color: #f59e0b;
+        color: #3b82f6;
         font-size: 24px;
     }
 
@@ -127,7 +127,7 @@
     }
 
     .form-label i {
-        color: #f59e0b;
+        color: #3b82f6;
         margin-right: 8px;
         font-size: 16px;
     }
@@ -146,8 +146,8 @@
 
     .form-control:focus {
         outline: none;
-        border-color: #f59e0b;
-        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
     .form-control::placeholder {
@@ -177,7 +177,7 @@
     }
 
     .password-toggle:hover {
-        color: #f59e0b;
+        color: #3b82f6;
     }
 
     /* Password Strength Meter */
@@ -203,7 +203,7 @@
     }
 
     .strength-fill.weak { width: 33.33%; background: #ef4444; }
-    .strength-fill.medium { width: 66.66%; background: #f59e0b; }
+    .strength-fill.medium { width: 66.66%; background: #3b82f6; }
     .strength-fill.strong { width: 100%; background: #10b981; }
 
     .strength-text {
@@ -218,6 +218,77 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 15px;
         margin-top: 10px;
+    }
+
+    .role-select-wrapper {
+        position: relative;
+    }
+
+    .role-select-wrapper::after {
+        content: '\f282';
+        font-family: 'bootstrap-icons';
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .role-select {
+        width: 100%;
+        padding: 14px 40px 14px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #1e293b;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        appearance: none;
+    }
+
+    .role-select:hover {
+        border-color: #3b82f6;
+    }
+
+    .role-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    }
+
+    .role-custom-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #1e293b;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+        margin-top: 12px;
+        display: none;
+    }
+
+    .role-custom-input.show {
+        display: block;
+        animation: slideDown 0.2s ease;
+    }
+
+    .role-custom-input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .role-option {
@@ -242,10 +313,10 @@
     }
 
     .role-option input[type="radio"]:checked + label {
-        border-color: #f59e0b;
+        border-color: #3b82f6;
         background: #fff3e0;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
     }
 
     .role-option label i {
@@ -301,7 +372,7 @@
     /* Submit Button */
     .submit-btn {
         width: 100%;
-        background: #f59e0b;
+        background: #3b82f6;
         color: white;
         border: none;
         padding: 14px 20px;
@@ -312,16 +383,16 @@
         align-items: center;
         justify-content: center;
         gap: 10px;
-        box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+        box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
         transition: all 0.3s ease;
         cursor: pointer;
         margin-top: 20px;
     }
 
     .submit-btn:hover {
-        background: #d97706;
+        background: #2563eb;
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3);
+        box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
     }
 
     .submit-btn i {
@@ -410,7 +481,7 @@
             <div class="page-header">
                 <div>
                     <h2>
-                        <i class="bi bi-person-plus me-2" style="color: #f59e0b;"></i>
+                        <i class="bi bi-person-plus me-2" style="color: #3b82f6;"></i>
                         Add New User
                     </h2>
                     <p>Create a new user account</p>
@@ -570,17 +641,21 @@
                                 <i class="bi bi-shield-check"></i>
                                 User Role
                             </label>
-                            <select class="form-control" name="role">
-                                <% (roleOptions || ['SuperAdmin', 'Company', 'Employee', 'Customer', 'Vendor']).forEach((roleName) => { %>
-                                    <option value="<%= roleName %>" <%= roleName === 'Employee' ? 'selected' : '' %>>
-                                        <%= roleName %>
-                                    </option>
-                                <% }) %>
-                            </select>
+                            <div class="role-select-wrapper">
+                                <select class="role-select" name="role" id="roleSelect" onchange="toggleCustomRole(this)">
+                                    <% (roleOptions || ['SuperAdmin', 'Company', 'Employee', 'Customer', 'Vendor']).forEach((roleName) => { %>
+                                        <option value="<%= roleName %>" <%= roleName === 'Employee' ? 'selected' : '' %>>
+                                            <%= roleName %>
+                                        </option>
+                                    <% }) %>
+                                    <option value="Custom">+ Custom Role</option>
+                                </select>
+                            </div>
                             <input type="text"
-                                   class="form-control mt-2"
+                                   class="role-custom-input"
+                                   id="customRoleInput"
                                    name="customRole"
-                                   placeholder="Custom role (optional)"
+                                   placeholder="Enter custom role name"
                                    maxlength="50">
                         </div>
 
@@ -650,7 +725,7 @@ function checkPasswordStrength(password) {
         } else if (strength <= 4) {
             strengthFill.className = 'strength-fill medium';
             strengthText.textContent = 'Medium';
-            strengthText.style.color = '#f59e0b';
+            strengthText.style.color = '#3b82f6';
         } else {
             strengthFill.className = 'strength-fill strong';
             strengthText.textContent = 'Strong';
@@ -661,13 +736,36 @@ function checkPasswordStrength(password) {
     }
 }
 
+// Toggle custom role input
+function toggleCustomRole(select) {
+    const customInput = document.getElementById('customRoleInput');
+    if (select.value === 'Custom') {
+        customInput.classList.add('show');
+        customInput.focus();
+    } else {
+        customInput.classList.remove('show');
+        customInput.value = '';
+    }
+}
+
 // Form validation
 document.getElementById('userForm').addEventListener('submit', function(e) {
     const password = document.getElementById('password').value;
+    const roleSelect = document.getElementById('roleSelect');
+    const customRoleInput = document.getElementById('customRoleInput');
     
     if (password.length < 6) {
         e.preventDefault();
         alert('Password must be at least 6 characters long');
+        return false;
+    }
+    
+    if (roleSelect.value === 'Custom' && !customRoleInput.value.trim()) {
+        e.preventDefault();
+        customInput.style.borderColor = '#ef4444';
+        customRoleInput.focus();
+        alert('Please enter a custom role name');
+        return false;
     }
 });
 </script>

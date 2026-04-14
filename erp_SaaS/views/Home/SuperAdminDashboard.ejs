@@ -4,10 +4,10 @@
     body { margin: 0; padding: 0; background: #f5f7fb; overflow-x: hidden; }
     .main-wrapper { display: flex; width: 100%; min-height: 100vh; }
     .content-wrapper { flex: 1; margin-left: var(--admin-sidebar-width); width: calc(100% - var(--admin-sidebar-width)); padding: 25px; background: #f5f7fb; min-height: 100vh; box-sizing: border-box; }
-    .hero { background: linear-gradient(135deg, #111827, #1f2937); color: white; border-radius: 22px; padding: 26px; margin-bottom: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .hero { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; border-radius: 22px; padding: 26px; margin-bottom: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3); }
     .hero h2 { margin: 0; font-size: 30px; }
-    .hero p { margin: 8px 0 0; color: #d1d5db; }
-    .badge-role { background: rgba(248, 113, 113, 0.15); color: #fecaca; border: 1px solid rgba(252, 165, 165, 0.4); border-radius: 999px; padding: 10px 16px; font-size: 12px; font-weight: 700; height: fit-content; }
+    .hero p { margin: 8px 0 0; color: #dbeafe; }
+    .badge-role { background: rgba(59, 130, 246, 0.15); color: #dbeafe; border: 1px solid rgba(147, 197, 253, 0.4); border-radius: 999px; padding: 10px 16px; font-size: 12px; font-weight: 700; height: fit-content; }
     .stats-grid, .spotlight-grid, .insight-grid { display: grid; gap: 16px; margin-bottom: 24px; }
     .stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .spotlight-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -18,7 +18,7 @@
     .metric-help { font-size: 12px; color: #64748b; margin-top: 8px; }
     .spotlight-card { text-decoration: none; color: inherit; transition: 0.2s ease; }
     .spotlight-card:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08); }
-    .spotlight-icon { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: #fff7ed; color: #ea580c; font-size: 24px; margin-bottom: 14px; }
+    .spotlight-icon { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: #eff6ff; color: #3b82f6; font-size: 24px; margin-bottom: 14px; }
     .list-card h4, .table-card h4 { margin: 0 0 14px; font-size: 18px; color: #0f172a; }
     .mini-list { display: grid; gap: 12px; }
     .mini-item { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #eef2f6; }
@@ -28,7 +28,7 @@
     .mini-status { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; white-space: nowrap; height: fit-content; }
     .table-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; overflow: hidden; }
     .table-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 18px 20px; border-bottom: 1px solid #e2e8f0; }
-    .table-top a { color: #d97706; text-decoration: none; font-weight: 700; }
+    .table-top a { color: #3b82f6; text-decoration: none; font-weight: 700; }
     .table-responsive { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; min-width: 900px; }
     th, td { padding: 13px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 14px; }
@@ -39,6 +39,34 @@
     .status.suspended { background: #fee2e2; color: #991b1b; }
     @media (max-width: 1200px) { .stats-grid, .spotlight-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .insight-grid { grid-template-columns: 1fr; } }
     @media (max-width: 768px) { .content-wrapper { margin-left: 0; width: 100%; padding: 14px; } .stats-grid, .spotlight-grid { grid-template-columns: 1fr; } }
+    
+    /* Dark Mode Styles */
+    [data-theme="dark"] body { background: #0f172a; }
+    [data-theme="dark"] .content-wrapper { background: #0f172a; }
+    [data-theme="dark"] .hero { background: linear-gradient(135deg, #1e3a8a, #2563eb); box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4); }
+    [data-theme="dark"] .hero h2 { color: #ffffff; }
+    [data-theme="dark"] .hero p { color: #bfdbfe; }
+    [data-theme="dark"] .badge-role { background: rgba(37, 99, 235, 0.2); color: #93c5fd; border-color: rgba(147, 197, 253, 0.5); }
+    [data-theme="dark"] .card { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] .metric-label { color: #94a3b8; }
+    [data-theme="dark"] .metric-value { color: #f1f5f9; }
+    [data-theme="dark"] .metric-help { color: #64748b; }
+    [data-theme="dark"] .list-card h4, [data-theme="dark"] .table-card h4 { color: #f1f5f9; }
+    [data-theme="dark"] .mini-item { border-color: #334155; }
+    [data-theme="dark"] .mini-title { color: #f1f5f9; }
+    [data-theme="dark"] .mini-subtitle { color: #94a3b8; }
+    [data-theme="dark"] .mini-status { background: #1e3a8a; color: #93c5fd; }
+    [data-theme="dark"] .table-card { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] .table-top { border-color: #334155; }
+    [data-theme="dark"] th { background: #0f172a; color: #94a3b8; }
+    [data-theme="dark"] td { border-color: #334155; color: #cbd5e1; }
+    [data-theme="dark"] .status.active { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+    [data-theme="dark"] .status.inactive { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+    [data-theme="dark"] .status.suspended { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    [data-theme="dark"] .spotlight-icon { background: #1e3a8a; color: #93c5fd; }
+    [data-theme="dark"] .hero a { color: #ffffff !important; background: rgba(255,255,255,0.15) !important; }
+    [data-theme="dark"] .spotlight-card:hover { background: #334155; box-shadow: 0 14px 32px rgba(0, 0, 0, 0.3); }
+    [data-theme="dark"] tbody tr:hover { background: #334155; }
 </style>
 
 <div class="main-wrapper">
@@ -48,7 +76,7 @@
             <div>
                 <h2>SuperAdmin Dashboard</h2>
                 <p><strong><%= userName %></strong> | <%= userEmail %></p>
-                <p><a href="/permissions" style="color:#fdba74; text-decoration:none; font-weight:700;">Manage role permissions</a></p>
+                <p><a href="/permissions" style="color:#ffffff; text-decoration:none; font-weight:700; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 8px; display: inline-block; margin-top: 8px;">Manage role permissions</a></p>
             </div>
             <div class="badge-role"><%= userRole %></div>
         </div>

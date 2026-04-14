@@ -48,7 +48,7 @@
         .sidebar-brand h3 {
             font-weight: 700;
             font-size: 22px;
-            background: linear-gradient(135deg, #d4a017, #f5c542);
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -60,7 +60,7 @@
         .sidebar-brand h3 i {
             background: none;
             -webkit-background-clip: unset;
-            color: #d4a017;
+            color: #3b82f6;
             font-size: 28px;
         }
         .sidebar-nav {
@@ -88,18 +88,18 @@
             color: #7e8b9c;
         }
         .sidebar-nav li.active a {
-            background: #fef3c7;
-            color: #d4a017;
+            background: #dbeafe;
+            color: #3b82f6;
         }
         .sidebar-nav li.active a i {
-            color: #d4a017;
+            color: #3b82f6;
         }
         .sidebar-nav li a:hover:not(.active) {
-            background: #fef9e6;
-            color: #b8860b;
+            background: #eff6ff;
+            color: #2563eb;
         }
         .sidebar-nav li a:hover i {
-            color: #d4a017;
+            color: #3b82f6;
         }
 
         /* ========= CONTENT WRAPPER ========= */
@@ -142,7 +142,7 @@
             align-items: center;
         }
         .add-product-btn {
-            background: #d4a017;
+            background: #3b82f6;
             border: none;
             padding: 10px 22px;
             border-radius: 40px;
@@ -153,12 +153,12 @@
             align-items: center;
             gap: 8px;
             transition: 0.2s;
-            box-shadow: 0 3px 6px rgba(212, 160, 23, 0.2);
+            box-shadow: 0 3px 6px rgba(59, 130, 246, 0.2);
         }
         .add-product-btn:hover {
-            background: #b8860b;
+            background: #2563eb;
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(212, 160, 23, 0.25);
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.25);
         }
         .admin-badge {
             background: #f1f5f9;
@@ -194,10 +194,10 @@
             border-left: 4px solid transparent;
         }
         .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.05);}
-        .stat-card.primary { border-left-color: #d4a017; }
-        .stat-card.warning { border-left-color: #f59e0b; }
+        .stat-card.primary { border-left-color: #3b82f6; }
+        .stat-card.warning { border-left-color: #3b82f6; }
         .stat-card.info { border-left-color: #3b82f6; }
-        .stat-card.secondary { border-left-color: #8b5cf6; }
+        .stat-card.secondary { border-left-color: #3b82f6; }
         .stat-header { display: flex; justify-content: space-between; align-items: center;}
         .stat-label { color: #5b6e8c; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
         .stat-value { font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 0;}
@@ -221,7 +221,7 @@
             gap: 12px;
         }
         .table-header i {
-            color: #d4a017;
+            color: #3b82f6;
             font-size: 24px;
         }
         .table-header span {
@@ -268,7 +268,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .rating-stars {
-            color: #f5c542;
+            color: #60a5fa;
             letter-spacing: 2px;
             font-size: 14px;
             white-space: nowrap;
@@ -294,8 +294,8 @@
             color: #721c24;
         }
         .badge-status.low-stock {
-            background: #fef3c7;
-            color: #d4a017;
+            background: #dbeafe;
+            color: #3b82f6;
         }
         .badge-status.out-stock {
             background: #ffe8e6;
@@ -313,7 +313,7 @@
             transition: 0.2s;
             font-size: 1.2rem;
         }
-        .action-icons a.edit:hover { color: #d4a017; }
+        .action-icons a.edit:hover { color: #3b82f6; }
         .action-icons a.delete:hover { color: #dc2626; }
         .status-select {
             padding: 4px 8px;
@@ -359,7 +359,7 @@
     <div class="content-wrapper">
         <div class="top-header">
             <div class="header-title">
-                <h1><i class="bi bi-table me-2" style="color:#d4a017;"></i> Product Inventory</h1>
+                <h1><i class="bi bi-table me-2" style="color:#3b82f6;"></i> Product Inventory</h1>
                 <p>Manage, track and organize all product listings</p>
             </div>
             <div class="header-actions">
@@ -428,7 +428,7 @@
         <% productdata.forEach(function(product) { %>
             <tr data-id="<%= product._id %>">
                 <td><strong><%= product.name %></strong></td>
-                <td><span style="font-weight:600; color:#d4a017;">$<%= product.price %></span></td>
+                <td><span style="font-weight:600; color:#3b82f6;">$<%= product.price %></span></td>
                 <td>
                     <div style="display:flex; align-items:center; gap:8px;">
                         <img src="upload/<%= product.image %>" class="product-img" alt="<%= product.name %>" onerror="this.src='https://placehold.co/50x50?text=No+Image'">

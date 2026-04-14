@@ -402,11 +402,14 @@ router.get("/leads", requireModuleAccess("leadManagement"), async (req, res) => 
 })
 
 router.get("/lead-capture", requireModuleAccess("leadManagement", "add"), async (req, res) => {
-    const leads = await BusinessLead.find(await buildOwnerFilter(req)).sort({ createdAt: -1 }).limit(5).lean()
+    const ownerFilter = await buildOwnerFilter(req)
+    const allLeads = await BusinessLead.find(ownerFilter).sort({ createdAt: -1 }).lean()
+    const recentLeads = allLeads.slice(0, 5)
     res.render("ERP/LeadManagement.ejs", {
         loginname: getLoginName(req),
         activeTab: "capture",
-        leads,
+        leads: allLeads,
+        recentLeads: recentLeads,
         pageTitle: "Lead Capture"
     })
 })
@@ -439,6 +442,44 @@ router.get("/lead-score", requireModuleAccess("leadManagement"), async (req, res
         leads,
         pageTitle: "Lead Scoring"
     })
+})
+
+router.get("/lead-edit/:id", requireModuleAccess("leadManagement", "edit"), async (req, res) => {
+    const lead = await BusinessLead.findById(req.params.id).lean()
+    if (!lead) {
+        return res.redirect("/leads?error=Lead not found")
+    }
+    const allLeads = await BusinessLead.find(await buildOwnerFilter(req)).sort({ createdAt: -1 }).lean()
+    res.render("ERP/LeadManagement.ejs", {
+        loginname: getLoginName(req),
+        activeTab: "edit",
+        leads: allLeads,
+        leadToEdit: lead,
+        pageTitle: "Edit Lead"
+    })
+})
+
+router.post("/lead-edit/:id", requireModuleAccess("leadManagement", "edit"), async (req, res) => {
+    await BusinessLead.findByIdAndUpdate(req.params.id, {
+        name: req.body.name,
+        company: req.body.company,
+        email: req.body.email,
+        phone: req.body.phone,
+        source: req.body.source || "Website",
+        stage: req.body.stage || "New",
+        score: toNumber(req.body.score, 50),
+        estimatedValue: toNumber(req.body.estimatedValue, 0),
+        assignedTo: req.body.assignedTo || "",
+        nextFollowUp: req.body.nextFollowUp || null,
+        notes: req.body.notes || "",
+        status: req.body.status || "Open"
+    })
+    res.redirect("/leads?message=Lead updated successfully")
+})
+
+router.post("/lead-delete/:id", requireModuleAccess("leadManagement", "delete"), async (req, res) => {
+    await BusinessLead.findByIdAndDelete(req.params.id)
+    res.redirect("/leads?message=Lead deleted successfully")
 })
 
 router.get("/ledger", requireModuleAccess("accounting"), async (req, res) => {

@@ -1,0 +1,286 @@
+<%- include('../../partials/admin/header.ejs') %>
+
+<style>
+    :root { --admin-sidebar-width: 350px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { margin: 0; padding: 0; background: #f5f7fb; overflow-x: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .main-wrapper { display: flex; width: 100%; min-height: 100vh; position: relative; }
+    .content-wrapper { flex: 1; margin-left: var(--admin-sidebar-width); width: calc(100% - var(--admin-sidebar-width)); min-height: 100vh; background: #f5f7fb; padding: 25px; box-sizing: border-box; transition: all 0.3s ease; }
+
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px; }
+    .page-title h1 { color: #1e293b; font-weight: 700; margin: 0; font-size: 28px; display: flex; align-items: center; gap: 12px; }
+    .page-title h1 i { color: #3b82f6; }
+    .page-title p { color: #64748b; font-size: 14px; margin: 6px 0 0; }
+    .add-btn { background: #3b82f6; color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease; cursor: pointer; text-decoration: none; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25); }
+    .add-btn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35); color: white; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; border-radius: 14px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.3s ease; }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+    .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .stat-header h6 { margin: 0; font-size: 13px; color: #64748b; font-weight: 500; }
+    .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .stat-icon.blue { background: #eff6ff; color: #3b82f6; }
+    .stat-icon.green { background: #f0fdf4; color: #22c55e; }
+    .stat-icon.orange { background: #fff7ed; color: #f97316; }
+    .stat-icon.purple { background: #f5f3ff; color: #8b5cf6; }
+    .stat-icon.red { background: #fef2f2; color: #ef4444; }
+    .stat-value { font-size: 24px; font-weight: 700; color: #1e293b; }
+
+    .filter-card { background: white; border-radius: 14px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .filter-row { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
+    .filter-group { flex: 1; min-width: 160px; }
+    .filter-group label { display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 6px; }
+    .filter-group input, .filter-group select { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
+    .filter-btn { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; }
+    .reset-btn { background: #f1f5f9; color: #475569; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; }
+
+    .table-card { background: white; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
+    .table-header { display: flex; align-items: center; gap: 12px; padding: 20px 24px; border-bottom: 1px solid #f1f5f9; background: #fafafa; }
+    .table-header i { font-size: 22px; color: #3b82f6; }
+    .table-header h3 { font-size: 18px; font-weight: 700; color: #1e293b; margin: 0; }
+    .po-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .po-table th { background: #f8fafc; padding: 14px 16px; text-align: left; font-weight: 600; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
+    .po-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; }
+    .po-table tr:hover { background: #f8fafc; }
+
+    .po-number { color: #3b82f6; font-weight: 600; text-decoration: none; }
+    .vendor-name { font-weight: 600; color: #1e293b; }
+    .delivery-progress { display: flex; align-items: center; gap: 8px; }
+    .progress-bar { flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; max-width: 100px; }
+    .progress-fill { height: 100%; background: #22c55e; border-radius: 3px; }
+    .progress-text { font-size: 12px; color: #64748b; }
+
+    .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-draft { background: #f1f5f9; color: #475569; }
+    .status-sent { background: #eff6ff; color: #3b82f6; }
+    .status-acknowledged { background: #f5f3ff; color: #8b5cf6; }
+    .status-partially-received { background: #fef3c7; color: #92400e; }
+    .status-received { background: #dcfce7; color: #166534; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+    .status-closed { background: #e2e8f0; color: #64748b; }
+
+    .action-btns { display: flex; gap: 6px; }
+    .action-btn { width: 32px; height: 32px; border: none; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; text-decoration: none; }
+    .action-btn.view { background: #eff6ff; color: #3b82f6; }
+    .action-btn.view:hover { background: #3b82f6; color: white; }
+    .action-btn.edit { background: #f0fdf4; color: #22c55e; }
+    .action-btn.edit:hover { background: #22c55e; color: white; }
+    .action-btn.print { background: #f8fafc; color: #64748b; }
+    .action-btn.print:hover { background: #64748b; color: white; }
+    .action-btn.delete { background: #fef2f2; color: #ef4444; }
+    .action-btn.delete:hover { background: #ef4444; color: white; }
+
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state i { font-size: 64px; color: #cbd5e1; margin-bottom: 20px; }
+    .empty-state h5 { color: #475569; margin-bottom: 10px; }
+    .empty-state p { color: #94a3b8; margin-bottom: 20px; }
+
+    .alert { margin-bottom: 20px; padding: 14px 18px; border-radius: 10px; display: flex; align-items: center; gap: 10px; }
+    .alert-success { background: #dcfce7; border: 1px solid #86efac; color: #166534; }
+    .alert-error { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; }
+
+    @media (max-width: 1200px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .content-wrapper { margin-left: 0; width: 100%; padding: 15px; } }
+</style>
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+    
+    <div class="content-wrapper">
+        <% if (message) { %>
+            <div class="alert <%= message.includes('success') ? 'alert-success' : 'alert-error' %>">
+                <i class="bi <%= message.includes('success') ? 'bi-check-circle' : 'bi-exclamation-circle' %>"></i>
+                <%= message %>
+            </div>
+        <% } %>
+        
+        <div class="page-header">
+            <div class="page-title">
+                <h1><i class="bi bi-file-earmark-text"></i> Purchase Orders</h1>
+                <p>Manage vendor purchase orders and deliveries</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/vendors" class="add-btn" style="background: #8b5cf6;">
+                    <i class="bi bi-people"></i> Vendors
+                </a>
+                <a href="/purchase-orders/new" class="add-btn">
+                    <i class="bi bi-plus-lg"></i> Create PO
+                </a>
+            </div>
+        </div>
+        
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h6>Total POs</h6>
+                    <div class="stat-icon blue"><i class="bi bi-file-earmark-text"></i></div>
+                </div>
+                <div class="stat-value"><%= stats.total %></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h6>Draft</h6>
+                    <div class="stat-icon orange"><i class="bi bi-pencil"></i></div>
+                </div>
+                <div class="stat-value"><%= stats.draft %></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h6>Sent</h6>
+                    <div class="stat-icon purple"><i class="bi bi-send"></i></div>
+                </div>
+                <div class="stat-value"><%= stats.sent %></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h6>Partial</h6>
+                    <div class="stat-icon" style="background: #fef3c7; color: #92400e;"><i class="bi bi-clock-history"></i></div>
+                </div>
+                <div class="stat-value"><%= stats.partiallyReceived %></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h6>Received</h6>
+                    <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+                </div>
+                <div class="stat-value"><%= stats.received %></div>
+            </div>
+        </div>
+        
+        <div class="filter-card">
+            <form method="GET" action="/purchase-orders">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="">All Status</option>
+                            <option value="Draft" <%= filters.status === 'Draft' ? 'selected' : '' %>>Draft</option>
+                            <option value="Sent" <%= filters.status === 'Sent' ? 'selected' : '' %>>Sent</option>
+                            <option value="Acknowledged" <%= filters.status === 'Acknowledged' ? 'selected' : '' %>>Acknowledged</option>
+                            <option value="Partially Received" <%= filters.status === 'Partially Received' ? 'selected' : '' %>>Partially Received</option>
+                            <option value="Received" <%= filters.status === 'Received' ? 'selected' : '' %>>Received</option>
+                            <option value="Cancelled" <%= filters.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Vendor</label>
+                        <input type="text" name="vendor" placeholder="Search vendor..." value="<%= filters.vendor || '' %>">
+                    </div>
+                    <div class="filter-group">
+                        <label>From Date</label>
+                        <input type="date" name="dateFrom" value="<%= filters.dateFrom || '' %>">
+                    </div>
+                    <div class="filter-group">
+                        <label>To Date</label>
+                        <input type="date" name="dateTo" value="<%= filters.dateTo || '' %>">
+                    </div>
+                    <button type="submit" class="filter-btn"><i class="bi bi-funnel"></i> Filter</button>
+                    <a href="/purchase-orders" class="reset-btn"><i class="bi bi-arrow-repeat"></i> Reset</a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="table-card">
+            <div class="table-header">
+                <i class="bi bi-table"></i>
+                <h3>Purchase Order List</h3>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="po-table">
+                    <thead>
+                        <tr>
+                            <th>PO Number</th>
+                            <th>Vendor</th>
+                            <th>PO Date</th>
+                            <th>Expected Delivery</th>
+                            <th>Total</th>
+                            <th>Delivery</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (purchaseOrders && purchaseOrders.length > 0) { %>
+                            <% purchaseOrders.forEach(po => { %>
+                                <% 
+                                    const totalQty = po.items.reduce((sum, item) => sum + item.quantity, 0);
+                                    const receivedQty = po.items.reduce((sum, item) => sum + (item.receivedQty || 0), 0);
+                                    const deliveryPercent = totalQty > 0 ? Math.round((receivedQty / totalQty) * 100) : 0;
+                                %>
+                                <tr>
+                                    <td>
+                                        <a href="/purchase-orders/<%= po._id %>" class="po-number">
+                                            <%= po.poNumber %>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div class="vendor-name"><%= po.vendorName %></div>
+                                        <div style="font-size: 12px; color: #64748b;"><%= po.vendorPhone || '' %></div>
+                                    </td>
+                                    <td><%= po.poDate ? new Date(po.poDate).toLocaleDateString() : '-' %></td>
+                                    <td><%= po.expectedDeliveryDate ? new Date(po.expectedDeliveryDate).toLocaleDateString() : '-' %></td>
+                                    <td style="font-weight: 600;">₹<%= (po.totalAmount || 0).toLocaleString() %></td>
+                                    <td>
+                                        <div class="delivery-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: <%= deliveryPercent %>%;"></div>
+                                            </div>
+                                            <span class="progress-text"><%= receivedQty %>/<%= totalQty %></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-<%= po.status.toLowerCase().replace(/\s+/g, '-') %>">
+                                            <%= po.status %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <a href="/purchase-orders/<%= po._id %>" class="action-btn view" title="View">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="/purchase-orders/<%= po._id %>/edit" class="action-btn edit" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="/purchase-orders/<%= po._id %>/print" class="action-btn print" title="Print" target="_blank">
+                                                <i class="bi bi-printer"></i>
+                                            </a>
+                                            <form method="POST" action="/purchase-orders/<%= po._id %>/delete" style="display:inline;" onsubmit="return confirm('Delete this purchase order?')">
+                                                <button type="submit" class="action-btn delete" title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                        <h5>No Purchase Orders Found</h5>
+                                        <p>Create your first purchase order to get started</p>
+                                        <a href="/purchase-orders/new" class="add-btn">
+                                            <i class="bi bi-plus-lg"></i> Create Purchase Order
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => {
+            alert.style.opacity = '0';
+            alert.style.transition = 'opacity 0.5s';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 5000);
+</script>

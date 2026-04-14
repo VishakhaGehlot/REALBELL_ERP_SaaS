@@ -1,0 +1,261 @@
+<%- include('../../partials/admin/header.ejs') %>
+
+<style>
+    :root { --admin-sidebar-width: 350px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { margin: 0; padding: 0; background: #f5f7fb; overflow-x: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .main-wrapper { display: flex; width: 100%; min-height: 100vh; position: relative; }
+    .content-wrapper { flex: 1; margin-left: var(--admin-sidebar-width); width: calc(100% - var(--admin-sidebar-width)); min-height: 100vh; background: #f5f7fb; padding: 25px; box-sizing: border-box; }
+
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .page-title h1 { color: #1e293b; font-weight: 700; margin: 0; font-size: 28px; display: flex; align-items: center; gap: 12px; }
+    .page-title h1 i { color: #3b82f6; }
+    .action-btns { display: flex; gap: 10px; }
+    .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; border: none; cursor: pointer; }
+    .btn-back { background: #f1f5f9; color: #475569; }
+    .btn-edit { background: #f0fdf4; color: #22c55e; }
+    .btn-print { background: #3b82f6; color: white; }
+    .btn-receive { background: #22c55e; color: white; }
+
+    .po-card { background: white; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; max-width: 900px; margin: 0 auto; }
+    .po-header { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 30px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .po-brand h2 { margin: 0; font-size: 24px; font-weight: 700; }
+    .po-status { text-align: right; }
+    .status-badge { display: inline-block; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; text-transform: uppercase; background: rgba(255,255,255,0.2); }
+    .po-number { margin-top: 8px; font-size: 14px; opacity: 0.9; }
+
+    .po-body { padding: 30px; }
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 30px; }
+    .info-block h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin: 0 0 8px; }
+    .info-block p { margin: 0; color: #1e293b; font-size: 14px; line-height: 1.5; }
+    .info-block .name { font-weight: 700; font-size: 16px; color: #1e293b; }
+
+    .items-section { margin: 30px 0; }
+    .items-section h3 { font-size: 16px; font-weight: 700; color: #1e293b; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 2px solid #f1f5f9; }
+    .items-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .items-table th { background: #f8fafc; padding: 12px 16px; text-align: left; font-weight: 600; color: #64748b; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
+    .items-table td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
+    .items-table td:last-child, .items-table th:last-child { text-align: right; }
+    .product-name { font-weight: 600; }
+    .product-desc { font-size: 13px; color: #64748b; }
+    .received-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .received-complete { background: #dcfce7; color: #166534; }
+    .received-pending { background: #fef3c7; color: #92400e; }
+
+    .summary-section { margin-top: 30px; padding-top: 20px; border-top: 2px solid #f1f5f9; }
+    .summary-table { width: 100%; max-width: 350px; margin-left: auto; font-size: 14px; }
+    .summary-table td { padding: 8px 0; }
+    .summary-table td:first-child { color: #64748b; }
+    .summary-table td:last-child { text-align: right; font-weight: 600; color: #1e293b; }
+    .summary-table .total-row td { padding: 16px 0; border-top: 2px solid #3b82f6; font-size: 20px; font-weight: 700; color: #3b82f6; }
+
+    .receive-section { background: #f8fafc; border-radius: 12px; padding: 24px; margin-top: 30px; }
+    .receive-section h3 { font-size: 16px; font-weight: 700; color: #1e293b; margin: 0 0 20px; }
+    .receive-form { display: flex; flex-direction: column; gap: 16px; }
+    .receive-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 16px; align-items: center; padding: 12px; background: white; border-radius: 8px; }
+    .receive-row.header { background: transparent; font-weight: 600; color: #64748b; font-size: 12px; text-transform: uppercase; }
+    .receive-row input { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; width: 100%; }
+
+    .status-section { background: #f8fafc; border-radius: 12px; padding: 24px; margin-top: 30px; }
+    .status-form { display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 16px; align-items: end; }
+
+    .notes-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9; }
+    .notes-section h4 { font-size: 14px; font-weight: 700; color: #1e293b; margin: 0 0 10px; }
+    .notes-section p { margin: 0; color: #64748b; font-size: 14px; line-height: 1.6; }
+
+    .alert { margin-bottom: 20px; padding: 14px 18px; border-radius: 10px; display: flex; align-items: center; gap: 10px; }
+    .alert-success { background: #dcfce7; border: 1px solid #86efac; color: #166534; }
+    .alert-error { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; }
+
+    @media (max-width: 768px) { 
+        .content-wrapper { margin-left: 0; width: 100%; padding: 15px; } 
+        .info-grid { grid-template-columns: 1fr; }
+        .status-form { grid-template-columns: 1fr; }
+        .receive-row { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs') %>
+    
+    <div class="content-wrapper">
+        <% if (message) { %>
+            <div class="alert <%= message.includes('success') ? 'alert-success' : 'alert-error' %>">
+                <i class="bi <%= message.includes('success') ? 'bi-check-circle' : 'bi-exclamation-circle' %>"></i>
+                <%= message %>
+            </div>
+        <% } %>
+        
+        <div class="page-header">
+            <div class="page-title">
+                <h1><i class="bi bi-file-earmark-text"></i> Purchase Order Details</h1>
+            </div>
+            <div class="action-btns">
+                <a href="/purchase-orders" class="btn btn-back"><i class="bi bi-arrow-left"></i> Back</a>
+                <a href="/purchase-orders/<%= purchaseOrder._id %>/edit" class="btn btn-edit"><i class="bi bi-pencil"></i> Edit</a>
+                <a href="/purchase-orders/<%= purchaseOrder._id %>/print" class="btn btn-print" target="_blank"><i class="bi bi-printer"></i> Print</a>
+            </div>
+        </div>
+        
+        <div class="po-card">
+            <div class="po-header">
+                <div class="po-brand">
+                    <h2><i class="bi bi-building"></i> REAL ERP</h2>
+                    <p>Purchase Order</p>
+                </div>
+                <div class="po-status">
+                    <span class="status-badge"><%= purchaseOrder.status %></span>
+                    <div class="po-number">PO #<%= purchaseOrder.poNumber %></div>
+                </div>
+            </div>
+            
+            <div class="po-body">
+                <div class="info-grid">
+                    <div class="info-block">
+                        <h4>Vendor</h4>
+                        <p class="name"><%= purchaseOrder.vendorName %></p>
+                        <% if (purchaseOrder.vendorAddress) { %><p><%= purchaseOrder.vendorAddress %></p><% } %>
+                        <% if (purchaseOrder.vendorEmail) { %><p><i class="bi bi-envelope"></i> <%= purchaseOrder.vendorEmail %></p><% } %>
+                        <% if (purchaseOrder.vendorPhone) { %><p><i class="bi bi-telephone"></i> <%= purchaseOrder.vendorPhone %></p><% } %>
+                        <% if (purchaseOrder.vendorGstNumber) { %><p><strong>GST:</strong> <%= purchaseOrder.vendorGstNumber %></p><% } %>
+                    </div>
+                    <div class="info-block">
+                        <h4>PO Date</h4>
+                        <p><%= purchaseOrder.poDate ? new Date(purchaseOrder.poDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '-' %></p>
+                        <h4 style="margin-top: 16px;">Expected Delivery</h4>
+                        <p><%= purchaseOrder.expectedDeliveryDate ? new Date(purchaseOrder.expectedDeliveryDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '-' %></p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Status</h4>
+                        <p><strong><%= purchaseOrder.status %></strong></p>
+                        <h4 style="margin-top: 16px;">Payment Terms</h4>
+                        <p><%= purchaseOrder.paymentTerms || 'Net 30' %></p>
+                    </div>
+                </div>
+                
+                <div class="items-section">
+                    <h3>Order Items</h3>
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-right">Unit Price</th>
+                                <th class="text-right">Discount</th>
+                                <th class="text-right">Tax</th>
+                                <th class="text-right">Total</th>
+                                <th class="text-center">Received</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% purchaseOrder.items.forEach(item => { %>
+                                <tr>
+                                    <td>
+                                        <div class="product-name"><%= item.name %></div>
+                                        <% if (item.description) { %><div class="product-desc"><%= item.description %></div><% } %>
+                                    </td>
+                                    <td class="text-center"><%= item.quantity %></td>
+                                    <td class="text-right">₹<%= item.unitPrice.toLocaleString() %></td>
+                                    <td class="text-right"><%= item.discount %>%</td>
+                                    <td class="text-right"><%= item.taxPercent %>% (₹<%= item.taxAmount.toLocaleString() %>)</td>
+                                    <td class="text-right"><strong>₹<%= item.total.toLocaleString() %></strong></td>
+                                    <td class="text-center">
+                                        <% if (item.receivedQty >= item.quantity) { %>
+                                            <span class="received-badge received-complete"><%= item.receivedQty %>/<%= item.quantity %></span>
+                                        <% } else { %>
+                                            <span class="received-badge received-pending"><%= item.receivedQty || 0 %>/<%= item.quantity %></span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="summary-section">
+                    <table class="summary-table">
+                        <tr><td>Subtotal</td><td>₹<%= purchaseOrder.subtotal.toLocaleString() %></td></tr>
+                        <tr><td>Discount</td><td>- ₹<%= purchaseOrder.totalDiscount.toLocaleString() %></td></tr>
+                        <tr><td>Tax</td><td>+ ₹<%= purchaseOrder.totalTax.toLocaleString() %></td></tr>
+                        <tr class="total-row"><td>Total Amount</td><td>₹<%= purchaseOrder.totalAmount.toLocaleString() %></td></tr>
+                    </table>
+                </div>
+                
+                <% if (purchaseOrder.status !== 'Received' && purchaseOrder.status !== 'Cancelled' && purchaseOrder.status !== 'Closed') { %>
+                <div class="receive-section">
+                    <h3><i class="bi bi-box-seam"></i> Receive Items (GRN)</h3>
+                    <form method="POST" action="/purchase-orders/<%= purchaseOrder._id %>/receive" class="receive-form">
+                        <div class="receive-row header">
+                            <span>Product</span>
+                            <span class="text-center">Ordered</span>
+                            <span class="text-center">Already Received</span>
+                            <span class="text-center">Receive Now</span>
+                        </div>
+                        <% purchaseOrder.items.forEach((item, index) => { %>
+                            <% if (item.receivedQty < item.quantity) { %>
+                                <div class="receive-row">
+                                    <span><%= item.name %></span>
+                                    <span class="text-center"><%= item.quantity %></span>
+                                    <span class="text-center"><%= item.receivedQty || 0 %></span>
+                                    <input type="number" name="received[<%= index %>]" value="0" min="0" max="<%= item.quantity - (item.receivedQty || 0) %>">
+                                </div>
+                            <% } %>
+                        <% }) %>
+                        <button type="submit" class="btn btn-receive" style="margin-top: 10px;">
+                            <i class="bi bi-check-lg"></i> Receive Items
+                        </button>
+                    </form>
+                </div>
+                <% } %>
+                
+                <div class="status-section">
+                    <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin: 0 0 20px;"><i class="bi bi-gear"></i> Update Status</h3>
+                    <form method="POST" action="/purchase-orders/<%= purchaseOrder._id %>/status" class="status-form">
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 6px;">PO Status</label>
+                            <select name="status" style="padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; width: 100%;">
+                                <option value="Draft" <%= purchaseOrder.status === 'Draft' ? 'selected' : '' %>>Draft</option>
+                                <option value="Sent" <%= purchaseOrder.status === 'Sent' ? 'selected' : '' %>>Sent</option>
+                                <option value="Acknowledged" <%= purchaseOrder.status === 'Acknowledged' ? 'selected' : '' %>>Acknowledged</option>
+                                <option value="Partially Received" <%= purchaseOrder.status === 'Partially Received' ? 'selected' : '' %>>Partially Received</option>
+                                <option value="Received" <%= purchaseOrder.status === 'Received' ? 'selected' : '' %>>Received</option>
+                                <option value="Cancelled" <%= purchaseOrder.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                <option value="Closed" <%= purchaseOrder.status === 'Closed' ? 'selected' : '' %>>Closed</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 6px;">Delivery Status</label>
+                            <select name="deliveryStatus" style="padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; width: 100%;">
+                                <option value="Pending" <%= purchaseOrder.deliveryStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                <option value="In Transit" <%= purchaseOrder.deliveryStatus === 'In Transit' ? 'selected' : '' %>>In Transit</option>
+                                <option value="Delivered" <%= purchaseOrder.deliveryStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                <option value="Partial" <%= purchaseOrder.deliveryStatus === 'Partial' ? 'selected' : '' %>>Partial</option>
+                            </select>
+                        </div>
+                        <div></div>
+                        <button type="submit" class="btn btn-receive">
+                            <i class="bi bi-arrow-repeat"></i> Update
+                        </button>
+                    </form>
+                </div>
+                
+                <% if (purchaseOrder.notes || purchaseOrder.termsAndConditions) { %>
+                    <div class="notes-section">
+                        <% if (purchaseOrder.notes) { %><h4>Notes</h4><p><%= purchaseOrder.notes %></p><% } %>
+                        <% if (purchaseOrder.termsAndConditions) { %><h4 style="margin-top: 20px;">Terms & Conditions</h4><p><%= purchaseOrder.termsAndConditions %></p><% } %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => {
+            alert.style.opacity = '0';
+            alert.style.transition = 'opacity 0.5s';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 5000);
+</script>
