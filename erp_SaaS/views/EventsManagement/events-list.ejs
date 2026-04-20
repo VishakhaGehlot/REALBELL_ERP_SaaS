@@ -1,0 +1,436 @@
+<!--
+  FILE: views/EventsManagement/events-list.ejs
+  PURPOSE: Display all events in a table/list view with filters
+  FEATURES: Table view, filters, sorting, actions
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Events | Events Management</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- DataTables -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            background: #f8fafc;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            margin-left: 280px;
+            margin-top: 80px;
+            padding: 25px 30px;
+        }
+
+        /* Header */
+        .page-header {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+
+        .page-header h2 {
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* Filter Card */
+        .filter-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+
+        /* Table Container */
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+
+        .table thead th {
+            background: #f8fafc;
+            color: #1e293b;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-status.active { background: #d1fae5; color: #059669; }
+        .badge-status.pending { background: #fef3c7; color: #d97706; }
+        .badge-status.completed { background: #ede9fe; color: #7c3aed; }
+        .badge-status.cancelled { background: #fee2e2; color: #dc2626; }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .event-title-cell {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .event-meta {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                margin-left: 0;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('../../partials/admin/header.ejs') %>
+    
+    <div class="main-wrapper">
+        <%- include('../../partials/admin/left.ejs') %>
+
+        <div class="content-wrapper">
+            <!-- Header -->
+            <div class="page-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h2><i class="bi bi-list-ul me-2"></i>All Events</h2>
+                        <p class="text-muted mb-0">Manage all your events from one place</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="/calendar" class="btn btn-outline-primary me-2">
+                            <i class="bi bi-calendar3"></i> Calendar View
+                        </a>
+                        <a href="/upcoming-events" class="btn btn-primary">
+                            <i class="bi bi-calendar-event"></i> Upcoming Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #dbeafe; color: #2563eb;">
+                        <i class="bi bi-calendar"></i>
+                    </div>
+                    <div class="stat-value" id="totalEvents">0</div>
+                    <div class="stat-label">Total Events</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #d1fae5; color: #059669;">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="stat-value" id="activeEvents">0</div>
+                    <div class="stat-label">Active</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fef3c7; color: #d97706;">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                    <div class="stat-value" id="pendingEvents">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #ede9fe; color: #7c3aed;">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="stat-value" id="totalAttendees">0</div>
+                    <div class="stat-label">Total Attendees</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-card">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search events...">
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="typeFilter">
+                            <option value="">All Types</option>
+                            <option value="Conference">Conference</option>
+                            <option value="Webinar">Webinar</option>
+                            <option value="Workshop">Workshop</option>
+                            <option value="Meeting">Meeting</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" class="form-control" id="dateFrom" placeholder="From">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" class="form-control" id="dateTo" placeholder="To">
+                    </div>
+                    <div class="col-md-1">
+                        <button class="btn btn-outline-secondary w-100" id="resetBtn">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events Table -->
+            <div class="table-container">
+                <table id="eventsTable" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Type</th>
+                            <th>Date & Time</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Registrations</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsTbody">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="custom-toast" id="toastMsg" style="position: fixed; bottom: 30px; right: 30px; background: #1e293b; color: white; padding: 12px 24px; border-radius: 50px; display: none; z-index: 1100;">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span id="toastText"></span>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        // Events from ERP database
+        let events = <%- JSON.stringify(events || []) %>;
+        let dataTable = null;
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toastMsg');
+            const toastText = document.getElementById('toastText');
+            toastText.textContent = message;
+            toast.style.backgroundColor = isError ? '#dc2626' : '#10b981';
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        function updateStats() {
+            const total = events.length;
+            const active = events.filter(e => e.status === 'active').length;
+            const pending = events.filter(e => e.status === 'pending').length;
+            const totalAttendees = events.reduce((sum, e) => sum + (e.registered || 0), 0);
+
+            document.getElementById('totalEvents').textContent = total;
+            document.getElementById('activeEvents').textContent = active;
+            document.getElementById('pendingEvents').textContent = pending;
+            document.getElementById('totalAttendees').textContent = totalAttendees;
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                active: '<span class="badge-status active">Active</span>',
+                pending: '<span class="badge-status pending">Pending</span>',
+                completed: '<span class="badge-status completed">Completed</span>',
+                cancelled: '<span class="badge-status cancelled">Cancelled</span>'
+            };
+            return badges[status] || `<span class="badge-status">${status}</span>`;
+        }
+
+        function renderTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+
+            let filtered = events.filter(event => {
+                if (searchTerm && !event.title.toLowerCase().includes(searchTerm)) return false;
+                if (statusFilter && event.status !== statusFilter) return false;
+                if (typeFilter && event.type !== typeFilter) return false;
+                if (dateFrom && new Date(event.start) < new Date(dateFrom)) return false;
+                if (dateTo && new Date(event.start) > new Date(dateTo)) return false;
+                return true;
+            });
+
+            const tbody = document.getElementById('eventsTbody');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">No events found</td></tr>';
+                if (dataTable) dataTable.destroy();
+                dataTable = null;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(event => {
+                const eventDate = new Date(event.start);
+                const formattedDate = eventDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const formattedTime = eventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                const registered = event.registered || 0;
+                const capacity = event.capacity || 100;
+                const percent = Math.round((registered / capacity) * 100);
+
+                html += `
+                    <tr>
+                        <td>
+                            <div class="event-title-cell">${escapeHtml(event.title)}</div>
+                            <div class="event-meta">${escapeHtml(event.description?.substring(0, 50) || '')}${event.description?.length > 50 ? '...' : ''}</div>
+                        </td>
+                        <td><span class="badge bg-light text-dark">${event.type}</span></td>
+                        <td>
+                            <div><i class="bi bi-calendar me-1"></i>${formattedDate}</div>
+                            <div class="event-meta"><i class="bi bi-clock me-1"></i>${formattedTime}</div>
+                        </td>
+                        <td><i class="bi bi-geo-alt me-1"></i>${escapeHtml(event.location || 'TBD')}</td>
+                        <td>${getStatusBadge(event.status)}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">${registered}/${capacity}</span>
+                                <div class="progress flex-grow-1" style="height: 6px; width: 60px;">
+                                    <div class="progress-bar bg-success" style="width: ${percent}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="/registrations?event=${event.id}" class="btn btn-sm btn-outline-primary btn-action">
+                                <i class="bi bi-people"></i> Registrations
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+
+            if (dataTable) dataTable.destroy();
+            dataTable = $('#eventsTable').DataTable({
+                pageLength: 10,
+                responsive: true,
+                order: [[2, 'asc']],
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ events"
+                }
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', renderTable);
+        document.getElementById('statusFilter').addEventListener('change', renderTable);
+        document.getElementById('typeFilter').addEventListener('change', renderTable);
+        document.getElementById('dateFrom').addEventListener('change', renderTable);
+        document.getElementById('dateTo').addEventListener('change', renderTable);
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            renderTable();
+        });
+
+        // Initialize
+        updateStats();
+        renderTable();
+    </script>
+</body>
+</html>

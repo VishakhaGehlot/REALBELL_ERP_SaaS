@@ -12,6 +12,8 @@ const PosOrder = require('../models/PosOrder')
 const userPlan = require('../models/userPlan')
 const BusinessLead = require('../models/BusinessLead')
 const DealPipeline = require('../models/DealPipeline')
+const Lead = require('../models/CRM/Lead')
+const Deal = require('../models/CRM/Deal')
 const ProjectBoard = require('../models/ProjectBoard')
 const AccountingEntry = require('../models/AccountingEntry')
 const EventSchedule = require('../models/EventSchedule')
@@ -128,6 +130,92 @@ async function buildCompanyDashboard(user, permissions) {
                 latestContact.status || 'Pending',
                 latestContact.createdAt,
                 '/addcontacttable'
+            ))
+        }
+    }
+
+    // Lead Management Stats
+    if (hasAnyPermission(permissions, 'leadManagement')) {
+        const leadFilter = { 
+            $or: [
+                { createdBy: user._id },
+                { assignedTo: user._id }
+            ]
+        }
+        const [totalLeads, newLeads, contactedLeads, qualifiedLeads, convertedLeads, latestLead] = await Promise.all([
+            Lead.countDocuments(leadFilter),
+            Lead.countDocuments({ ...leadFilter, status: 'New' }),
+            Lead.countDocuments({ ...leadFilter, status: 'Contacted' }),
+            Lead.countDocuments({ ...leadFilter, status: 'Qualified' }),
+            Lead.countDocuments({ ...leadFilter, status: 'Converted' }),
+            Lead.findOne(leadFilter).sort({ createdAt: -1 }).lean()
+        ])
+
+        moduleCards.push({
+            moduleKey: 'leadManagement',
+            label: 'CRM Leads',
+            icon: 'bi-funnel-fill',
+            total: totalLeads,
+            primaryText: `${qualifiedLeads} qualified leads`,
+            secondaryText: `${newLeads} new, ${contactedLeads} contacted`,
+            alertCount: newLeads + contactedLeads,
+            link: '/crm/leads'
+        })
+
+        if (latestLead) {
+            recentActivity.push(buildRecentItem(
+                `Lead: ${latestLead.name || 'New Lead'}`,
+                latestLead.email || latestLead.phone || 'Lead captured',
+                latestLead.status || 'New',
+                latestLead.createdAt,
+                '/crm/leads'
+            ))
+        }
+    }
+
+    // Deal Pipeline Stats
+    if (hasAnyPermission(permissions, 'dealManagement')) {
+        const dealFilter = { 
+            $or: [
+                { createdBy: user._id },
+                { owner: user._id }
+            ]
+        }
+        const [totalDeals, discoveryDeals, proposalDeals, negotiationDeals, wonDeals, lostDeals, dealsValue, latestDeal] = await Promise.all([
+            Deal.countDocuments(dealFilter),
+            Deal.countDocuments({ ...dealFilter, stage: 'Discovery' }),
+            Deal.countDocuments({ ...dealFilter, stage: 'Proposal' }),
+            Deal.countDocuments({ ...dealFilter, stage: 'Negotiation' }),
+            Deal.countDocuments({ ...dealFilter, stage: 'Closed Won' }),
+            Deal.countDocuments({ ...dealFilter, stage: 'Closed Lost' }),
+            Deal.aggregate([
+                { $match: { ...dealFilter, stage: { $nin: ['Closed Won', 'Closed Lost'] } } },
+                { $group: { _id: null, total: { $sum: '$expectedRevenue' } } }
+            ]),
+            Deal.findOne(dealFilter).sort({ createdAt: -1 }).lean()
+        ])
+
+        const pipelineValue = dealsValue[0]?.total || 0
+        const activeDeals = discoveryDeals + proposalDeals + negotiationDeals
+
+        moduleCards.push({
+            moduleKey: 'dealManagement',
+            label: 'CRM Deals',
+            icon: 'bi-trophy',
+            total: totalDeals,
+            primaryText: `₹${Number(pipelineValue).toLocaleString('en-IN')} pipeline`,
+            secondaryText: `${activeDeals} active, ${wonDeals} won`,
+            alertCount: negotiationDeals + proposalDeals,
+            link: '/crm/deals'
+        })
+
+        if (latestDeal) {
+            recentActivity.push(buildRecentItem(
+                `Deal: ${latestDeal.title || 'New Deal'}`,
+                `Value: ₹${Number(latestDeal.value || 0).toLocaleString('en-IN')}`,
+                latestDeal.stage || 'Discovery',
+                latestDeal.createdAt,
+                '/crm/deals'
             ))
         }
     }

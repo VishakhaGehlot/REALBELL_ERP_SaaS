@@ -4,7 +4,7 @@ const ZoomMeeting = require('../models/ZoomMeeting');
 
 // GET - Render Zoom Template page
 router.get("/schedule-meeting", (req, res) => {
-    res.render("Zoom/ZoomTemplate", { 
+    res.render("Zoom/ZoomTemplate", {
         title: "Zoom Meeting Management",
         user: req.user || null
     });
@@ -15,14 +15,14 @@ router.get("/zoom-meetings", async (req, res) => {
     try {
         const { search, linkStatus } = req.query;
         let filter = {};
-        
+
         if (search) {
             filter.$or = [
                 { title: { $regex: search, $options: 'i' } },
                 { zoomId: { $regex: search, $options: 'i' } }
             ];
         }
-        
+
         if (linkStatus === 'has_link') {
             filter.joinLink = { $ne: null, $ne: "" };
         } else if (linkStatus === 'no_link') {
@@ -31,20 +31,20 @@ router.get("/zoom-meetings", async (req, res) => {
                 { joinLink: "" }
             ];
         }
-        
+
         const meetings = await ZoomMeeting.find(filter).sort({ createdAt: -1 });
-        
+
         // Calculate statistics
         const totalMeetings = meetings.length;
         const withLinkCount = meetings.filter(m => m.joinLink && m.joinLink.trim() !== "").length;
         const todayCount = meetings.filter(m => m.dateTime && m.dateTime.toLowerCase().includes('today')).length;
-        const weekCount = meetings.filter(m => 
+        const weekCount = meetings.filter(m =>
             m.dateTime && (
-                m.dateTime.toLowerCase().includes('today') || 
+                m.dateTime.toLowerCase().includes('today') ||
                 m.dateTime.toLowerCase().includes('tomorrow')
             )
         ).length;
-        
+
         res.json({
             success: true,
             meetings,
@@ -65,11 +65,11 @@ router.get("/zoom-meetings", async (req, res) => {
 router.post("/zoom-meetings", async (req, res) => {
     try {
         const { title, zoomId, passcode, dateTime, joinLink } = req.body;
-        
+
         if (!title && !zoomId) {
             return res.status(400).json({ success: false, message: "Please enter at least Meeting Title or Zoom ID" });
         }
-        
+
         const newMeeting = new ZoomMeeting({
             title: title || "Untitled Meeting",
             zoomId: zoomId || `auto-${Date.now()}`,
@@ -77,7 +77,7 @@ router.post("/zoom-meetings", async (req, res) => {
             dateTime: dateTime || "Not scheduled",
             joinLink: joinLink || ""
         });
-        
+
         await newMeeting.save();
         res.json({ success: true, meeting: newMeeting, message: "Meeting added successfully!" });
     } catch (error) {
@@ -104,7 +104,7 @@ router.get("/zoom-meetings/:id", async (req, res) => {
 router.put("/zoom-meetings/:id", async (req, res) => {
     try {
         const { title, zoomId, passcode, dateTime, joinLink } = req.body;
-        
+
         const updatedMeeting = await ZoomMeeting.findByIdAndUpdate(
             req.params.id,
             {
@@ -117,11 +117,11 @@ router.put("/zoom-meetings/:id", async (req, res) => {
             },
             { new: true, runValidators: true }
         );
-        
+
         if (!updatedMeeting) {
             return res.status(404).json({ success: false, message: "Meeting not found" });
         }
-        
+
         res.json({ success: true, meeting: updatedMeeting, message: "Meeting updated successfully!" });
     } catch (error) {
         console.error(error);

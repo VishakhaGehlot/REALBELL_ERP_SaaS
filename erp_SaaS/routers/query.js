@@ -9,9 +9,38 @@ router.get('/contact',(req,res)=>{
 })
 router.post('/contact',async(req,res)=>{
     const {fname,lname,email,phone,moreDesc}=req.body
-   const Record=await querytable({firstName:fname,lastName:lname,email,phone,message:moreDesc})
-   Record.save()
-   console.log(Record)
+    
+    // Save to query table as originally planned
+    const Record=await querytable({firstName:fname,lastName:lname,email,phone,message:moreDesc})
+    await Record.save()
+    
+    // Also add to CRM Leads as requested
+    try {
+        const CrmLead = require('../models/CrmLead');
+        const CrmActivity = require('../models/CrmActivity');
+        
+        const lead = new CrmLead({
+            name: fname + (lname ? ' ' + lname : ''),
+            email: email,
+            phone: phone || '',
+            source: 'Website',
+            status: 'New',
+            score: 50,
+            assignedTo: 'Unassigned'
+        });
+        await lead.save();
+        
+        await new CrmActivity({
+            type: "Note",
+            description: "Lead generated from Contact Us Form. Message: " + moreDesc,
+            referenceModel: "CrmLead",
+            referenceId: lead._id
+        }).save();
+    } catch(err) {
+        console.error("Error saving lead from contact form:", err);
+    }
+    
+    res.render("Home/contact", { success: "Thank you for contacting us. We will get back to you shortly!" });
 })
 
 router.use(requireAuth)

@@ -808,21 +808,15 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/leads" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                        <a href="/crm/dashboard" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-graph-up"></i>
+                            <span>Lead Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/crm/leads" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-star"></i>
                             <span>All Leads</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/lead-capture" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-download"></i>
-                            <span>Lead Capture</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/lead-score" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-activity"></i>
-                            <span>Lead Scoring</span>
                         </a>
                     </li>
                 </ul>
@@ -841,21 +835,9 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/deals" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-cup-straw"></i>
-                            <span>Active Deals</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/negotiation" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-chat-left-text"></i>
-                            <span>Negotiation Logs</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/closed-won" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-flag-checkered"></i>
-                            <span>Closed Won</span>
+                        <a href="/crm/deals" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-kanban"></i>
+                            <span>Deal Pipeline</span>
                         </a>
                     </li>
                 </ul>
@@ -874,13 +856,13 @@
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/sms-templates" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                        <a href="/rcscampaign" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-file-earmark-text"></i>
                             <span>Templates</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/sms-campaigns" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                        <a href="/rcs/setting" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-megaphone"></i>
                             <span>Campaigns</span>
                         </a>
@@ -978,16 +960,43 @@
                             <span>Schedule Meeting</span>
                         </a>
                     </li>
+                </ul>
+            </div>
+        </li>
+        <% } %>
+
+        <% if (hasModuleAccess('eventsManagement')) { %>
+        <!-- ==================== EVENTS MANAGEMENT ==================== -->
+        <li class="nav-main-item">
+            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
+                <i class="bi bi-calendar-event-fill"></i>
+                <span>Events Management</span>
+                <i class="bi bi-chevron-right chevron-icon"></i>
+            </div>
+            <div class="submenu-wrapper" style="display: none;">
+                <ul class="menu-items">
                     <li class="nav-sub-item">
-                        <a href="/meetings-list" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-list-ul"></i>
-                            <span>Meetings List</span>
+                        <a href="/calendar" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-calendar3"></i>
+                            <span>Calendar View</span>
                         </a>
                     </li>
                     <li class="nav-sub-item">
-                        <a href="/recordings" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-camera-reels"></i>
-                            <span>Recordings</span>
+                        <a href="/events-list" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-list-ul"></i>
+                            <span>All Events</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/upcoming-events" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>Upcoming Events</span>
+                        </a>
+                    </li>
+                    <li class="nav-sub-item">
+                        <a href="/registrations" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Registrations</span>
                         </a>
                     </li>
                 </ul>

@@ -1,0 +1,147 @@
+<%- include('../../partials/admin/header.ejs')%>
+
+<style>
+    :root {
+        --primary: #3b82f6; 
+        --primary-hover: #1d4ed8;
+        --secondary: #10B981;
+        --dark: #1E293B;
+        --light: #F8FAFC;
+        --gray: #64748B;
+        --card-bg: white;
+        --bg-color: #F8FAFC;
+        --text-color: #0F172A;
+        --border-color: #F1F5F9;
+        --shadow: rgba(0, 0, 0, 0.03);
+    }
+
+    [data-theme="dark"], [data-theme="dark"] body {
+        --primary: #3b82f6;
+        --primary-hover: #60a5fa;
+        --secondary: #34d399;
+        --dark: #F8FAFC;
+        --light: #0f172a;
+        --gray: #94a3b8;
+        --card-bg: #1e293b;
+        --bg-color: #0f172a;
+        --text-color: #f1f5f9;
+        --border-color: rgba(255, 255, 255, 0.1);
+        --shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    body { background: var(--bg-color); margin: 0; padding: 0; font-family: 'Inter', sans-serif; color: var(--text-color); transition: background-color 0.3s, color 0.3s;}
+    .main-wrapper { display: flex; width: 100%; min-height: 100vh; }
+    .content-wrapper { flex: 1; margin-left: 350px; padding: 40px; width: calc(100% - 350px); }
+    
+    .dashboard-title { font-size: 36px; font-weight: 900; margin-bottom: 30px; letter-spacing:-1px; color: var(--text-color);}
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
+    .stat-card {
+        background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px var(--shadow);
+        border: 1px solid var(--border-color); transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-5px); }
+    .stat-label { color: var(--gray); font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 10px; display:block;}
+    .stat-val { font-size: 32px; font-weight: 800; color: var(--text-color); }
+
+    .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+    .chart-container { background: var(--card-bg); padding: 30px; border-radius: 20px; box-shadow: 0 4px 20px var(--shadow); border: 1px solid var(--border-color); color: var(--text-color); }
+    .chart-title { font-weight: 700; margin-bottom: 20px; font-size: 18px; color: var(--text-color); }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs')%>
+    <div class="content-wrapper">
+        <h1 class="dashboard-title">CRM Analytics Overview</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">Total Leads</span>
+                <div class="stat-val" id="kpiLeads">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Total Deals</span>
+                <div class="stat-val" id="kpiDeals">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Win Rate</span>
+                <div class="stat-val" style="color: #10B981;" id="kpiWinRate">0%</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Pipeline Value</span>
+                <div class="stat-val" style="color: #3B82F6;" id="kpiValue">$0</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Deal by Stages</h3>
+                <canvas id="pipelineChart" height="100"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Conversion Status</h3>
+                <canvas id="conversionChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function initDashboard() {
+        try {
+            const res = await fetch('/api/analytics');
+            const data = await res.json();
+
+            document.getElementById('kpiLeads').innerText = data.totalLeads;
+            document.getElementById('kpiDeals').innerText = data.totalDeals;
+            document.getElementById('kpiWinRate').innerText = data.conversionRate + '%';
+
+            let pipelineVal = 0;
+            const labels = [];
+            const values = [];
+            
+            data.pipelineStages.forEach(st => {
+                pipelineVal += st.totalValue;
+                labels.push(st._id);
+                values.push(st.totalValue);
+            });
+
+            document.getElementById('kpiValue').innerText = '$' + pipelineVal.toLocaleString();
+
+            // Render Charts
+            new Chart(document.getElementById('pipelineChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Value ($)',
+                        data: values,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 8
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display:false } } }
+            });
+
+            const winCount = data.pipelineStages.find(s => s._id === 'Closed Won')?.count || 0;
+            const lostCount = data.pipelineStages.find(s => s._id === 'Closed Lost')?.count || 0;
+
+            new Chart(document.getElementById('conversionChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Won', 'Lost', 'Open'],
+                    datasets: [{
+                        data: [winCount, lostCount, data.totalDeals - winCount - lostCount],
+                        backgroundColor: ['#10B981', '#EF4444', '#64748B']
+                    }]
+                },
+                options: { responsive: true, cutout: '75%', plugins: { legend: { display: false } } }
+            });
+
+        } catch (e) { console.error('Error fetching analytics'); }
+    }
+
+    initDashboard();
+</script>

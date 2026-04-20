@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Send SMS - RCS Campaign</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 35px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .required:after {
+            content: " *";
+            color: red;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .row select {
+            flex: 1;
+        }
+
+        .help-btn, .import-btn {
+            padding: 12px 20px;
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .help-btn:hover, .import-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-1px);
+        }
+
+        .import-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        .import-btn:hover {
+            background: #45a049;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 25px;
+            margin-top: 8px;
+        }
+
+        .radio-group label {
+            display: inline-flex;
+            align-items: center;
+            font-weight: normal;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .radio-group input[type="radio"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .toolbar {
+            border: 2px solid #e0e0e0;
+            border-top: none;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .toolbar button {
+            background: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            font-size: 18px;
+            margin-right: 8px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .toolbar button:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .counter {
+            font-size: 12px;
+            text-align: right;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-now {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-schedule {
+            background: #ff9800;
+            color: white;
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 25px 40px;
+            border-radius: 12px;
+            z-index: 1000;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .schedule-picker {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .schedule-picker.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .template-info {
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            .buttons {
+                flex-direction: column;
+            }
+            .row {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Bulk SMS Campaign</h1>
+            <p>Send messages with DLT Template ID support</p>
+        </div>
+
+        <div class="content">
+            <div id="alert" class="alert"></div>
+
+            <form id="smsForm">
+                <div class="form-group">
+                    <div class="row">
+                        <select id="smsType" required>
+                            <option value="">Select SMS Type</option>
+                            <option value="promotional">📢 Promotional - Route 1</option>
+                            <option value="transactional">🔔 Transactional - Route 2 (DLT Required)</option>
+                            <option value="otp">🔐 OTP Service - Route 2 (DLT Required)</option>
+                            <option value="dnd">📞 Trans DND - Route 4 (DLT Required)</option>
+                        </select>
+                        <button type="button" class="help-btn" onclick="showHelp()">❓ Help</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Sender ID</label>
+                    <input type="text" id="senderId" maxlength="11" placeholder="Enter 6-11 character Sender ID" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Mobile Numbers</label>
+                    <div class="row">
+                        <button type="button" class="import-btn" onclick="document.getElementById('fileInput').click()">
+                            📁 Import CSV
+                        </button>
+                        <button type="button" class="import-btn" onclick="showExample()">
+                            📋 Example
+                        </button>
+                    </div>
+                    <input type="file" id="fileInput" accept=".csv">
+                    <textarea id="mobileNumbers" placeholder="Enter mobile numbers (comma separated or one per line)&#10;Example:&#10;9999999999,8888888888,7777777777&#10;OR&#10;9999999999&#10;8888888888&#10;7777777777" required></textarea>
+                    <div class="counter" id="numberCount">0 numbers entered</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Message Type</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="messageType" value="text" checked> 🇬🇧 English
+                        </label>
+                        <label>
+                            <input type="radio" name="messageType" value="unicode"> 🌐 Unicode (Hindi/Other)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Message</label>
+                    <textarea id="message" placeholder="Type your message here..."></textarea>
+                    <div class="toolbar">
+                        <button type="button" onclick="insertEmoji('😊')">😊</button>
+                        <button type="button" onclick="insertEmoji('❤️')">❤️</button>
+                        <button type="button" onclick="insertEmoji('👍')">👍</button>
+                        <button type="button" onclick="insertText('[NAME]')">[NAME]</button>
+                        <button type="button" onclick="insertText('[ORDER_ID]')">[ORDER_ID]</button>
+                        <button type="button" onclick="insertText('[OTP]')">[OTP]</button>
+                    </div>
+                    <div class="counter" id="charCount">0 characters / 0 credits</div>
+                </div>
+
+                <div id="templateInfo" class="template-info" style="display: none;">
+                    🔑 <strong>DLT Template ID in use:</strong> <span id="activeTemplateId">Loading...</span>
+                    <br><small>This Template ID will be sent with your message as per TRAI guidelines</small>
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn btn-now" onclick="sendSMS('now')">
+                        ✈ Send Now
+                    </button>
+                    <button type="button" class="btn btn-schedule" onclick="showSchedule()">
+                        📅 Schedule
+                    </button>
+                </div>
+
+                <div id="schedulePicker" class="schedule-picker">
+                    <div class="form-group">
+                        <label>Schedule Date & Time</label>
+                        <input type="datetime-local" id="scheduleTime">
+                        <button type="button" class="btn btn-schedule" onclick="sendSMS('schedule')" style="margin-top: 15px;">
+                            ✅ Confirm Schedule
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <div>⏳ Sending SMS... Please wait...</div>
+    </div>
+
+    <script>
+        let currentSettings = {};
+
+        // Load settings and sender ID
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/get-settings');
+                const data = await response.json();
+                currentSettings = data;
+                
+                if (data.senderId) {
+                    document.getElementById('senderId').value = data.senderId;
+                }
+                
+                // Show template info
+                if (data.templateId) {
+                    document.getElementById('templateInfo').style.display = 'block';
+                    document.getElementById('activeTemplateId').textContent = data.templateId;
+                } else {
+                    document.getElementById('activeTemplateId').textContent = 'Not configured! Please add in Settings';
+                }
+                
+                console.log('Settings loaded:', data);
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        function updateCounter() {
+            const message = document.getElementById('message').value;
+            const charCount = message.length;
+            let credits = Math.ceil(charCount / 160);
+            if (credits === 0) credits = 1;
+            
+            document.getElementById('charCount').textContent = `${charCount} characters / ${credits} credit(s)`;
+        }
+
+        function updateNumberCount() {
+            const numbers = document.getElementById('mobileNumbers').value;
+            let count = 0;
+            
+            if (numbers.includes('\n')) {
+                count = numbers.split('\n').filter(n => n.trim()).length;
+            } else if (numbers.includes(',')) {
+                count = numbers.split(',').filter(n => n.trim()).length;
+            } else if (numbers.trim()) {
+                count = 1;
+            }
+            
+            document.getElementById('numberCount').textContent = `${count} number(s) entered`;
+        }
+
+        function insertEmoji(emoji) {
+            const textarea = document.getElementById('message');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            textarea.value = text.substring(0, start) + emoji + text.substring(end);
+            textarea.focus();
+            updateCounter();
+        }
+
+        function insertText(text) {
+            const textarea = document.getElementById('message');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const currentText = textarea.value;
+            textarea.value = currentText.substring(0, start) + text + currentText.substring(end);
+            textarea.focus();
+            updateCounter();
+        }
+
+        // CSV Import
+        document.getElementById('fileInput').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('/api/import-csv', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('mobileNumbers').value = data.numbers;
+                    updateNumberCount();
+                    showAlert('✅ CSV imported successfully! ' + data.count + ' numbers loaded', 'success');
+                } else {
+                    showAlert('❌ ' + data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Error importing CSV', 'error');
+            }
+            
+            e.target.value = '';
+        });
+
+        function showExample() {
+            document.getElementById('mobileNumbers').value = '9999999999,8888888888,7777777777';
+            updateNumberCount();
+        }
+
+        function showSchedule() {
+            const picker = document.getElementById('schedulePicker');
+            picker.classList.toggle('active');
+        }
+
+        async function sendSMS(type) {
+            const senderId = document.getElementById('senderId').value;
+            const mobileNumbers = document.getElementById('mobileNumbers').value;
+            const message = document.getElementById('message').value;
+            const messageType = document.querySelector('input[name="messageType"]:checked').value;
+            const smsType = document.getElementById('smsType').value;
+            
+            // Validation
+            if (!smsType) {
+                showAlert('Please select SMS Type', 'error');
+                return;
+            }
+            
+            if (!senderId) {
+                showAlert('Please enter Sender ID', 'error');
+                return;
+            }
+            
+            if (!mobileNumbers.trim()) {
+                showAlert('Please enter mobile numbers', 'error');
+                return;
+            }
+            
+            if (!message.trim()) {
+                showAlert('Please enter message', 'error');
+                return;
+            }
+            
+            // Check DLT requirement
+            const requiresDLT = smsType === 'transactional' || smsType === 'otp' || smsType === 'dnd';
+            if (requiresDLT && !currentSettings.templateId) {
+                showAlert('⚠️ DLT Template ID is required for ' + smsType.toUpperCase() + ' messages!\n\nPlease configure Template ID in Gateway Settings first.', 'error');
+                return;
+            }
+            
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            
+            try {
+                let url = '/api/send-sms';
+                let data = {
+                    senderId,
+                    mobileNumbers,
+                    message,
+                    messageType,
+                    templateId: currentSettings.templateId  // Send template ID
+                };
+                
+                if (type === 'schedule') {
+                    const scheduleTime = document.getElementById('scheduleTime').value;
+                    if (!scheduleTime) {
+                        showAlert('Please select schedule time', 'error');
+                        loading.style.display = 'none';
+                        return;
+                    }
+                    url = '/api/schedule-sms';
+                    data.scheduleTime = scheduleTime;
+                }
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    if (type === 'now') {
+                        // Clear form but keep sender ID
+                        document.getElementById('mobileNumbers').value = '';
+                        document.getElementById('message').value = '';
+                        updateCounter();
+                        updateNumberCount();
+                    } else {
+                        document.getElementById('schedulePicker').classList.remove('active');
+                        document.getElementById('scheduleTime').value = '';
+                    }
+                } else {
+                    showAlert(result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message, 'error');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function showHelp() {
+            alert('📢 SMS Type Guide:\n\n' +
+                  '• Promotional - For marketing/bulk messages (Route 1)\n' +
+                  '• Transactional - For alerts, notifications (Route 2) - DLT REQUIRED\n' +
+                  '• OTP Service - For OTP messages (Route 2) - DLT REQUIRED\n' +
+                  '• Trans DND - For DND numbers (Route 4) - DLT REQUIRED\n\n' +
+                  '⚠️ Important: Transactional/OTP messages MUST have a valid DLT Template ID configured in Settings.\n\n' +
+                  '📝 Character limit: 160 characters = 1 SMS credit');
+        }
+
+        // Event listeners
+        document.getElementById('message').addEventListener('input', updateCounter);
+        document.getElementById('mobileNumbers').addEventListener('input', updateNumberCount);
+        
+        // SMS type change handler
+        document.getElementById('smsType').addEventListener('change', function() {
+            const requiresDLT = this.value === 'transactional' || this.value === 'otp' || this.value === 'dnd';
+            if (requiresDLT && !currentSettings.templateId) {
+                showAlert('⚠️ Warning: ' + this.options[this.selectedIndex].text + ' requires DLT Template ID. Please configure it in Settings.', 'error');
+            }
+        });
+        
+        // Initialize
+        loadSettings();
+        updateCounter();
+        updateNumberCount();
+    </script>
+</body>
+</html>

@@ -1,0 +1,898 @@
+<%- include('../../partials/admin/header.ejs')%>
+
+<style>
+    /* CSS Variables for theming - FIXED for better dark mode */
+    :root {
+        --primary: #3b82f6;
+        --primary-hover: #2563eb;
+        --primary-light: rgba(59, 130, 246, 0.1);
+        --secondary: #10B981;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --danger: #EF4444;
+        --purple: #8B5CF6;
+        
+        /* Dark mode defaults (your current theme) */
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --bg-tertiary: #334155;
+        --bg-card: #1e293b;
+        --bg-hover: #252f47;
+        
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        
+        --border-color: #334155;
+        --border-light: #475569;
+        
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Light mode overrides */
+    html[data-theme="light"],
+    [data-theme="light"] body {
+        --bg-primary: #f1f5f9;
+        --bg-secondary: #ffffff;
+        --bg-tertiary: #e2e8f0;
+        --bg-card: #ffffff;
+        --bg-hover: #f1f5f9;
+        
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --text-muted: #94a3b8;
+        
+        --border-color: #e2e8f0;
+        --border-light: #cbd5e1;
+        
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        background: var(--bg-primary) !important;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .main-wrapper {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+        background: var(--bg-primary);
+    }
+
+    .content-wrapper {
+        flex: 1;
+        margin-left: 350px;
+        padding: 30px;
+        transition: all 0.3s ease;
+        width: calc(100% - 350px);
+        background: var(--bg-primary);
+    }
+
+    /* Header Styles */
+    .page-header {
+        background: var(--bg-card);
+        border-radius: 16px;
+        padding: 24px 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow);
+        margin-bottom: 30px;
+        border: 1px solid var(--border-color);
+    }
+
+    .page-title {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .page-title h2 {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.5px;
+    }
+
+    .page-title span {
+        font-size: 14px;
+        color: var(--text-secondary);
+    }
+
+    .btn-premium {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Table Card */
+    .table-card {
+        background: var(--bg-card);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        overflow-x: auto;
+    }
+
+    .leads-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+
+    .leads-table th {
+        color: var(--text-muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        padding: 16px 20px;
+        border-bottom: 2px solid var(--border-color);
+        text-align: left;
+        background: transparent;
+    }
+
+    .leads-table td {
+        padding: 18px 20px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 14px;
+        font-weight: 500;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .leads-table tr td:first-child {
+        border-radius: 12px 0 0 12px;
+        border-left: 1px solid var(--border-color);
+    }
+
+    .leads-table tr td:last-child {
+        border-radius: 0 12px 12px 0;
+        border-right: 1px solid var(--border-color);
+    }
+
+    .leads-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .leads-table tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .leads-table tbody tr:hover td {
+        background: var(--bg-hover);
+        border-color: var(--border-light);
+    }
+
+    /* Lead Name Cell */
+    .lead-name {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .lead-name .name {
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--text-primary);
+    }
+
+    .lead-name .email {
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+
+    /* Status Select */
+    .status-select-wrapper {
+        position: relative;
+    }
+
+    .status-select {
+        padding: 8px 14px;
+        border-radius: 20px;
+        border: 2px solid transparent;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        outline: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        appearance: none;
+        padding-right: 32px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='currentColor' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        transition: all 0.2s;
+    }
+
+    .status-select:hover {
+        transform: scale(1.05);
+    }
+
+    .status-new { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }
+    .status-contacted { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+    .status-qualified { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
+    .status-lost { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+
+    /* Source Badge */
+    .source-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .source-badge i {
+        font-size: 10px;
+    }
+
+    /* Score Badge */
+    .score-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+        color: white;
+        border-radius: 10px;
+        font-weight: 800;
+        font-size: 14px;
+    }
+
+    /* Action Buttons */
+    .action-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 14px;
+    }
+
+    .action-btn.edit { 
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+    
+    .action-btn.edit:hover {
+        background: var(--primary);
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    .action-btn.delete { 
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+    
+    .action-btn.delete:hover {
+        background: var(--danger);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .action-btn.save {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+    
+    .action-btn.save:hover {
+        background: var(--success);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .action-divider {
+        width: 1px;
+        height: 20px;
+        background: var(--border-color);
+        margin: 0 4px;
+    }
+
+    /* Modal Styles - FIXED */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .modal-content {
+        background: var(--bg-card);
+        color: var(--text-primary);
+        border-radius: 24px;
+        padding: 32px;
+        width: 100%;
+        max-width: 520px;
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-overlay.active .modal-content {
+        transform: scale(1);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--text-primary);
+    }
+
+    .modal-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--bg-tertiary);
+        border: none;
+        cursor: pointer;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 18px;
+    }
+
+    .modal-close:hover {
+        background: var(--danger);
+        color: white;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 14px;
+    }
+
+    .form-label span {
+        color: var(--danger);
+    }
+
+    .form-input, .form-select {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: 2px solid var(--border-color);
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 15px;
+        outline: none;
+        transition: all 0.2s;
+        font-family: inherit;
+    }
+
+    .form-input:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .form-select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        padding-right: 45px;
+    }
+
+    .form-select option {
+        background: var(--bg-card);
+        color: var(--text-primary);
+        padding: 10px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 16px;
+        margin-top: 28px;
+    }
+
+    .btn-cancel {
+        flex: 1;
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+        border: none;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 15px;
+    }
+
+    .btn-cancel:hover {
+        background: var(--border-light);
+    }
+
+    .btn-save {
+        flex: 1;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 15px;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+
+    .empty-state h4 {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .content-wrapper {
+            padding: 20px;
+        }
+        
+        .leads-table {
+            min-width: 900px;
+        }
+    }
+</style>
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs')%>
+
+    <div class="content-wrapper">
+        <div class="page-header">
+            <div class="page-title">
+                <h2>Lead Management</h2>
+                <span>Manage and track all prospective clients intelligently</span>
+            </div>
+            <button class="btn-premium" onclick="openModal()">
+                <i class="bi bi-plus-lg"></i>
+                Add New Lead
+            </button>
+        </div>
+
+        <div class="table-card">
+            <table class="leads-table" id="leadsTable">
+                <thead>
+                    <tr>
+                        <th>Lead</th>
+                        <th>Phone</th>
+                        <th>Source</th>
+                        <th>Status</th>
+                        <th>Assigned To</th>
+                        <th>Score</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="leadModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Create New Lead</h3>
+            <button class="modal-close" onclick="closeModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <form id="leadForm">
+            <input type="hidden" id="editLeadId" value="">
+            <div class="form-group">
+                <label class="form-label">Full Name <span>*</span></label>
+                <input type="text" class="form-input" id="leadName" placeholder="Enter full name..." required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Email <span>*</span></label>
+                    <input type="email" class="form-input" id="leadEmail" placeholder="email@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-input" id="leadPhone" placeholder="+1 (555) 000-0000">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Source</label>
+                    <select class="form-select" id="leadSource">
+                        <option value="Website">Website</option>
+                        <option value="Referral">Referral</option>
+                        <option value="Social Media">Social Media</option>
+                        <option value="Cold Call">Cold Call</option>
+                        <option value="Event">Event</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="leadStatus">
+                        <option value="New">New</option>
+                        <option value="Contacted">Contacted</option>
+                        <option value="Qualified">Qualified</option>
+                        <option value="Lost">Lost</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Lead Score (1-100)</label>
+                    <input type="number" class="form-input" id="leadScore" min="1" max="100" value="50" placeholder="50">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Assigned To</label>
+                    <select class="form-select" id="leadAssignee">
+                        <option value="Unassigned">Unassigned</option>
+                        <% if(typeof users !== 'undefined') { %>
+                            <% users.forEach(user => { %>
+                                <option value="<%= user.firstName %> <%= user.lastName %>">
+                                    <%= user.firstName %> <%= user.lastName %>
+                                </option>
+                            <% }) %>
+                        <% } %>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn-save" id="saveLeadBtn">Save Lead</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Source icons mapping
+    const sourceIcons = {
+        'Website': 'bi-globe',
+        'Referral': 'bi-people',
+        'Social Media': 'bi-share',
+        'Cold Call': 'bi-telephone',
+        'Event': 'bi-calendar-event',
+        'Other': 'bi-three-dots'
+    };
+
+    function openModal(lead = null) {
+        const modalTitle = document.getElementById('modalTitle');
+        const saveBtn = document.getElementById('saveLeadBtn');
+        
+        if(lead) {
+            modalTitle.innerText = 'Edit Lead';
+            saveBtn.innerText = 'Update Lead';
+            document.getElementById('editLeadId').value = lead._id;
+            document.getElementById('leadName').value = lead.name;
+            document.getElementById('leadEmail').value = lead.email;
+            document.getElementById('leadPhone').value = lead.phone || '';
+            document.getElementById('leadSource').value = lead.source || 'Website';
+            document.getElementById('leadStatus').value = lead.status || 'New';
+            document.getElementById('leadScore').value = lead.score || 50;
+            document.getElementById('leadAssignee').value = lead.assignedTo || 'Unassigned';
+        } else {
+            modalTitle.innerText = 'Create New Lead';
+            saveBtn.innerText = 'Save Lead';
+            document.getElementById('editLeadId').value = '';
+            document.getElementById('leadForm').reset();
+            document.getElementById('leadStatus').value = 'New';
+            document.getElementById('leadScore').value = 50;
+            document.getElementById('leadAssignee').value = 'Unassigned';
+        }
+        document.getElementById('leadModal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('leadModal').classList.remove('active');
+        setTimeout(() => {
+            document.getElementById('leadForm').reset();
+            document.getElementById('editLeadId').value = '';
+        }, 300);
+    }
+    
+    // Close modal on overlay click
+    document.getElementById('leadModal').addEventListener('click', function(e) {
+        if(e.target === this) closeModal();
+    });
+
+    function getStatusClass(status) {
+        const statusMap = {
+            'New': 'status-new',
+            'Contacted': 'status-contacted',
+            'Qualified': 'status-qualified',
+            'Lost': 'status-lost'
+        };
+        return statusMap[status] || 'status-new';
+    }
+
+    let allLeads = [];
+
+    async function fetchLeads() {
+        try {
+            const res = await fetch('/api/leads');
+            const leads = await res.json();
+            allLeads = leads;
+            const tbody = document.querySelector('#leadsTable tbody');
+            tbody.innerHTML = '';
+            
+            if(leads.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="bi bi-people"></i>
+                                <h4>No leads found</h4>
+                                <p>Start by adding your first lead to track potential clients</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            leads.forEach(lead => {
+                const tr = document.createElement('tr');
+                const sourceIcon = sourceIcons[lead.source] || 'bi-globe';
+                
+                tr.innerHTML = `
+                    <td>
+                        <div class="lead-name">
+                            <div class="name">${lead.name || 'Unnamed'}</div>
+                            <div class="email">${lead.email || 'No email'}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-size: 14px; color: var(--text-secondary);">${lead.phone || '-'}</div>
+                    </td>
+                    <td>
+                        <div class="source-badge">
+                            <i class="bi ${sourceIcon}"></i>
+                            ${lead.source || 'Website'}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="status-select-wrapper">
+                            <select id="status-select-${lead._id}" class="status-select ${getStatusClass(lead.status)}" onchange="updateLeadStatus('${lead._id}')">
+                                <option value="New" ${lead.status === 'New' ? 'selected' : ''}>New</option>
+                                <option value="Contacted" ${lead.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+                                <option value="Qualified" ${lead.status === 'Qualified' ? 'selected' : ''}>Qualified</option>
+                                <option value="Lost" ${lead.status === 'Lost' ? 'selected' : ''}>Lost</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; font-weight: 600;">
+                            <i class="bi bi-person-badge text-primary"></i>
+                            ${lead.assignedTo || 'Unassigned'}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="score-badge">${lead.score || 0}</div>
+                    </td>
+                    <td>
+                        <div class="action-group">
+                            <button class="action-btn edit" onclick="editLead('${lead._id}')" title="Edit Lead">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <div class="action-divider"></div>
+                            <button class="action-btn delete" onclick="deleteLead('${lead._id}')" title="Delete Lead">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error('Failed to fetch leads', error);
+            const tbody = document.querySelector('#leadsTable tbody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <h4>Failed to load leads</h4>
+                            <p>Please refresh the page to try again</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    async function updateLeadStatus(id) {
+        const newStatus = document.getElementById('status-select-' + id).value;
+        const selectEl = document.getElementById('status-select-' + id);
+        
+        // Update visual class immediately
+        selectEl.className = 'status-select ' + getStatusClass(newStatus);
+        
+        try {
+            const response = await fetch('/api/leads/' + id + '/status', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+            
+            if(!response.ok) throw new Error('Update failed');
+            
+            // Show success feedback
+            const originalText = selectEl.options[selectEl.selectedIndex].text;
+            selectEl.options[selectEl.selectedIndex].text = 'Saved!';
+            setTimeout(() => {
+                selectEl.options[selectEl.selectedIndex].text = originalText;
+            }, 1000);
+            
+        } catch(e) { 
+            alert('Failed to update status. Please try again.');
+            fetchLeads(); // Reset to original state
+        }
+    }
+
+    async function deleteLead(id) {
+        if(!confirm('Are you sure you want to delete this lead? This action cannot be undone.')) return;
+        
+        try {
+            const response = await fetch('/api/leads/' + id, { method: 'DELETE' });
+            if(!response.ok) throw new Error('Delete failed');
+            fetchLeads();
+        } catch (error) {
+            alert('Failed to delete lead. Please try again.');
+        }
+    }
+
+    function editLead(id) { 
+        const lead = allLeads.find(l => l._id === id);
+        if(lead) openModal(lead); 
+    }
+
+    document.getElementById('leadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const leadId = document.getElementById('editLeadId').value;
+        const data = {
+            name: document.getElementById('leadName').value.trim(),
+            email: document.getElementById('leadEmail').value.trim(),
+            phone: document.getElementById('leadPhone').value.trim(),
+            source: document.getElementById('leadSource').value,
+            status: document.getElementById('leadStatus').value,
+            score: parseInt(document.getElementById('leadScore').value) || 50,
+            assignedTo: document.getElementById('leadAssignee').value || 'Unassigned'
+        };
+
+        const method = leadId ? 'PUT' : 'POST';
+        const url = leadId ? '/api/leads/' + leadId : '/api/leads';
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to save lead');
+            }
+            
+            closeModal();
+            fetchLeads();
+        } catch (error) {
+            alert(error.message || 'Failed to save lead. Please try again.');
+        }
+    });
+
+    // Load initial leads
+    document.addEventListener('DOMContentLoaded', fetchLeads);
+</script>

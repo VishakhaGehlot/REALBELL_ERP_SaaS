@@ -842,6 +842,10 @@
                 <div class="actions-grid">
                     <% if (hasAccess('crm', 'view')) { %><a href="/addcontacttable" class="action-btn"><i class="bi bi-people"></i><span>All Contacts</span></a><% } %>
                     <% if (hasAccess('crm', 'add')) { %><a href="/addcontactform" class="action-btn"><i class="bi bi-person-plus"></i><span>Add Contact</span></a><% } %>
+                    <% if (hasAccess('leadManagement', 'view')) { %><a href="/crm/leads" class="action-btn"><i class="bi bi-funnel"></i><span>View Leads</span></a><% } %>
+                    <% if (hasAccess('leadManagement', 'add')) { %><a href="/crm/leads" class="action-btn" onclick="event.preventDefault(); window.location.href='/crm/leads?action=add'"><i class="bi bi-person-plus"></i><span>Add Lead</span></a><% } %>
+                    <% if (hasAccess('dealManagement', 'view')) { %><a href="/crm/deals" class="action-btn"><i class="bi bi-kanban"></i><span>Deal Pipeline</span></a><% } %>
+                    <% if (hasAccess('dealManagement', 'add')) { %><a href="/crm/deals" class="action-btn" onclick="event.preventDefault(); window.location.href='/crm/deals?action=add'"><i class="bi bi-plus-circle"></i><span>Add Deal</span></a><% } %>
                     <% if (hasAccess('hrm', 'view')) { %><a href="/employees" class="action-btn"><i class="bi bi-person-badge"></i><span>Employees</span></a><% } %>
                     <% if (hasAccess('hrm', 'add')) { %><a href="/AddNewEmployee" class="action-btn"><i class="bi bi-person-plus-fill"></i><span>Add Employee</span></a><% } %>
                     <% if (hasAccess('queryManagement', 'view')) { %><a href="/querytable" class="action-btn"><i class="bi bi-chat-dots"></i><span>View Queries</span></a><% } %>

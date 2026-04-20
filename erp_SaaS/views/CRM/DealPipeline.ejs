@@ -1,0 +1,920 @@
+<%- include('../../partials/admin/header.ejs')%>
+
+<style>
+    /* CSS Variables for theming - FIXED for better dark mode */
+    :root {
+        --primary: #3B82F6;
+        --primary-hover: #2563EB;
+        --primary-light: rgba(59, 130, 246, 0.1);
+        --success: #10B981;
+        --warning: #F59E0B;
+        --danger: #EF4444;
+        --purple: #8B5CF6;
+        
+        /* Light mode defaults */
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --bg-tertiary: #334155;
+        --bg-card: #1e293b;
+        --bg-column: #162033;
+        --bg-hover: #252f47;
+        
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        
+        --border-color: #334155;
+        --border-light: #475569;
+        
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+        --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Light mode overrides */
+    html[data-theme="light"],
+    [data-theme="light"] body {
+        --bg-primary: #f1f5f9;
+        --bg-secondary: #ffffff;
+        --bg-tertiary: #e2e8f0;
+        --bg-card: #ffffff;
+        --bg-column: #f8fafc;
+        --bg-hover: #f1f5f9;
+        
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --text-muted: #94a3b8;
+        
+        --border-color: #e2e8f0;
+        --border-light: #cbd5e1;
+        
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        background: var(--bg-primary) !important;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .main-wrapper { 
+        display: flex; 
+        width: 100%; 
+        min-height: 100vh;
+        background: var(--bg-primary);
+    }
+    
+    .content-wrapper { 
+        flex: 1; 
+        margin-left: 350px; 
+        padding: 30px; 
+        transition: all 0.3s ease; 
+        width: calc(100% - 350px);
+        background: var(--bg-primary);
+    }
+
+    /* Header Styles */
+    .page-header {
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 30px;
+        padding: 20px 24px;
+        background: var(--bg-card);
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+    }
+    
+    .page-title {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .page-title h2 {
+        font-size: 28px; 
+        font-weight: 800; 
+        margin: 0; 
+        color: var(--text-primary);
+        letter-spacing: -0.5px;
+    }
+    
+    .page-title span {
+        font-size: 14px;
+        color: var(--text-secondary);
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+        color: white; 
+        border: none; 
+        padding: 14px 28px;
+        border-radius: 12px; 
+        font-weight: 700; 
+        cursor: pointer; 
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+    }
+    
+    .btn-create:hover { 
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-create:active {
+        transform: translateY(0);
+    }
+
+    /* Kanban Board */
+    .kanban-board {
+        display: flex; 
+        gap: 20px; 
+        overflow-x: auto;
+        padding-bottom: 20px;
+        height: calc(100vh - 200px);
+    }
+    
+    .kanban-board::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    .kanban-board::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+        border-radius: 4px;
+    }
+    
+    .kanban-board::-webkit-scrollbar-thumb {
+        background: var(--border-light);
+        border-radius: 4px;
+    }
+
+    .kanban-column {
+        flex: 1; 
+        min-width: 280px;
+        max-width: 320px;
+        background: var(--bg-column); 
+        border-radius: 20px; 
+        padding: 20px;
+        display: flex; 
+        flex-direction: column;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+    }
+    
+    .kanban-column:hover {
+        border-color: var(--border-light);
+    }
+
+    .column-header {
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .column-title-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .column-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+    }
+    
+    .column-icon.discovery { background: rgba(59, 130, 246, 0.2); color: var(--primary); }
+    .column-icon.proposal { background: rgba(139, 92, 246, 0.2); color: var(--purple); }
+    .column-icon.negotiation { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .column-icon.won { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+    .column-icon.lost { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+    .column-title { 
+        font-weight: 700; 
+        font-size: 14px; 
+        color: var(--text-primary);
+        letter-spacing: 0.3px;
+    }
+    
+    .column-count {
+        background: var(--bg-tertiary);
+        color: var(--text-primary); 
+        padding: 4px 12px; 
+        border-radius: 20px; 
+        font-size: 13px; 
+        font-weight: 700;
+        min-width: 28px;
+        text-align: center;
+    }
+
+    .kanban-cards { 
+        flex: 1; 
+        overflow-y: auto; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 12px;
+        padding-right: 4px;
+    }
+    
+    .kanban-cards::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .kanban-cards::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .kanban-cards::-webkit-scrollbar-thumb {
+        background: var(--border-light);
+        border-radius: 2px;
+    }
+
+    .deal-card {
+        background: var(--bg-card); 
+        padding: 20px; 
+        border-radius: 14px; 
+        box-shadow: var(--shadow-sm);
+        cursor: grab; 
+        transition: all 0.3s ease; 
+        border: 1px solid var(--border-color);
+        position: relative;
+    }
+    
+    .deal-card:hover { 
+        box-shadow: var(--shadow-lg); 
+        border-color: var(--primary);
+        transform: translateY(-3px);
+    }
+    
+    .deal-card.sortable-ghost {
+        opacity: 0.4;
+        background: var(--primary-light);
+        border: 2px dashed var(--primary);
+    }
+    
+    .deal-card.sortable-drag {
+        cursor: grabbing;
+        transform: rotate(3deg) scale(1.02);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .deal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+
+    .deal-actions {
+        display: flex; 
+        gap: 6px;
+    }
+
+    .deal-action-btn { 
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: var(--bg-tertiary);
+        border: none; 
+        cursor: pointer; 
+        color: var(--text-secondary);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+    }
+    
+    .deal-action-btn:hover { 
+        background: var(--primary);
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    .deal-action-btn.delete:hover { 
+        background: var(--danger);
+        color: white;
+    }
+
+    .deal-action-btn.doc:hover { 
+        background: var(--success);
+        color: white;
+    }
+
+    .deal-title { 
+        font-weight: 700; 
+        font-size: 15px; 
+        color: var(--text-primary);
+        line-height: 1.4;
+        flex: 1;
+        padding-right: 10px;
+    }
+    
+    .deal-value { 
+        font-weight: 800; 
+        font-size: 22px; 
+        color: var(--primary); 
+        margin-bottom: 12px;
+        display: block; 
+    }
+    
+    .deal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-color);
+        margin-top: 12px;
+    }
+    
+    .deal-lead { 
+        font-size: 13px; 
+        color: var(--text-secondary); 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
+    
+    .deal-lead i {
+        font-size: 14px;
+    }
+    
+    .deal-date {
+        font-size: 11px;
+        color: var(--text-muted);
+        background: var(--bg-tertiary);
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+
+    /* Empty State */
+    .empty-column {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-muted);
+        font-size: 13px;
+        border: 2px dashed var(--border-color);
+        border-radius: 12px;
+        margin-top: 10px;
+    }
+    
+    .empty-column i {
+        font-size: 32px;
+        margin-bottom: 10px;
+        display: block;
+        opacity: 0.5;
+    }
+
+    /* Modal Styles - FIXED */
+    .modal-overlay {
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%;
+        background: rgba(15, 23, 42, 0.8); 
+        backdrop-filter: blur(8px);
+        display: none; 
+        align-items: center; 
+        justify-content: center; 
+        z-index: 10000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .modal-overlay.active { 
+        display: flex; 
+        opacity: 1;
+    }
+    
+    .modal-content { 
+        background: var(--bg-card); 
+        padding: 32px; 
+        border-radius: 24px; 
+        width: 100%; 
+        max-width: 480px; 
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+    }
+    
+    .modal-overlay.active .modal-content {
+        transform: scale(1);
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+    
+    .modal-header h3 {
+        margin: 0; 
+        font-weight: 800;
+        font-size: 22px;
+        color: var(--text-primary);
+    }
+    
+    .modal-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--bg-tertiary);
+        border: none;
+        cursor: pointer;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 18px;
+    }
+    
+    .modal-close:hover {
+        background: var(--danger);
+        color: white;
+    }
+    
+    .form-group { 
+        margin-bottom: 20px; 
+    }
+    
+    .form-label { 
+        display: block; 
+        margin-bottom: 8px; 
+        font-weight: 600; 
+        font-size: 14px;
+        color: var(--text-primary);
+    }
+    
+    .form-label span {
+        color: var(--danger);
+    }
+    
+    .form-input, .form-select { 
+        width: 100%; 
+        padding: 14px 16px; 
+        border-radius: 12px; 
+        border: 2px solid var(--border-color); 
+        background: var(--bg-primary); 
+        color: var(--text-primary); 
+        outline: none; 
+        font-size: 15px;
+        transition: all 0.2s;
+        font-family: inherit;
+    }
+    
+    .form-input:focus, .form-select:focus { 
+        border-color: var(--primary); 
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-input::placeholder {
+        color: var(--text-muted);
+    }
+    
+    .form-select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        padding-right: 45px;
+    }
+    
+    .form-select option {
+        background: var(--bg-card);
+        color: var(--text-primary);
+        padding: 10px;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    
+    .btn-save { 
+        width: 100%; 
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+        color: white; 
+        padding: 16px; 
+        border: none; 
+        border-radius: 12px; 
+        font-weight: 700; 
+        margin-top: 10px; 
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .kanban-column {
+            min-width: 260px;
+        }
+    }
+</style>
+
+<!-- Load SortableJS for Drag and Drop -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+<div class="main-wrapper">
+    <%- include('../../partials/admin/left.ejs')%>
+
+    <div class="content-wrapper">
+        <div class="page-header">
+            <div class="page-title">
+                <h2>Deal Pipeline</h2>
+                <span>Manage your sales pipeline and track deals through each stage</span>
+            </div>
+            <button class="btn-create" onclick="openModal()">
+                <i class="bi bi-plus-lg"></i>
+                New Deal
+            </button>
+        </div>
+
+        <div class="kanban-board" id="kanbanBoard">
+            <% const stages = ["Discovery", "Proposal", "Negotiation", "Closed Won", "Closed Lost"]; %>
+            <% const stageIcons = { "Discovery": "bi-search", "Proposal": "bi-file-earmark-text", "Negotiation": "bi-handshake", "Closed Won": "bi-trophy", "Closed Lost": "bi-x-circle" }; %>
+            <% const stageClasses = { "Discovery": "discovery", "Proposal": "proposal", "Negotiation": "negotiation", "Closed Won": "won", "Closed Lost": "lost" }; %>
+            <% stages.forEach(stage => { %>
+                <div class="kanban-column" id="col-<%= stage.replace(' ', '-') %>" data-stage="<%= stage %>">
+                    <div class="column-header">
+                        <div class="column-title-group">
+                            <div class="column-icon <%= stageClasses[stage] %>">
+                                <i class="bi <%= stageIcons[stage] %>"></i>
+                            </div>
+                            <div class="column-title"><%= stage %></div>
+                        </div>
+                        <div class="column-count" id="count-<%= stage.replace(' ', '-') %>">0</div>
+                    </div>
+                    <div class="kanban-cards" id="cards-<%= stage.replace(' ', '-') %>">
+                        <!-- Cards injected here via JS -->
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="dealModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Create New Deal</h3>
+            <button class="modal-close" onclick="closeModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <form id="dealForm">
+            <input type="hidden" id="editDealId" value="">
+            <div class="form-group">
+                <label class="form-label">Deal Title <span>*</span></label>
+                <input type="text" class="form-input" id="dealTitle" placeholder="Enter deal name..." required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Value ($) <span>*</span></label>
+                    <input type="number" class="form-input" id="dealValue" placeholder="0.00" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stage <span>*</span></label>
+                    <select class="form-select" id="dealStage" required>
+                        <option value="Discovery">Discovery</option>
+                        <option value="Proposal">Proposal</option>
+                        <option value="Negotiation">Negotiation</option>
+                        <option value="Closed Won">Closed Won</option>
+                        <option value="Closed Lost">Closed Lost</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Associated Lead <span>*</span></label>
+                <select class="form-select" id="dealLead" required>
+                    <option value="">Select a lead...</option>
+                    <% if(leads) { leads.forEach(lead => { %>
+                        <option value="<%= lead._id %>"><%= lead.name %> (<%= lead.email %>)</option>
+                    <% }) } %>
+                </select>
+            </div>
+            <button type="submit" class="btn-save" id="saveDealBtn">Create Deal</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const stagesList = ["Discovery", "Proposal", "Negotiation", "Closed Won", "Closed Lost"];
+    let allDeals = [];
+    let sortableInstances = [];
+
+    function openModal(deal = null, preselectedStage = null) {
+        const modalTitle = document.getElementById('modalTitle');
+        const saveBtn = document.getElementById('saveDealBtn');
+        const stageSelect = document.getElementById('dealStage');
+        
+        if(deal) {
+            document.getElementById('editDealId').value = deal._id;
+            document.getElementById('dealTitle').value = deal.title;
+            document.getElementById('dealValue').value = deal.value;
+            document.getElementById('dealStage').value = deal.stage;
+            document.getElementById('dealLead').value = deal.leadId ? (deal.leadId._id || deal.leadId) : '';
+            modalTitle.innerText = 'Edit Deal';
+            saveBtn.innerText = 'Update Deal';
+        } else {
+            document.getElementById('dealForm').reset();
+            document.getElementById('editDealId').value = '';
+            modalTitle.innerText = 'Create New Deal';
+            saveBtn.innerText = 'Create Deal';
+            
+            // Preselect stage if provided
+            if(preselectedStage) {
+                stageSelect.value = preselectedStage;
+            } else {
+                stageSelect.value = 'Discovery';
+            }
+        }
+        
+        document.getElementById('dealModal').classList.add('active');
+    }
+    
+    function closeModal() { 
+        document.getElementById('dealModal').classList.remove('active');
+        setTimeout(() => {
+            document.getElementById('dealForm').reset();
+            document.getElementById('editDealId').value = '';
+        }, 300);
+    }
+    
+    // Close modal on overlay click
+    document.getElementById('dealModal').addEventListener('click', function(e) {
+        if(e.target === this) closeModal();
+    });
+
+    function formatDate(dateString) {
+        if(!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function renderEmptyState(container) {
+        container.innerHTML = `
+            <div class="empty-column">
+                <i class="bi bi-inbox"></i>
+                <div>No deals yet</div>
+                <div style="font-size: 11px; margin-top: 4px;">Drag deals here or click Add Deal</div>
+            </div>
+        `;
+    }
+
+    async function loadDeals() {
+        try {
+            const res = await fetch('/api/deals');
+            const deals = await res.json();
+            
+            // Clear all columns
+            stagesList.forEach(stage => {
+                const container = document.getElementById('cards-' + stage.replace(' ', '-'));
+                container.innerHTML = '';
+            });
+
+            const counts = {};
+            stagesList.forEach(s => counts[s] = 0);
+
+            allDeals = deals;
+            
+            if(deals.length === 0) {
+                stagesList.forEach(stage => {
+                    const container = document.getElementById('cards-' + stage.replace(' ', '-'));
+                    renderEmptyState(container);
+                });
+            } else {
+                deals.forEach(deal => {
+                    const stageId = deal.stage ? deal.stage.replace(' ', '-') : 'Discovery';
+                    const container = document.getElementById('cards-' + stageId);
+                    
+                    if(container) {
+                        // Remove empty state if exists
+                        if(container.querySelector('.empty-column')) {
+                            container.innerHTML = '';
+                        }
+                        
+                        counts[deal.stage] = (counts[deal.stage] || 0) + 1;
+                        
+                        const card = document.createElement('div');
+                        card.className = 'deal-card';
+                        card.dataset.id = deal._id;
+                        card.innerHTML = `
+                            <div class="deal-header">
+                                <div class="deal-title">${deal.title || 'Untitled Deal'}</div>
+                                <div class="deal-actions">
+                                    <button class="deal-action-btn doc" onclick="generateDocument('${deal._id}')" title="Generate Document/Quote">
+                                        <i class="bi bi-file-earmark-pdf"></i>
+                                    </button>
+                                    <button class="deal-action-btn edit" onclick="editDeal('${deal._id}')" title="Edit Deal">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="deal-action-btn delete" onclick="deleteDeal('${deal._id}')" title="Delete Deal">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <span class="deal-value">$${Number(deal.value || 0).toLocaleString()}</span>
+                            <div class="deal-footer">
+                                <div class="deal-lead">
+                                    <i class="bi bi-person-circle"></i>
+                                    ${deal.leadId ? (deal.leadId.name || 'Unknown') : 'No Lead'}
+                                </div>
+                                <div class="deal-date">${formatDate(deal.createdAt)}</div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    }
+                });
+                
+                // Render empty state for columns with no deals
+                stagesList.forEach(stage => {
+                    const container = document.getElementById('cards-' + stage.replace(' ', '-'));
+                    if(container.children.length === 0) {
+                        renderEmptyState(container);
+                    }
+                });
+            }
+
+            // Update counts
+            stagesList.forEach(stage => {
+                const countEl = document.getElementById('count-' + stage.replace(' ', '-'));
+                if(countEl) {
+                    countEl.innerText = counts[stage] || 0;
+                }
+            });
+
+        } catch(e) { 
+            console.error("Error loading deals", e);
+            alert('Failed to load deals. Please refresh the page.');
+        }
+    }
+
+    // Initialize drag and drop
+    function initSortable() {
+        // Destroy existing instances
+        sortableInstances.forEach(instance => instance.destroy());
+        sortableInstances = [];
+        
+        stagesList.forEach(stage => {
+            const container = document.getElementById('cards-' + stage.replace(' ', '-'));
+            if(container) {
+                const sortable = new Sortable(container, {
+                    group: 'shared',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    dragClass: 'sortable-drag',
+                    delay: 0,
+                    delayOnTouchOnly: true,
+                    onEnd: async function (evt) {
+                        const itemEl = evt.item;
+                        const dealId = itemEl.dataset.id;
+                        const newStageElem = evt.to.closest('.kanban-column');
+                        const newStage = newStageElem ? newStageElem.dataset.stage : null;
+                        
+                        if(newStage && dealId) {
+                            try {
+                                const response = await fetch('/api/deals/' + dealId + '/stage', {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ stage: newStage })
+                                });
+                                
+                                if(response.ok) {
+                                    // Update counts visually without full reload
+                                    loadDeals();
+                                } else {
+                                    throw new Error('Failed to update');
+                                }
+                            } catch(e) { 
+                                console.error('Failed to update stage', e);
+                                alert('Failed to move deal. Please try again.');
+                                loadDeals(); // Reload to reset position
+                            }
+                        }
+                    },
+                });
+                sortableInstances.push(sortable);
+            }
+        });
+    }
+
+    function editDeal(id) {
+        event.stopPropagation();
+        const deal = allDeals.find(d => d._id === id);
+        if(deal) openModal(deal);
+    }
+
+    async function deleteDeal(id) {
+        event.stopPropagation();
+        if(!confirm('Are you sure you want to delete this deal? This action cannot be undone.')) return;
+        
+        try {
+            const res = await fetch('/api/deals/' + id, { method: 'DELETE' });
+            if(!res.ok) throw new Error('Deletion failed');
+            loadDeals();
+        } catch(e) { 
+            alert('Failed to delete deal. Please try again.');
+        }
+    }
+
+    async function generateDocument(id) {
+        event.stopPropagation();
+        try {
+            const btn = event.currentTarget;
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="width: 1rem; height: 1rem; border-width: 0.15em;"></span>';
+            btn.disabled = true;
+
+            const res = await fetch('/api/deals/' + id + '/generate-document', { method: 'POST' });
+            if(!res.ok) throw new Error('Generation failed');
+            
+            alert('Document/Quote generated and sent successfully for this deal.');
+            
+            btn.innerHTML = originalIcon;
+            btn.disabled = false;
+        } catch (e) { 
+            alert('Failed to generate document for this deal.');
+            if(event && event.currentTarget) {
+                event.currentTarget.innerHTML = '<i class="bi bi-file-earmark-pdf"></i>';
+                event.currentTarget.disabled = false;
+            }
+        }
+    }
+
+    document.getElementById('dealForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const dealId = document.getElementById('editDealId').value;
+        const payload = {
+            title: document.getElementById('dealTitle').value.trim(),
+            value: parseFloat(document.getElementById('dealValue').value) || 0,
+            leadId: document.getElementById('dealLead').value,
+            stage: document.getElementById('dealStage').value
+        };
+
+        const method = dealId ? 'PUT' : 'POST';
+        const url = dealId ? '/api/deals/' + dealId : '/api/deals';
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            if(!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Operation failed');
+            }
+            
+            closeModal();
+            loadDeals();
+        } catch(e) { 
+            alert(e.message || 'Failed to save deal. Please try again.');
+        }
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDeals().then(() => {
+            initSortable();
+        });
+    });
+</script>
