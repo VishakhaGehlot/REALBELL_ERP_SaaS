@@ -2,14 +2,24 @@ const router=require('express').Router()
 const upload=require('../middleware/multer')
 const accountTable=require('../models/Accounting')
 const { requireAuth } = require('../middleware/roleAuth')
-const { requireModuleAccess } = require('../middleware/permissionAuth')
+const { requireScopedModuleAccess } = require('../middleware/permissionAuth')
+const { buildOwnedDocumentFilter } = require('../middleware/dataScope')
 
 router.use(requireAuth)
-router.use(requireModuleAccess('frontendManagement'))
+router.use(requireScopedModuleAccess('frontendManagement', [
+    '/accounttable',
+    '/accountform',
+    '/accountstatus',
+    '/accountdelete',
+    '/accountedit'
+]))
 
 
 router.get('/accounttable',async(req,res)=>{
-    const data=await accountTable.find()
+    const data=await accountTable.find(buildOwnedDocumentFilter(req,{
+        idFields:['createdByUserId'],
+        emailFields:['createdByEmail']
+    }))
      const loginname=req.session.email
     res.render("Frontend/Account/AccountingTable.ejs",{data,loginname})
 })
@@ -21,8 +31,14 @@ router.get('/accountform',(req,res)=>{
 })
 router.post('/accountform',upload.single('img'),async(req,res)=>{
    const {title,desc}=req.body
-   const imageFile=req.file.filename
-   const Record=await accountTable({title:title,desc:desc,img:imageFile})
+   const imageFile=req.file ? req.file.filename : ""
+   const Record=await accountTable({
+    title:title,
+    desc:desc,
+    img:imageFile,
+    createdByUserId: req.session?.userId || null,
+    createdByEmail: String(req.session?.email || '').toLowerCase()
+   })
    Record.save()
 })
 
@@ -35,19 +51,28 @@ router.get('/accountstatus/:id/:status',async(req,res)=>{
     }else{
         newStatus="Pending"
     }
-    await accountTable.findByIdAndUpdate(id,{status:newStatus})
+    await accountTable.findOneAndUpdate(buildOwnedDocumentFilter(req,{
+        idFields:['createdByUserId'],
+        emailFields:['createdByEmail']
+    },{ _id:id }),{status:newStatus})
     res.redirect("/accounttable")
      
 })
  router.get('/accountdelete/:id',async(req,res)=>{
     const id=req.params.id
-    await accountTable.findByIdAndDelete(id)
+    await accountTable.findOneAndDelete(buildOwnedDocumentFilter(req,{
+        idFields:['createdByUserId'],
+        emailFields:['createdByEmail']
+    },{ _id:id }))
     res.redirect('/accounttable')
     
 })
 router.get('/accountedit/:id',async(req,res)=>{
     const id=req.params.id
-    const Record=await accountTable.findById(id)
+    const Record=await accountTable.findOne(buildOwnedDocumentFilter(req,{
+        idFields:['createdByUserId'],
+        emailFields:['createdByEmail']
+    },{ _id:id }))
          const loginname=req.session.email
 
     res.render("Frontend/Account/AccountEdit.ejs",{Record,loginname})
@@ -55,7 +80,10 @@ router.get('/accountedit/:id',async(req,res)=>{
 router.post('/accountedit/:id',async(req,res)=>{
     const{title,desc}=req.body
     const id=req.params.id
-    await accountTable.findByIdAndUpdate(id,{title:title,desc,desc})
+    await accountTable.findOneAndUpdate(buildOwnedDocumentFilter(req,{
+        idFields:['createdByUserId'],
+        emailFields:['createdByEmail']
+    },{ _id:id }),{title:title,desc:desc})
     
 })
 

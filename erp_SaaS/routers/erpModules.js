@@ -11,21 +11,20 @@ const SmsCampaign = require("../models/SmsCampaign")
 const EventSchedule = require("../models/EventSchedule")
 const SupportDeskRecord = require("../models/SupportDeskRecord")
 const SecurityRecord = require("../models/SecurityRecord")
-const { requireAuth, resolveRequestRole } = require("../middleware/roleAuth")
+const { requireAuth } = require("../middleware/roleAuth")
 const { requireModuleAccess } = require("../middleware/permissionAuth")
+const { buildOwnedDocumentFilter } = require("../middleware/dataScope")
 
 router.use(requireAuth)
 
 function getLoginName(req) {
-    return req.session.email || "Admin"
+    return String(req.session?.email || "").trim()
 }
 
 async function buildOwnerFilter(req) {
-    const role = await resolveRequestRole(req)
-    if (role === "SuperAdmin") {
-        return {}
-    }
-    return { createdBy: getLoginName(req) }
+    return buildOwnedDocumentFilter(req, {
+        emailFields: ["createdBy"]
+    })
 }
 
 function toNumber(value, fallback = 0) {
@@ -54,7 +53,10 @@ function normalizeToArray(value) {
 async function getPosPageData(req, activeTab = "new-sale", extra = {}) {
     const ownerFilter = await buildOwnerFilter(req)
     const [products, orders] = await Promise.all([
-        Product.find().sort({ createdAt: -1 }).lean(),
+        Product.find(buildOwnedDocumentFilter(req, {
+            idFields: ["createdByUserId"],
+            emailFields: ["createdByEmail"]
+        })).sort({ createdAt: -1 }).lean(),
         PosOrder.find(ownerFilter).sort({ createdAt: -1 }).lean()
     ])
 
@@ -105,7 +107,10 @@ router.post("/new-sale", requireModuleAccess("pos", "add"), async (req, res) => 
     }
 
     const uniqueProductIds = [...new Set(rowItems.map((item) => item.productId))]
-    const dbProducts = await Product.find({ _id: { $in: uniqueProductIds } })
+    const dbProducts = await Product.find(buildOwnedDocumentFilter(req, {
+        idFields: ["createdByUserId"],
+        emailFields: ["createdByEmail"]
+    }, { _id: { $in: uniqueProductIds } }))
     const productMap = new Map(dbProducts.map((product) => [String(product._id), product]))
     const selectedItems = []
 
@@ -185,7 +190,10 @@ router.post("/orders/delete/:id", requireModuleAccess("pos", "delete"), async (r
 
     for (const item of order.items || []) {
         if (!item.productId) continue
-        const product = await Product.findById(item.productId)
+        const product = await Product.findOne(buildOwnedDocumentFilter(req, {
+            idFields: ["createdByUserId"],
+            emailFields: ["createdByEmail"]
+        }, { _id: item.productId }))
         if (!product) continue
 
         const updatedStock = toNumber(product.stock, 0) + toNumber(item.quantity, 0)
@@ -445,7 +453,10 @@ router.get("/lead-score", requireModuleAccess("leadManagement"), async (req, res
 })
 
 router.get("/lead-edit/:id", requireModuleAccess("leadManagement", "edit"), async (req, res) => {
-    const lead = await BusinessLead.findById(req.params.id).lean()
+    const lead = await BusinessLead.findOne({
+        _id: req.params.id,
+        ...(await buildOwnerFilter(req))
+    }).lean()
     if (!lead) {
         return res.redirect("/leads?error=Lead not found")
     }
@@ -460,7 +471,10 @@ router.get("/lead-edit/:id", requireModuleAccess("leadManagement", "edit"), asyn
 })
 
 router.post("/lead-edit/:id", requireModuleAccess("leadManagement", "edit"), async (req, res) => {
-    await BusinessLead.findByIdAndUpdate(req.params.id, {
+    await BusinessLead.findOneAndUpdate({
+        _id: req.params.id,
+        ...(await buildOwnerFilter(req))
+    }, {
         name: req.body.name,
         company: req.body.company,
         email: req.body.email,
@@ -478,7 +492,10 @@ router.post("/lead-edit/:id", requireModuleAccess("leadManagement", "edit"), asy
 })
 
 router.post("/lead-delete/:id", requireModuleAccess("leadManagement", "delete"), async (req, res) => {
-    await BusinessLead.findByIdAndDelete(req.params.id)
+    await BusinessLead.findOneAndDelete({
+        _id: req.params.id,
+        ...(await buildOwnerFilter(req))
+    })
     res.redirect("/leads?message=Lead deleted successfully")
 })
 

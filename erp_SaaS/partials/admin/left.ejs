@@ -359,36 +359,25 @@
     <%
         const perms = (typeof modulePermissions !== 'undefined' && modulePermissions)
             ? modulePermissions
-            : {
-                subscription: { view: true, add: true, edit: true, delete: true },
-                crm: { view: true, add: true, edit: true, delete: true },
-                hrm: { view: true, add: true, edit: true, delete: true },
-                queryManagement: { view: true, add: true, edit: true, delete: true },
-                frontendManagement: { view: true, add: true, edit: true, delete: true },
-                productManagement: { view: true, add: true, edit: true, delete: true },
-                accounting: { view: true, add: true, edit: true, delete: true },
-                pos: { view: true, add: true, edit: true, delete: true },
-                salesManagement: { view: true, add: true, edit: true, delete: true },
-                projectManagement: { view: true, add: true, edit: true, delete: true },
-                leadManagement: { view: true, add: true, edit: true, delete: true },
-                dealManagement: { view: true, add: true, edit: true, delete: true },
-                smsManagement: { view: true, add: true, edit: true, delete: true },
-                emailNotification: { view: true, add: true, edit: true, delete: true },
-                eventsManagement: { view: true, add: true, edit: true, delete: true },
-                zoomMeeting: { view: true, add: true, edit: true, delete: true },
-                supportDeskManagement: { view: true, add: true, edit: true, delete: true }
-            };
+            : {};
         const currentRole = (typeof currentUserRole !== 'undefined' && currentUserRole) ? currentUserRole : 'User';
         const roleKey = String(currentRole || '').trim().toLowerCase();
         const isSuperAdmin = roleKey === 'superadmin';
-        const hasModuleAccess = (moduleKey) => {
+        const hasAnyPermission = (moduleKey, actions) => {
+            const actionList = Array.isArray(actions) && actions.length ? actions : ['view', 'add', 'edit', 'delete'];
+            if (typeof canAccessAny === 'function') {
+                return canAccessAny(moduleKey, actionList);
+            }
             if (isSuperAdmin) return true;
-            return Boolean(perms[moduleKey] && perms[moduleKey].view);
+            return actionList.some((action) => Boolean(perms[moduleKey] && perms[moduleKey][action]));
+        };
+        const hasModuleAccess = (moduleKey) => {
+            return hasAnyPermission(moduleKey);
         };
         const hasAccess = (typeof canAccess === 'function')
             ? canAccess
             : ((moduleKey, action) => {
-                if (isSuperAdmin) return true;
+                if (isSuperAdmin) return Boolean(perms[moduleKey] && perms[moduleKey][action || 'view']);
                 return Boolean(perms[moduleKey] && perms[moduleKey][action || 'view']);
             });
     %>
@@ -439,24 +428,39 @@
             </div>
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
+                    <% if (hasAnyPermission('subscription', ['view', 'edit', 'delete'])) { %>
                     <li class="nav-sub-item">
                         <a href="/plan" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-tags"></i>
                             <span>Plans & Pricing</span>
                         </a>
                     </li>
+                    <% } %>
+                    <% if (hasAccess('subscription', 'add')) { %>
+                    <li class="nav-sub-item">
+                        <a href="/addplan" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Create Plan</span>
+                        </a>
+                    </li>
+                    <% } %>
+                    <% if (hasAccess('subscription', 'view')) { %>
                     <li class="nav-sub-item">
                         <a href="/paymentStatus" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-tags"></i>
                             <span>Pending Requests</span>
                         </a>
                     </li>
+                    <% } %>
+                    <% if (hasAccess('subscription', 'edit')) { %>
                     <li class="nav-sub-item">
                         <a href="/subscription/settings" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-gear"></i>
                             <span>Payment Settings</span>
                         </a>
                     </li>
+                    <% } %>
+                    <% if (hasAccess('subscription', 'view')) { %>
                     <li class="nav-sub-item">
                         <a href="/subscription/invoices" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-receipt"></i>
@@ -469,6 +473,7 @@
                             <span>Payment History</span>
                         </a>
                     </li>
+                    <% } %>
                 </ul>
             </div>
         </li>
@@ -594,15 +599,22 @@
             </div>
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
+                    <% if (hasAnyPermission('productManagement', ['view', 'edit', 'delete'])) { %>
                     <li class="nav-sub-item">
                         <a href="/producttable" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-person-badge"></i>
-                            <span>Product</span>
+                            <span>All Products</span>
                         </a>
                     </li>
-                    
-                    
-                  
+                    <% } %>
+                    <% if (hasAccess('productManagement', 'add')) { %>
+                    <li class="nav-sub-item">
+                        <a href="/addproduct" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Add Product</span>
+                        </a>
+                    </li>
+                    <% } %>
                 </ul>
             </div>
         </li>
@@ -618,12 +630,23 @@
             </div>
             <div class="submenu-wrapper" style="display: none;">
                 <ul class="menu-items">
+                    <% if (hasAnyPermission('hrm', ['view', 'edit', 'delete'])) { %>
                     <li class="nav-sub-item">
                         <a href="/employees" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-person-badge"></i>
                             <span>Employees</span>
                         </a>
                     </li>
+                    <% } %>
+                    <% if (hasAccess('hrm', 'add')) { %>
+                    <li class="nav-sub-item">
+                        <a href="/AddNewEmployee" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
+                            <i class="bi bi-person-plus"></i>
+                            <span>Add Employee</span>
+                        </a>
+                    </li>
+                    <% } %>
+                    <% if (hasAnyPermission('hrm', ['view', 'edit', 'delete'])) { %>
                     <li class="nav-sub-item">
                         <a href="/Attendance" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-calendar-check"></i>
@@ -642,6 +665,7 @@
                             <span>Leave Management</span>
                         </a>
                     </li>
+                    <% } %>
                 </ul>
             </div>
         </li>
@@ -958,45 +982,6 @@
                         <a href="/schedule-meeting" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
                             <i class="bi bi-clock"></i>
                             <span>Schedule Meeting</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </li>
-        <% } %>
-
-        <% if (hasModuleAccess('eventsManagement')) { %>
-        <!-- ==================== EVENTS MANAGEMENT ==================== -->
-        <li class="nav-main-item">
-            <div class="nav-main-link" onclick="toggleSubmenu(event, this)">
-                <i class="bi bi-calendar-event-fill"></i>
-                <span>Events Management</span>
-                <i class="bi bi-chevron-right chevron-icon"></i>
-            </div>
-            <div class="submenu-wrapper" style="display: none;">
-                <ul class="menu-items">
-                    <li class="nav-sub-item">
-                        <a href="/calendar" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-calendar3"></i>
-                            <span>Calendar View</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/events-list" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-list-ul"></i>
-                            <span>All Events</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/upcoming-events" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-calendar-event"></i>
-                            <span>Upcoming Events</span>
-                        </a>
-                    </li>
-                    <li class="nav-sub-item">
-                        <a href="/registrations" class="nav-sub-link" onclick="handleSubmenuClick(event, this)">
-                            <i class="bi bi-people-fill"></i>
-                            <span>Registrations</span>
                         </a>
                     </li>
                 </ul>

@@ -31,6 +31,15 @@ const footerSchema=mongoose.Schema({
      LinUrl:{
         type:String,
         required:true
+     },
+     createdByUserId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "auth",
+        default: null
+     },
+     createdByEmail:{
+        type:String,
+        default:""
      }
 })
 

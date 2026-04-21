@@ -3,11 +3,20 @@ const upload = require('../middleware/multer');
 const EmployeesTable = require('../models/HRM/Employees');
 const mongoose = require('mongoose');
 const { requireAuth } = require('../middleware/roleAuth');
-const { requireModuleAccess } = require('../middleware/permissionAuth');
+const { requireScopedModuleAccess } = require('../middleware/permissionAuth');
 const { getUserScope } = require('../middleware/dataScope');
 
 router.use(requireAuth);
-router.use(requireModuleAccess('hrm'));
+router.use(requireScopedModuleAccess('hrm', [
+    '/employees',
+    '/addnewemployee',
+    '/attendance',
+    '/addattendence',
+    '/leave',
+    '/addleave',
+    '/payroll',
+    '/addpayroll'
+]));
 
 function buildEmployeeScopeFilter(scope) {
     if (scope.fullAccess) return {}

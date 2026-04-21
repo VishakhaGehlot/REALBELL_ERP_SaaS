@@ -48,32 +48,6 @@ async function getUserScope(req) {
 
     const role = normalizeRole(user.role)
 
-    if (role === "SuperAdmin" || role === "CEO") {
-        return {
-            role,
-            fullAccess: true,
-            userIds: [String(user._id)],
-            emails: [String(user.email || "").toLowerCase()]
-        }
-    }
-
-    if (role === "Manager" || role === "HR") {
-        const scopedIds = await getSubordinateIds(user._id)
-        const scopedUsers = await authTable.find(
-            { _id: { $in: scopedIds } },
-            { email: 1 }
-        ).lean()
-
-        return {
-            role,
-            fullAccess: false,
-            userIds: scopedIds,
-            emails: scopedUsers
-                .map((u) => String(u.email || "").toLowerCase())
-                .filter(Boolean)
-        }
-    }
-
     return {
         role,
         fullAccess: false,
@@ -82,8 +56,52 @@ async function getUserScope(req) {
     }
 }
 
-module.exports = {
-    getCurrentUser,
-    getUserScope
+function buildOwnedDocumentFilter(req, { idFields = [], emailFields = [] } = {}, baseFilter = {}) {
+    const clauses = []
+    const userId = req.session && req.session.userId ? req.session.userId : null
+    const exactEmail = String(req.session && req.session.email ? req.session.email : "").trim()
+    const normalizedEmail = exactEmail.toLowerCase()
+    const emailValues = Array.from(new Set([exactEmail, normalizedEmail].filter(Boolean)))
+
+    if (userId) {
+        for (const field of idFields) {
+            clauses.push({ [field]: userId })
+        }
+    }
+
+    for (const field of emailFields) {
+        for (const value of emailValues) {
+            clauses.push({ [field]: value })
+        }
+    }
+
+    if (!clauses.length) {
+        if (!baseFilter || !Object.keys(baseFilter).length) {
+            return { _id: null }
+        }
+
+        return {
+            $and: [
+                baseFilter,
+                { _id: null }
+            ]
+        }
+    }
+
+    if (!baseFilter || !Object.keys(baseFilter).length) {
+        return { $or: clauses }
+    }
+
+    return {
+        $and: [
+            baseFilter,
+            { $or: clauses }
+        ]
+    }
 }
 
+module.exports = {
+    getCurrentUser,
+    getUserScope,
+    buildOwnedDocumentFilter
+}

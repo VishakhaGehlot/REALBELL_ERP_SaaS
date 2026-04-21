@@ -740,7 +740,14 @@
 
 <div class="main-wrapper">
     <%
-        const hasAccess = (typeof canAccess === 'function') ? canAccess : (() => true);
+        const hasAccess = (typeof canAccess === 'function') ? canAccess : (() => false);
+        const hasAnyPermission = (moduleKey, actions) => {
+            const actionList = Array.isArray(actions) && actions.length ? actions : ['view', 'add', 'edit', 'delete'];
+            if (typeof canAccessAny === 'function') {
+                return canAccessAny(moduleKey, actionList);
+            }
+            return actionList.some((action) => hasAccess(moduleKey, action));
+        };
     %>
     <%- include('../../partials/admin/left.ejs') %>
 
@@ -840,6 +847,9 @@
             <div class="quick-actions">
                 <h4><i class="bi bi-lightning-charge"></i> Quick Actions</h4>
                 <div class="actions-grid">
+                    <% if (hasAnyPermission('subscription', ['view', 'edit', 'delete'])) { %><a href="/plan" class="action-btn"><i class="bi bi-tags"></i><span>Plans</span></a><% } %>
+                    <% if (hasAccess('subscription', 'add')) { %><a href="/addplan" class="action-btn"><i class="bi bi-plus-square"></i><span>Create Plan</span></a><% } %>
+                    <% if (hasAccess('subscription', 'edit')) { %><a href="/subscription/settings" class="action-btn"><i class="bi bi-gear"></i><span>Payment Settings</span></a><% } %>
                     <% if (hasAccess('crm', 'view')) { %><a href="/addcontacttable" class="action-btn"><i class="bi bi-people"></i><span>All Contacts</span></a><% } %>
                     <% if (hasAccess('crm', 'add')) { %><a href="/addcontactform" class="action-btn"><i class="bi bi-person-plus"></i><span>Add Contact</span></a><% } %>
                     <% if (hasAccess('leadManagement', 'view')) { %><a href="/crm/leads" class="action-btn"><i class="bi bi-funnel"></i><span>View Leads</span></a><% } %>
@@ -849,8 +859,9 @@
                     <% if (hasAccess('hrm', 'view')) { %><a href="/employees" class="action-btn"><i class="bi bi-person-badge"></i><span>Employees</span></a><% } %>
                     <% if (hasAccess('hrm', 'add')) { %><a href="/AddNewEmployee" class="action-btn"><i class="bi bi-person-plus-fill"></i><span>Add Employee</span></a><% } %>
                     <% if (hasAccess('queryManagement', 'view')) { %><a href="/querytable" class="action-btn"><i class="bi bi-chat-dots"></i><span>View Queries</span></a><% } %>
-                    <% if (hasAccess('frontendManagement', 'view')) { %><a href="/faqtable" class="action-btn"><i class="bi bi-window"></i><span>Frontend CMS</span></a><% } %>
-                    <% if (hasAccess('productManagement', 'view')) { %><a href="/producttable" class="action-btn"><i class="bi bi-box-seam"></i><span>Products</span></a><% } %>
+                    <% if (hasAnyPermission('frontendManagement')) { %><a href="/faqtable" class="action-btn"><i class="bi bi-window"></i><span>Frontend CMS</span></a><% } %>
+                    <% if (hasAnyPermission('productManagement', ['view', 'edit', 'delete'])) { %><a href="/producttable" class="action-btn"><i class="bi bi-box-seam"></i><span>Products</span></a><% } %>
+                    <% if (hasAccess('productManagement', 'add')) { %><a href="/addproduct" class="action-btn"><i class="bi bi-plus-circle"></i><span>Add Product</span></a><% } %>
                     <% if (currentUserRole === 'SuperAdmin') { %><a href="/permissions" class="action-btn"><i class="bi bi-shield-check"></i><span>Permissions</span></a><% } %>
                 </div>
             </div>

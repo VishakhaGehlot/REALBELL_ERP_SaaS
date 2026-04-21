@@ -43,6 +43,10 @@ const MODULE_LABELS = {
     supportDeskManagement: "Support Desk Management"
 }
 
+// Keep module availability configurable from permissions instead of hard-locking
+// it by role. This preserves per-role dashboards without forcing modules off.
+const MODULE_ROLE_RULES = {}
+
 function moduleActionSet(value) {
     return {
         view: value,
@@ -173,6 +177,31 @@ function cloneDefaultPermissions(defaultPermissions) {
     return JSON.parse(JSON.stringify(defaultPermissions))
 }
 
+function isModuleAllowedForRole(role, moduleKey) {
+    const normalizedRole = normalizeRole(role)
+    const allowedRoles = MODULE_ROLE_RULES[moduleKey]
+
+    if (!Array.isArray(allowedRoles) || !allowedRoles.length) {
+        return true
+    }
+
+    return allowedRoles.includes(normalizedRole)
+}
+
+function applyRoleModuleRules(role, permissions) {
+    const maskedPermissions = cloneDefaultPermissions(permissions || {})
+
+    for (const moduleKey of PERMISSION_KEYS) {
+        if (!isModuleAllowedForRole(role, moduleKey)) {
+            maskedPermissions[moduleKey] = moduleActionSet(false)
+        } else if (!maskedPermissions[moduleKey]) {
+            maskedPermissions[moduleKey] = moduleActionSet(false)
+        }
+    }
+
+    return maskedPermissions
+}
+
 function mergeModulePermissions(baseModulePermissions, incomingModulePermissions) {
     const merged = { ...baseModulePermissions }
 
@@ -197,20 +226,31 @@ async function getPermissionsForRole(role) {
     const defaultPermissions = DEFAULT_PERMISSIONS[normalizedRole] || DEFAULT_PERMISSIONS.Employee
 
     if (normalizedRole === "SuperAdmin") {
-        return cloneDefaultPermissions(defaultPermissions)
+        return applyRoleModuleRules(normalizedRole, cloneDefaultPermissions(defaultPermissions))
     }
 
     const roleAliases = getRoleKeyAliases(normalizedRole)
     const roleKey = toPermissionRoleKey(normalizedRole)
+    
+    console.log(`[Permission Debug] Getting permissions for role: ${role} (normalized: ${normalizedRole}, key: ${roleKey})`)
+    console.log(`[Permission Debug] Role aliases:`, roleAliases)
+    
     const docs = await RolePermission.find({
         role: { $in: roleAliases }
     }).sort({ updatedAt: -1 }).lean()
+    
+    console.log(`[Permission Debug] Found ${docs.length} permission docs:`, docs.map(d => ({ role: d.role, updatedAt: d.updatedAt })))
+    
     const doc =
         docs.find((d) => String(d.role).toLowerCase() === roleKey) ||
         docs.find((d) => String(d.role).toLowerCase() === normalizedRole.toLowerCase()) ||
         docs[0]
+    
+    console.log(`[Permission Debug] Selected doc:`, doc ? { role: doc.role, hasPermissions: !!doc.permissions } : null)
+    
     if (!doc || !doc.permissions) {
-        return cloneDefaultPermissions(defaultPermissions)
+        console.log(`[Permission Debug] No doc found, returning defaults`)
+        return applyRoleModuleRules(normalizedRole, cloneDefaultPermissions(defaultPermissions))
     }
 
     const merged = cloneDefaultPermissions(defaultPermissions)
@@ -221,7 +261,7 @@ async function getPermissionsForRole(role) {
         )
     }
 
-    return merged
+    return applyRoleModuleRules(normalizedRole, merged)
 }
 
 async function attachRolePermissions(req, res, next) {
@@ -230,6 +270,7 @@ async function attachRolePermissions(req, res, next) {
             const guestPermissions = cloneDefaultPermissions(DEFAULT_PERMISSIONS.Employee)
             res.locals.modulePermissions = guestPermissions
             res.locals.canAccess = () => false
+            res.locals.canAccessAny = () => false
             res.locals.currentUserRole = "Employee"
             return next()
         }
@@ -240,12 +281,23 @@ async function attachRolePermissions(req, res, next) {
         req.modulePermissions = permissions
         res.locals.modulePermissions = permissions
         res.locals.currentUserRole = role
+        req.isModuleAllowedForRole = (moduleKey) => isModuleAllowedForRole(role, moduleKey)
+        res.locals.isModuleAllowedForRole = req.isModuleAllowedForRole
         res.locals.canAccess = (moduleKey, action = "view") => {
+            if (!isModuleAllowedForRole(role, moduleKey)) return false
             if (role === "SuperAdmin") return true
             return Boolean(
                 permissions[moduleKey] &&
                 permissions[moduleKey][action]
             )
+        }
+        res.locals.canAccessAny = (moduleKey, actions = ACTION_KEYS) => {
+            if (!isModuleAllowedForRole(role, moduleKey)) return false
+            if (role === "SuperAdmin") return true
+            const modulePermissions = permissions[moduleKey]
+            return Array.isArray(actions)
+                ? actions.some((action) => Boolean(modulePermissions && modulePermissions[action]))
+                : Boolean(modulePermissions && modulePermissions[actions])
         }
         return next()
     } catch (error) {
@@ -254,6 +306,7 @@ async function attachRolePermissions(req, res, next) {
         res.locals.modulePermissions = fallbackPermissions
         res.locals.currentUserRole = "Employee"
         res.locals.canAccess = () => false
+        res.locals.canAccessAny = () => false
         return next()
     }
 }
@@ -285,6 +338,13 @@ function requireModuleAccess(moduleKey, forcedAction) {
             }
 
             const role = await resolveRequestRole(req)
+            console.log(`[Permission Debug] Checking access for role: ${role}, module: ${moduleKey}, session:`, req.session.email)
+
+            if (!isModuleAllowedForRole(role, moduleKey)) {
+                console.log(`[Permission Debug] Module ${moduleKey} is hidden for role ${role}`)
+                return sendAccessDenied(req, res, forcedAction || resolveActionFromRequest(req), moduleKey)
+            }
+            
             if (role === "SuperAdmin") {
                 return next()
             }
@@ -292,6 +352,10 @@ function requireModuleAccess(moduleKey, forcedAction) {
             const permissions = await getPermissionsForRole(role)
             const modulePermissions = permissions[moduleKey]
             const action = forcedAction || resolveActionFromRequest(req)
+            
+            console.log(`[Permission Debug] Module: ${moduleKey}, Action: ${action}`)
+            console.log(`[Permission Debug] Module permissions:`, modulePermissions)
+            console.log(`[Permission Debug] Has permission:`, modulePermissions ? modulePermissions[action] : 'N/A')
 
             if (modulePermissions && modulePermissions[action]) {
                 return next()
@@ -302,11 +366,36 @@ function requireModuleAccess(moduleKey, forcedAction) {
                 return next()
             }
 
+            console.log(`[Permission Debug] Access DENIED for ${role} on ${moduleKey}:${action}`)
             return sendAccessDenied(req, res, action, moduleKey)
         } catch (error) {
             console.error("Module permission error:", error)
             return res.status(500).send("Permission check failed.")
         }
+    }
+}
+
+function normalizeRoutePrefix(routePrefix) {
+    const normalized = String(routePrefix || "").trim().toLowerCase()
+    if (!normalized) return ""
+    return normalized.startsWith("/") ? normalized : `/${normalized}`
+}
+
+function requireScopedModuleAccess(moduleKey, routePrefixes, forcedAction) {
+    const moduleGuard = requireModuleAccess(moduleKey, forcedAction)
+    const prefixes = (Array.isArray(routePrefixes) ? routePrefixes : [routePrefixes])
+        .map(normalizeRoutePrefix)
+        .filter(Boolean)
+
+    return (req, res, next) => {
+        const requestPath = normalizeRoutePrefix(req.path || req.originalUrl || "")
+        const shouldCheck = prefixes.some((prefix) => requestPath.startsWith(prefix))
+
+        if (!shouldCheck) {
+            return next()
+        }
+
+        return moduleGuard(req, res, next)
     }
 }
 
@@ -350,9 +439,8 @@ function resolveActionFromRequest(req) {
         ) {
             return "edit"
         }
-        // Opening pages/forms is treated as "view"; mutations are checked on POST/PUT/DELETE.
         if (path.includes("add") || path.includes("form") || path.includes("new")) {
-            return "view"
+            return "add"
         }
     }
 
@@ -365,7 +453,9 @@ module.exports = {
     MODULE_LABELS,
     DEFAULT_PERMISSIONS,
     toPermissionRoleKey,
+    isModuleAllowedForRole,
     getPermissionsForRole,
     attachRolePermissions,
-    requireModuleAccess
+    requireModuleAccess,
+    requireScopedModuleAccess
 }

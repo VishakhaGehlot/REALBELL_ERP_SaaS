@@ -1,4 +1,9 @@
 <%- include('../../partials/admin/header.ejs')%>
+<%
+    const planRecord = typeof plan !== 'undefined' && plan ? plan : null;
+    const formTarget = typeof formAction !== 'undefined' && formAction ? formAction : '/addplan';
+    const mode = typeof formMode !== 'undefined' && formMode ? formMode : (planRecord ? 'edit' : 'create');
+%>
     <style>
         * {
             margin: 0;
@@ -465,9 +470,9 @@
                 <div>
                     <h2>
                         <i class="bi bi-plus-circle"></i>
-                        Create New Plan
+                        <%= mode === 'edit' ? 'Edit Plan' : 'Create New Plan' %>
                     </h2>
-                    <p>Design subscription tiers, add features, and set pricing</p>
+                    <p><%= mode === 'edit' ? 'Update subscription pricing, features, and status' : 'Design subscription tiers, add features, and set pricing' %></p>
                 </div>
                 <a href="/plan" class="btn-back">
                     <i class="bi bi-arrow-left"></i>
@@ -479,16 +484,16 @@
             <div class="form-card">
                 <div class="form-header">
                     <i class="bi bi-file-earmark-plus"></i>
-                    <span>Plan Information</span>
+                    <span><%= mode === 'edit' ? 'Update Plan Information' : 'Plan Information' %></span>
                 </div>
                 <div class="form-body">
-                    <form action="/addplan" method="post" id="planForm">
+                    <form action="<%= formTarget %>" method="post" id="planForm">
                         <!-- Plan Title -->
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="bi bi-pencil-square"></i> Plan Title
                             </label>
-                            <input type="text" name="title" class="form-control" placeholder="e.g., Professional, Business, Premium" required>
+                            <input type="text" name="title" class="form-control" placeholder="e.g., Professional, Business, Premium" value="<%= planRecord ? planRecord.title : '' %>" required>
                         </div>
 
                         <!-- Price -->
@@ -498,7 +503,7 @@
                             </label>
                             <div class="price-input-wrapper">
                                 <span class="price-currency-symbol">₹</span>
-                                <input type="text" name="price" class="form-control" placeholder="2999" required style="padding-left: 32px;">
+                                <input type="text" name="price" class="form-control" placeholder="2999" value="<%= planRecord ? planRecord.price : '' %>" required style="padding-left: 32px;">
                             </div>
                         </div>
 
@@ -539,8 +544,8 @@
 
                         <!-- Submit Button -->
                         <button type="submit" class="btn-submit">
-                            <i class="bi bi-save"></i>
-                            Create Subscription Plan
+                            <i class="bi <%= mode === 'edit' ? 'bi-pencil-square' : 'bi-save' %>"></i>
+                            <%= mode === 'edit' ? 'Update Subscription Plan' : 'Create Subscription Plan' %>
                         </button>
                     </form>
                 </div>
@@ -550,7 +555,7 @@
 </div>
 
 <script>
-    let features = [];
+    let features = <%- JSON.stringify(planRecord && Array.isArray(planRecord.features) ? planRecord.features : []) %>;
     const input = document.getElementById("featureInput");
     const box = document.getElementById("featureBox");
     const hidden = document.getElementById("featuresData");
@@ -619,6 +624,20 @@
         hidden.value = JSON.stringify(features);
         updatePreview();
     }
+
+    function renderExistingFeatures() {
+        const inputWrapper = box.querySelector(".feature-input-wrapper");
+        box.querySelectorAll(".feature-tag").forEach((tag) => tag.remove());
+
+        features.forEach((value) => {
+            const tag = document.createElement("div");
+            tag.className = "feature-tag";
+            tag.innerHTML = `<i class="bi bi-star-fill" style="font-size: 10px;"></i> ${escapeHtml(value)} <span onclick='removeFeature(this, "${escapeHtml(value).replace(/"/g, '&quot;')}")'>&times;</span>`;
+            box.insertBefore(tag, inputWrapper);
+        });
+
+        updateFeatureCount();
+    }
     
     function addFeature(value) {
         if (value === "") return;
@@ -667,13 +686,13 @@
     }
     
     // Initialize preview on page load
-    updatePreview();
+    renderExistingFeatures();
     
     // Form submit validation: ensure at least one feature? (optional but good UX)
     const form = document.getElementById("planForm");
     form.addEventListener("submit", function(e) {
         if (features.length === 0) {
-            const confirmAdd = confirm("No features added. Are you sure you want to create a plan without features?");
+            const confirmAdd = confirm("No features added. Are you sure you want to continue without features?");
             if (!confirmAdd) {
                 e.preventDefault();
                 return;

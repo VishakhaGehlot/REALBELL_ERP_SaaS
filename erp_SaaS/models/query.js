@@ -10,6 +10,19 @@ const querySchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    handledByUserId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "auth",
+        default: null
+    },
+    handledByEmail: {
+        type: String,
+        default: ""
+    },
+    handledAt: {
+        type: Date,
+        default: null
+    },
     createdDate:{
         type:Date,
         default:Date.now

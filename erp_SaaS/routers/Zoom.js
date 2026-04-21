@@ -1,9 +1,12 @@
 // routes/zoomRoutes.js
 const router = require('express').Router();
 const ZoomMeeting = require('../models/ZoomMeeting');
+const { requireAuth } = require('../middleware/roleAuth');
+const { requireModuleAccess } = require('../middleware/permissionAuth');
+const { buildOwnedDocumentFilter } = require('../middleware/dataScope');
 
 // GET - Render Zoom Template page
-router.get("/schedule-meeting", (req, res) => {
+router.get("/schedule-meeting", requireAuth, requireModuleAccess('zoomMeeting', 'view'), (req, res) => {
     res.render("Zoom/ZoomTemplate", {
         title: "Zoom Meeting Management",
         user: req.user || null
@@ -11,7 +14,7 @@ router.get("/schedule-meeting", (req, res) => {
 });
 
 // GET - Get all meetings (with filters)
-router.get("/zoom-meetings", async (req, res) => {
+router.get("/zoom-meetings", requireAuth, requireModuleAccess('zoomMeeting', 'view'), async (req, res) => {
     try {
         const { search, linkStatus } = req.query;
         let filter = {};
@@ -32,7 +35,12 @@ router.get("/zoom-meetings", async (req, res) => {
             ];
         }
 
-        const meetings = await ZoomMeeting.find(filter).sort({ createdAt: -1 });
+        const ownershipFilter = buildOwnedDocumentFilter(req, {
+            idFields: ['createdByUserId'],
+            emailFields: ['createdByEmail']
+        }, filter);
+
+        const meetings = await ZoomMeeting.find(ownershipFilter).sort({ createdAt: -1 });
 
         // Calculate statistics
         const totalMeetings = meetings.length;
@@ -62,9 +70,10 @@ router.get("/zoom-meetings", async (req, res) => {
 });
 
 // POST - Add new meeting
-router.post("/zoom-meetings", async (req, res) => {
+router.post("/zoom-meetings", requireAuth, requireModuleAccess('zoomMeeting', 'add'), async (req, res) => {
     try {
         const { title, zoomId, passcode, dateTime, joinLink } = req.body;
+        const currentUserEmail = String(req.session?.email || '').toLowerCase();
 
         if (!title && !zoomId) {
             return res.status(400).json({ success: false, message: "Please enter at least Meeting Title or Zoom ID" });
@@ -75,7 +84,9 @@ router.post("/zoom-meetings", async (req, res) => {
             zoomId: zoomId || `auto-${Date.now()}`,
             passcode: passcode || "—",
             dateTime: dateTime || "Not scheduled",
-            joinLink: joinLink || ""
+            joinLink: joinLink || "",
+            createdByUserId: req.session?.userId || null,
+            createdByEmail: currentUserEmail
         });
 
         await newMeeting.save();
@@ -87,9 +98,12 @@ router.post("/zoom-meetings", async (req, res) => {
 });
 
 // GET - Get single meeting by ID
-router.get("/zoom-meetings/:id", async (req, res) => {
+router.get("/zoom-meetings/:id", requireAuth, requireModuleAccess('zoomMeeting', 'view'), async (req, res) => {
     try {
-        const meeting = await ZoomMeeting.findById(req.params.id);
+        const meeting = await ZoomMeeting.findOne(buildOwnedDocumentFilter(req, {
+            idFields: ['createdByUserId'],
+            emailFields: ['createdByEmail']
+        }, { _id: req.params.id }));
         if (!meeting) {
             return res.status(404).json({ success: false, message: "Meeting not found" });
         }
@@ -101,12 +115,15 @@ router.get("/zoom-meetings/:id", async (req, res) => {
 });
 
 // PUT - Update meeting by ID (Edit functionality)
-router.put("/zoom-meetings/:id", async (req, res) => {
+router.put("/zoom-meetings/:id", requireAuth, requireModuleAccess('zoomMeeting', 'edit'), async (req, res) => {
     try {
         const { title, zoomId, passcode, dateTime, joinLink } = req.body;
 
-        const updatedMeeting = await ZoomMeeting.findByIdAndUpdate(
-            req.params.id,
+        const updatedMeeting = await ZoomMeeting.findOneAndUpdate(
+            buildOwnedDocumentFilter(req, {
+                idFields: ['createdByUserId'],
+                emailFields: ['createdByEmail']
+            }, { _id: req.params.id }),
             {
                 title: title || "Untitled Meeting",
                 zoomId: zoomId,
@@ -130,9 +147,12 @@ router.put("/zoom-meetings/:id", async (req, res) => {
 });
 
 // DELETE - Delete meeting by ID
-router.delete("/zoom-meetings/:id", async (req, res) => {
+router.delete("/zoom-meetings/:id", requireAuth, requireModuleAccess('zoomMeeting', 'delete'), async (req, res) => {
     try {
-        const meeting = await ZoomMeeting.findByIdAndDelete(req.params.id);
+        const meeting = await ZoomMeeting.findOneAndDelete(buildOwnedDocumentFilter(req, {
+            idFields: ['createdByUserId'],
+            emailFields: ['createdByEmail']
+        }, { _id: req.params.id }));
         if (!meeting) {
             return res.status(404).json({ success: false, message: "Meeting not found" });
         }

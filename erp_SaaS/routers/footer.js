@@ -2,13 +2,27 @@ const router = require('express').Router()
 const upload = require('../middleware/multer')
 const footertable = require('../models/footer')
 const { requireAuth } = require('../middleware/roleAuth')
-const { requireModuleAccess } = require('../middleware/permissionAuth')
+const { requireScopedModuleAccess } = require('../middleware/permissionAuth')
+const { buildOwnedDocumentFilter } = require('../middleware/dataScope')
 
 router.use(requireAuth)
-router.use(requireModuleAccess('frontendManagement'))
+router.use(requireScopedModuleAccess('frontendManagement', [
+    '/footertable',
+    '/footerform',
+    '/footerstatus',
+    '/footerdelete',
+    '/footeredit'
+]))
+
+function buildFooterScopeFilter(req, baseFilter = {}) {
+    return buildOwnedDocumentFilter(req, {
+        idFields: ['createdByUserId'],
+        emailFields: ['createdByEmail']
+    }, baseFilter)
+}
 
 router.get('/footertable', async (req, res) => {
-    const footerdata = await footertable.find()
+    const footerdata = await footertable.find(buildFooterScopeFilter(req))
      const loginname=req.session.email
     res.render("Frontend/Footer/footertable.ejs", { footerdata, loginname })
 })
@@ -31,7 +45,9 @@ router.post('/footerform', upload.single('img'), async (req, res) => {
         instagramUrl: instagram,
         youtubeUrl: youtube,
         facebook: facebook,
-        LinUrl: linkedin
+        LinUrl: linkedin,
+        createdByUserId: req.session?.userId || null,
+        createdByEmail: String(req.session?.email || '').toLowerCase()
     })
 
     await Record.save()
@@ -53,7 +69,7 @@ router.get('/footerstatus/:id/:status', async (req, res) => {
         newStatus = "Pending"
     }
 
-    await footertable.findByIdAndUpdate(id, { status: newStatus })
+    await footertable.findOneAndUpdate(buildFooterScopeFilter(req, { _id: id }), { status: newStatus })
 
     res.redirect("/footertable")
 
@@ -64,7 +80,7 @@ router.get('/footerdelete/:id', async (req, res) => {
 
     const id = req.params.id
 
-    await footertable.findByIdAndDelete(id)
+    await footertable.findOneAndDelete(buildFooterScopeFilter(req, { _id: id }))
 
     res.redirect("/footertable")
 
@@ -75,7 +91,7 @@ router.get('/footeredit/:id', async (req, res) => {
 
     const id = req.params.id
 
-    const Record = await footertable.findById(id)
+    const Record = await footertable.findOne(buildFooterScopeFilter(req, { _id: id }))
          const loginname=req.session.email
 
 
@@ -103,7 +119,7 @@ router.post('/footeredit/:id', upload.single('img'), async (req, res) => {
         updateData.img = req.file.filename
     }
 
-    await footertable.findByIdAndUpdate(id, updateData)
+    await footertable.findOneAndUpdate(buildFooterScopeFilter(req, { _id: id }), updateData)
 
     res.redirect("/footertable")
 

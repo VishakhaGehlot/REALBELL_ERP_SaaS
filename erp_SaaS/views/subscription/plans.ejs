@@ -556,6 +556,13 @@
     </style>
 </head>
 <body>
+<%
+    const hasAccess = (typeof canAccess === 'function') ? canAccess : (() => true);
+    const canAddSubscription = hasAccess('subscription', 'add');
+    const canEditSubscription = hasAccess('subscription', 'edit');
+    const canDeleteSubscription = hasAccess('subscription', 'delete');
+    const showSubscriptionActions = canEditSubscription || canDeleteSubscription;
+%>
 <div class="main-wrapper">
     <!-- Sidebar partial simulation (matching original left.ejs) -->
     <div class="sidebar">
@@ -585,10 +592,12 @@
                     </h2>
                     <p>Manage pricing plans, features, and subscription statuses</p>
                 </div>
+                <% if (canAddSubscription) { %>
                 <a href="/addplan" class="btn-add">
                     <i class="bi bi-plus-circle"></i>
                     Create New Plan
                 </a>
+                <% } %>
             </div>
 
             <!-- Stats Cards (dynamic counts from Data) -->
@@ -641,7 +650,9 @@
                                 <th>Price</th>
                                 <th>Features</th>
                                 <th>Status</th>
+                                <% if (showSubscriptionActions) { %>
                                 <th style="text-align: center;">Actions</th>
+                                <% } %>
                             </tr>
                         </thead>
                         <tbody>
@@ -675,6 +686,7 @@
                                         </div>
                                     </td>
                                     <td>
+                                        <% if (canEditSubscription) { %>
                                         <a href="/planstatus/<%= plan._id %>/<%= plan.Status %>" class="status-badge <%= plan.Status === 'Active' ? 'active' : (plan.Status === 'Pending' ? 'pending' : 'inactive') %>" style="text-decoration: none;">
                                             <% if(plan.Status === 'Active') { %>
                                                 <i class="bi bi-check-circle-fill"></i> Active
@@ -684,23 +696,39 @@
                                                 <i class="bi bi-x-circle-fill"></i> <%= plan.Status || 'Inactive' %>
                                             <% } %>
                                         </a>
+                                        <% } else { %>
+                                        <span class="status-badge <%= plan.Status === 'Active' ? 'active' : (plan.Status === 'Pending' ? 'pending' : 'inactive') %>">
+                                            <% if(plan.Status === 'Active') { %>
+                                                <i class="bi bi-check-circle-fill"></i> Active
+                                            <% } else if(plan.Status === 'Pending') { %>
+                                                <i class="bi bi-clock-fill"></i> Pending
+                                            <% } else { %>
+                                                <i class="bi bi-x-circle-fill"></i> <%= plan.Status || 'Inactive' %>
+                                            <% } %>
+                                        </span>
+                                        <% } %>
                                     </td>
+                                    <% if (showSubscriptionActions) { %>
                                     <td style="text-align: center;">
                                         <div class="action-buttons">
-                                            <!-- Optional edit route - you can link to edit page if needed -->
+                                            <% if (canEditSubscription) { %>
                                             <a href="/editplan/<%= plan._id %>" class="action-btn edit" title="Edit Plan">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
+                                            <% } %>
+                                            <% if (canDeleteSubscription) { %>
                                             <a href="/deleteplan/<%= plan._id %>" class="action-btn delete" onclick="return confirm('Are you sure you want to delete this subscription plan?')" title="Delete Plan">
                                                 <i class="bi bi-trash3"></i>
                                             </a>
+                                            <% } %>
                                         </div>
                                     </td>
+                                    <% } %>
                                 </tr>
                             <% }) 
                             } else { %>
                                 <tr>
-                                    <td colspan="6">
+                                    <td colspan="<%= showSubscriptionActions ? 6 : 5 %>">
                                         <div class="empty-state">
                                             <i class="bi bi-journal-x"></i>
                                             <h5>No Subscription Plans Found</h5>

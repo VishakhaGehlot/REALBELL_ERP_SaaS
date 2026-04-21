@@ -515,6 +515,113 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
+        [data-theme="dark"] .top-header {
+            background: #111a2e;
+            border: 1px solid #253454;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+        }
+
+        [data-theme="dark"] .page-title h2 {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .page-title p,
+        [data-theme="dark"] .user-info span {
+            color: #9fb0cb !important;
+        }
+
+        [data-theme="dark"] .user-info i {
+            color: #60a5fa;
+        }
+
+        [data-theme="dark"] .reset-btn {
+            background: #16233d;
+            color: #e5e7eb;
+            border-color: #2a3c61;
+        }
+
+        [data-theme="dark"] .reset-btn:hover {
+            background: #1d2d4b;
+            border-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .zoom-table thead {
+            background: #0d1427;
+            border-bottom-color: #253454;
+        }
+
+        [data-theme="dark"] .zoom-table th {
+            color: #9fb0cb;
+        }
+
+        [data-theme="dark"] .zoom-table td {
+            color: #e5e7eb;
+            border-bottom-color: #253454;
+        }
+
+        [data-theme="dark"] .link-badge {
+            background: #23314c !important;
+            color: #dbeafe !important;
+        }
+
+        [data-theme="dark"] .link-badge.has-link {
+            background: rgba(34, 197, 94, 0.18) !important;
+            color: #86efac !important;
+        }
+
+        [data-theme="dark"] .link-badge.no-link {
+            background: rgba(245, 158, 11, 0.18) !important;
+            color: #fcd34d !important;
+        }
+
+        [data-theme="dark"] .btn-join {
+            background: rgba(34, 197, 94, 0.18);
+            color: #86efac;
+        }
+
+        [data-theme="dark"] .btn-edit {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+        }
+
+        [data-theme="dark"] .btn-delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        [data-theme="dark"] .btn-join:hover,
+        [data-theme="dark"] .btn-edit:hover,
+        [data-theme="dark"] .btn-delete:hover {
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .modal-content {
+            background: #111a2e;
+            border: 1px solid #253454;
+        }
+
+        [data-theme="dark"] .modal-body,
+        [data-theme="dark"] .modal-footer {
+            background: #111a2e;
+            border-color: #253454;
+        }
+
+        [data-theme="dark"] .modal-body .form-label {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .modal-footer .btn-secondary {
+            background: #16233d;
+            border-color: #2a3c61;
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .modal-footer .btn-secondary:hover {
+            background: #1d2d4b;
+            border-color: #3b82f6;
+        }
+
         @media (max-width: 768px) {
             .content-wrapper {
                 margin-left: 0;
@@ -547,527 +654,547 @@
     <!-- Header Include -->
     <%- include('../../partials/admin/header.ejs') %>
 
-        <div class="main-wrapper">
-            <!-- Sidebar Include -->
-            <%- include('../../partials/admin/left.ejs') %>
+    <div class="main-wrapper">
+        <!-- Sidebar Include -->
+        <%- include('../../partials/admin/left.ejs') %>
 
-                <div class="content-wrapper">
-                    <div class="container-fluid">
-                        <!-- Top Header -->
-                        <div class="top-header">
-                            <div class="page-title">
-                                <h2>
-                                    <i class="bi bi-camera-video-fill" style="color: #3b82f6;"></i>
-                                    Zoom Meetings Dashboard
-                                </h2>
-                                <p>Manage and organize all your Zoom meetings in one place</p>
-                            </div>
-                            <div class="user-info">
-                                <span>Welcome, Admin</span>
-                                <i class="bi bi-person-circle"></i>
-                            </div>
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                <!-- Top Header -->
+                <div class="top-header">
+                    <div class="page-title">
+                        <h2>
+                            <i class="bi bi-camera-video-fill" style="color: #3b82f6;"></i>
+                            Zoom Meetings Dashboard
+                        </h2>
+                        <p>Manage and organize all your Zoom meetings in one place</p>
+                    </div>
+                    <div class="user-info">
+                        <span>Welcome, Admin</span>
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-row">
+                    <div class="stat-card purple">
+                        <div class="stat-header">
+                            <h6>Total Meetings</h6>
+                            <i class="bi bi-camera-video"></i>
                         </div>
-
-                        <!-- Stats Cards -->
-                        <div class="stats-row">
-                            <div class="stat-card purple">
-                                <div class="stat-header">
-                                    <h6>Total Meetings</h6>
-                                    <i class="bi bi-camera-video"></i>
-                                </div>
-                                <div class="stat-number" id="totalMeetingsStat">0</div>
-                            </div>
-                            <div class="stat-card green">
-                                <div class="stat-header">
-                                    <h6>With Join Link</h6>
-                                    <i class="bi bi-link-45deg"></i>
-                                </div>
-                                <div class="stat-number" id="withLinkStat">0</div>
-                            </div>
-                            <div class="stat-card orange">
-                                <div class="stat-header">
-                                    <h6>Today's Meetings</h6>
-                                    <i class="bi bi-calendar-day"></i>
-                                </div>
-                                <div class="stat-number" id="todayMeetingsStat">0</div>
-                            </div>
-                            <div class="stat-card blue">
-                                <div class="stat-header">
-                                    <h6>This Week</h6>
-                                    <i class="bi bi-calendar-week"></i>
-                                </div>
-                                <div class="stat-number" id="weekMeetingsStat">0</div>
-                            </div>
+                        <div class="stat-number" id="totalMeetingsStat">0</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-header">
+                            <h6>With Join Link</h6>
+                            <i class="bi bi-link-45deg"></i>
                         </div>
+                        <div class="stat-number" id="withLinkStat">0</div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-header">
+                            <h6>Today's Meetings</h6>
+                            <i class="bi bi-calendar-day"></i>
+                        </div>
+                        <div class="stat-number" id="todayMeetingsStat">0</div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-header">
+                            <h6>This Week</h6>
+                            <i class="bi bi-calendar-week"></i>
+                        </div>
+                        <div class="stat-number" id="weekMeetingsStat">0</div>
+                    </div>
+                </div>
 
-                        <!-- Add Zoom Meeting Button -->
-                        <div style="margin-bottom: 20px; text-align: right;">
-                            <button class="add-btn" id="openAddModalBtn">
-                                <i class="bi bi-plus-lg"></i> Add Zoom Meeting
+                <!-- Add Zoom Meeting Button -->
+                <div style="margin-bottom: 20px; text-align: right;">
+                    <button class="add-btn" id="openAddModalBtn">
+                        <i class="bi bi-plus-lg"></i> Add Zoom Meeting
+                    </button>
+                </div>
+
+                <!-- Filter Card -->
+                <div class="filter-card">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label><i class="bi bi-search"></i> Search</label>
+                            <input type="text" id="searchInput" placeholder="Search by title, ID...">
+                        </div>
+                        <div class="filter-group">
+                            <label><i class="bi bi-link"></i> Link Status</label>
+                            <select id="linkFilter">
+                                <option value="">All Meetings</option>
+                                <option value="has_link">Has Join Link</option>
+                                <option value="no_link">No Join Link</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>&nbsp;</label>
+                            <button class="reset-btn" id="resetFiltersBtn">
+                                <i class="bi bi-arrow-repeat"></i> Reset Filters
                             </button>
                         </div>
-
-                        <!-- Filter Card -->
-                        <div class="filter-card">
-                            <div class="filter-row">
-                                <div class="filter-group">
-                                    <label><i class="bi bi-search"></i> Search</label>
-                                    <input type="text" id="searchInput" placeholder="Search by title, ID...">
-                                </div>
-                                <div class="filter-group">
-                                    <label><i class="bi bi-link"></i> Link Status</label>
-                                    <select id="linkFilter">
-                                        <option value="">All Meetings</option>
-                                        <option value="has_link">Has Join Link</option>
-                                        <option value="no_link">No Join Link</option>
-                                    </select>
-                                </div>
-                                <div class="filter-group">
-                                    <label>&nbsp;</label>
-                                    <button class="reset-btn" id="resetFiltersBtn">
-                                        <i class="bi bi-arrow-repeat"></i> Reset Filters
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Table Card -->
-                        <div class="table-card">
-                            <div class="table-header">
-                                <i class="bi bi-table"></i>
-                                <h3>Zoom Meetings List</h3>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="zoom-table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Meeting Title</th>
-                                            <th>Meeting ID</th>
-                                            <th>Date & Time</th>
-                                            <th>Passcode</th>
-                                            <th>Join Link</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="meetingsTableBody">
-                                        <tr>
-                                            <td colspan="7" class="empty-state">
-                                                <i class="bi bi-camera-video-off"></i>
-                                                <h5>No Meetings Found</h5>
-                                                <p>Click "Add Zoom Meeting" to create a new meeting</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
                     </div>
                 </div>
-        </div>
 
-        <!-- Add Meeting Modal -->
-        <div class="modal fade" id="addZoomModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add Zoom Meeting</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <!-- Table Card -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <i class="bi bi-table"></i>
+                        <h3>Zoom Meetings List</h3>
                     </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Meeting Title *</label>
-                            <input type="text" class="form-control" id="modalTitle"
-                                placeholder="e.g., Daily Standup, Client Call">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Zoom Meeting ID *</label>
-                            <input type="text" class="form-control" id="modalMeetingId" placeholder="123 456 7890">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Passcode</label>
-                            <input type="text" class="form-control" id="modalPasscode" placeholder="Optional passcode">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Date & Time</label>
-                            <input type="text" class="form-control" id="modalDateTime"
-                                placeholder="Today, 3:00 PM or Apr 15, 10:00 AM">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Zoom Join Link</label>
-                            <input type="text" class="form-control" id="modalJoinLink"
-                                placeholder="https://zoom.us/j/123456789">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-warning" id="confirmAddBtn"
-                            style="background: #3b82f6; color: white;">Add Meeting</button>
+                    <div class="table-responsive">
+                        <table class="zoom-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Meeting Title</th>
+                                    <th>Meeting ID</th>
+                                    <th>Date & Time</th>
+                                    <th>Passcode</th>
+                                    <th>Join Link</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="meetingsTableBody">
+                                <tr>
+                                    <td colspan="7" class="empty-state">
+                                        <i class="bi bi-camera-video-off"></i>
+                                        <h5>No Meetings Found</h5>
+                                        <p>Click "Add Zoom Meeting" to create a new meeting</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Edit Meeting Modal -->
-        <div class="modal fade" id="editMeetingModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Zoom Meeting</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    <!-- Add Meeting Modal -->
+    <div class="modal fade" id="addZoomModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add Zoom Meeting</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Meeting Title *</label>
+                        <input type="text" class="form-control" id="modalTitle"
+                            placeholder="e.g., Daily Standup, Client Call">
                     </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="editMeetingId">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Meeting Title *</label>
-                            <input type="text" class="form-control" id="editTitle">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Zoom Meeting ID *</label>
-                            <input type="text" class="form-control" id="editMeetingIdField">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Passcode</label>
-                            <input type="text" class="form-control" id="editPasscode">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Date & Time</label>
-                            <input type="text" class="form-control" id="editDateTime">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Zoom Join Link</label>
-                            <input type="text" class="form-control" id="editJoinLink">
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Zoom Meeting ID *</label>
+                        <input type="text" class="form-control" id="modalMeetingId" placeholder="123 456 7890">
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="confirmEditBtn"
-                            style="background: #3b82f6; color: white;">Update Meeting</button>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Passcode</label>
+                        <input type="text" class="form-control" id="modalPasscode" placeholder="Optional passcode">
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Date & Time</label>
+                        <input type="text" class="form-control" id="modalDateTime"
+                            placeholder="Today, 3:00 PM or Apr 15, 10:00 AM">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Zoom Join Link</label>
+                        <input type="text" class="form-control" id="modalJoinLink"
+                            placeholder="https://zoom.us/j/123456789">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" id="confirmAddBtn"
+                        style="background: #3b82f6; color: white;">Add Meeting</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div id="toastMsg" class="toast-msg"></div>
+    <!-- Edit Meeting Modal -->
+    <div class="modal fade" id="editMeetingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Zoom Meeting</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editMeetingId">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Meeting Title *</label>
+                        <input type="text" class="form-control" id="editTitle">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Zoom Meeting ID *</label>
+                        <input type="text" class="form-control" id="editMeetingIdField">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Passcode</label>
+                        <input type="text" class="form-control" id="editPasscode">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Date & Time</label>
+                        <input type="text" class="form-control" id="editDateTime">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Zoom Join Link</label>
+                        <input type="text" class="form-control" id="editJoinLink">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmEditBtn"
+                        style="background: #3b82f6; color: white;">Update Meeting</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-            (function () {
-                const STORAGE_KEY = 'zoom_template_meetings_edit';
+    <div id="toastMsg" class="toast-msg"></div>
 
-                function loadMeetings() {
-                    const stored = localStorage.getItem(STORAGE_KEY);
-                    if (stored) {
-                        try {
-                            return JSON.parse(stored);
-                        } catch (e) { return []; }
-                    }
-                    return [];
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function () {
+            let meetings = [];
+            let currentFilter = { search: '', linkStatus: '' };
+            let currentEditId = null;
+
+            const tableBody = document.getElementById('meetingsTableBody');
+            const searchInput = document.getElementById('searchInput');
+            const linkFilter = document.getElementById('linkFilter');
+            const resetBtn = document.getElementById('resetFiltersBtn');
+            const openModalBtn = document.getElementById('openAddModalBtn');
+            const confirmAddBtn = document.getElementById('confirmAddBtn');
+            const confirmEditBtn = document.getElementById('confirmEditBtn');
+            const addModal = new bootstrap.Modal(document.getElementById('addZoomModal'));
+            const editModal = new bootstrap.Modal(document.getElementById('editMeetingModal'));
+            const totalStat = document.getElementById('totalMeetingsStat');
+            const withLinkStat = document.getElementById('withLinkStat');
+            const todayStat = document.getElementById('todayMeetingsStat');
+            const weekStat = document.getElementById('weekMeetingsStat');
+
+            function showToast(message, duration = 2000) {
+                const toast = document.getElementById('toastMsg');
+                if (!toast) return;
+                toast.textContent = message;
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, duration);
+            }
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str.replace(/[&<>]/g, function (m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    return m;
+                });
+            }
+
+            function hasJoinLink(meeting) {
+                return Boolean(meeting && meeting.joinLink && String(meeting.joinLink).trim() !== '');
+            }
+
+            function normalizePasscode(passcode) {
+                const value = String(passcode || '').trim();
+                if (!value || value === '-' || value === '—' || value === 'â€”') {
+                    return '';
                 }
+                return value;
+            }
 
-                function saveMeetings(meetings) {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(meetings));
+            function getFilteredMeetings() {
+                let filtered = [...meetings];
+                if (currentFilter.search) {
+                    const searchLower = currentFilter.search.toLowerCase();
+                    filtered = filtered.filter((meeting) =>
+                        String(meeting.title || '').toLowerCase().includes(searchLower) ||
+                        String(meeting.zoomId || '').toLowerCase().includes(searchLower)
+                    );
                 }
-
-                let meetings = loadMeetings();
-
-                // DOM elements
-                const tableBody = document.getElementById('meetingsTableBody');
-                const searchInput = document.getElementById('searchInput');
-                const linkFilter = document.getElementById('linkFilter');
-                const resetBtn = document.getElementById('resetFiltersBtn');
-                const openModalBtn = document.getElementById('openAddModalBtn');
-                const confirmAddBtn = document.getElementById('confirmAddBtn');
-                const confirmEditBtn = document.getElementById('confirmEditBtn');
-                const addModal = new bootstrap.Modal(document.getElementById('addZoomModal'));
-                const editModal = new bootstrap.Modal(document.getElementById('editMeetingModal'));
-
-                // Stats elements
-                const totalStat = document.getElementById('totalMeetingsStat');
-                const withLinkStat = document.getElementById('withLinkStat');
-                const todayStat = document.getElementById('todayMeetingsStat');
-                const weekStat = document.getElementById('weekMeetingsStat');
-
-                let currentFilter = { search: '', linkStatus: '' };
-                let currentEditId = null;
-
-                function showToast(message, duration = 2000) {
-                    const toast = document.getElementById('toastMsg');
-                    toast.textContent = message;
-                    toast.style.display = 'block';
-                    setTimeout(() => {
-                        toast.style.display = 'none';
-                    }, duration);
+                if (currentFilter.linkStatus === 'has_link') {
+                    filtered = filtered.filter(hasJoinLink);
+                } else if (currentFilter.linkStatus === 'no_link') {
+                    filtered = filtered.filter((meeting) => !hasJoinLink(meeting));
                 }
+                return filtered;
+            }
 
-                function generateDemoId() {
-                    return Math.floor(Math.random() * 900000000) + 100000000;
-                }
+            function updateStats() {
+                totalStat.innerText = meetings.length;
+                withLinkStat.innerText = meetings.filter(hasJoinLink).length;
+                const todayMeetings = meetings.filter((meeting) =>
+                    String(meeting.dateTime || '').toLowerCase().includes('today')
+                ).length;
+                todayStat.innerText = todayMeetings;
+                const weekMeetings = meetings.filter((meeting) => {
+                    const dateTime = String(meeting.dateTime || '').toLowerCase();
+                    return dateTime.includes('today') || dateTime.includes('tomorrow');
+                }).length;
+                weekStat.innerText = weekMeetings;
+            }
 
-                function addMeeting(title, meetingId, passcode, dateTime, joinLink) {
-                    if (!title.trim() && !meetingId.trim()) {
-                        showToast("⚠️ Please enter at least Meeting Title or Zoom ID", 2000);
-                        return false;
-                    }
-                    if (!title.trim()) title = "Untitled Meeting";
-                    if (!meetingId.trim()) {
-                        meetingId = String(generateDemoId());
-                        showToast(`🔁 Auto-generated ID: ${meetingId}`, 1500);
-                    }
+            function renderEmptyState(title, subtitle) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <i class="bi bi-camera-video-off"></i>
+                            <h5>${escapeHtml(title)}</h5>
+                            <p>${escapeHtml(subtitle)}</p>
+                        </td>
+                    </tr>
+                `;
+            }
 
-                    const newMeeting = {
-                        uniqueId: Date.now() + Math.floor(Math.random() * 100000),
-                        title: title.trim(),
-                        zoomId: meetingId.trim(),
-                        passcode: passcode.trim() || "—",
-                        dateTime: dateTime.trim() || "Not scheduled",
-                        joinLink: joinLink.trim() || "",
-                        createdAt: new Date().toISOString()
-                    };
-                    meetings.unshift(newMeeting);
-                    saveMeetings(meetings);
-                    renderTable();
-                    updateStats();
-                    showToast(`✅ "${newMeeting.title}" added successfully!`, 2000);
-                    return true;
-                }
-
-                function updateMeeting(id, title, meetingId, passcode, dateTime, joinLink) {
-                    const meetingIndex = meetings.findIndex(m => m.uniqueId === id);
-                    if (meetingIndex !== -1) {
-                        meetings[meetingIndex] = {
-                            ...meetings[meetingIndex],
-                            title: title.trim(),
-                            zoomId: meetingId.trim(),
-                            passcode: passcode.trim() || "—",
-                            dateTime: dateTime.trim() || "Not scheduled",
-                            joinLink: joinLink.trim() || "",
-                            updatedAt: new Date().toISOString()
-                        };
-                        saveMeetings(meetings);
-                        renderTable();
-                        updateStats();
-                        showToast(`✅ Meeting updated successfully!`, 2000);
-                        return true;
-                    }
-                    return false;
-                }
-
-                function deleteMeeting(uniqueId) {
-                    const meeting = meetings.find(m => m.uniqueId === uniqueId);
-                    if (meeting) {
-                        meetings = meetings.filter(m => m.uniqueId !== uniqueId);
-                        saveMeetings(meetings);
-                        renderTable();
-                        updateStats();
-                        showToast(`🗑️ Removed "${meeting.title}"`, 1600);
-                    }
-                }
-
-                function openEditModal(meeting) {
-                    currentEditId = meeting.uniqueId;
-                    document.getElementById('editTitle').value = meeting.title;
-                    document.getElementById('editMeetingIdField').value = meeting.zoomId;
-                    document.getElementById('editPasscode').value = meeting.passcode === "—" ? "" : meeting.passcode;
-                    document.getElementById('editDateTime').value = meeting.dateTime === "Not scheduled" ? "" : meeting.dateTime;
-                    document.getElementById('editJoinLink').value = meeting.joinLink;
-                    editModal.show();
-                }
-
-                function joinMeeting(meeting) {
-                    if (meeting.joinLink && meeting.joinLink.trim() !== "" &&
-                        (meeting.joinLink.startsWith('http://') || meeting.joinLink.startsWith('https://'))) {
-                        window.open(meeting.joinLink, '_blank');
-                        showToast(`🔗 Opening Zoom: ${meeting.title}`, 1800);
+            function renderTable() {
+                const filtered = getFilteredMeetings();
+                if (!filtered.length) {
+                    if (meetings.length) {
+                        renderEmptyState('No Meetings Found', 'Try changing the search or link filters.');
                     } else {
-                        const passMsg = (meeting.passcode && meeting.passcode !== "—") ? ` Passcode: ${meeting.passcode}` : "";
-                        alert(`🎥 DEMO JOIN: "${meeting.title}"\nMeeting ID: ${meeting.zoomId}${passMsg}\n\n💡 Add a Zoom link to join directly.`);
-                        showToast(`🖥️ Simulated join for ${meeting.title}`, 1600);
+                        renderEmptyState('No Meetings Found', 'Click "Add Zoom Meeting" to create a new meeting.');
                     }
+                    return;
                 }
+                let html = '';
+                filtered.forEach((meeting, index) => {
+                    const safeId = String(meeting._id || '');
+                    const safeTitle = escapeHtml(meeting.title || 'Untitled Meeting');
+                    const safeZoomId = escapeHtml(meeting.zoomId || '-');
+                    const safeDateTime = escapeHtml(meeting.dateTime || 'Not scheduled');
+                    const safePasscode = escapeHtml(normalizePasscode(meeting.passcode) || '-');
+                    const linkDisplay = hasJoinLink(meeting)
+                        ? '<span class="link-badge has-link"><i class="bi bi-link-45deg"></i> Available</span>'
+                        : '<span class="link-badge no-link"><i class="bi bi-unlink"></i> No link</span>';
 
-                function escapeHtml(str) {
-                    if (!str) return '';
-                    return str.replace(/[&<>]/g, function (m) {
-                        if (m === '&') return '&amp;';
-                        if (m === '<') return '&lt;';
-                        if (m === '>') return '&gt;';
-                        return m;
-                    });
-                }
-
-                function updateStats() {
-                    totalStat.innerText = meetings.length;
-                    const withLink = meetings.filter(m => m.joinLink && m.joinLink.trim() !== "").length;
-                    withLinkStat.innerText = withLink;
-
-                    const todayMeetings = meetings.filter(m => m.dateTime.toLowerCase().includes('today')).length;
-                    todayStat.innerText = todayMeetings;
-
-                    const weekMeetings = meetings.filter(m =>
-                        m.dateTime.toLowerCase().includes('today') ||
-                        m.dateTime.toLowerCase().includes('tomorrow')
-                    ).length;
-                    weekStat.innerText = weekMeetings > 0 ? weekMeetings : Math.min(meetings.length, 3);
-                }
-
-                function renderTable() {
-                    let filtered = [...meetings];
-
-                    if (currentFilter.search) {
-                        const searchLower = currentFilter.search.toLowerCase();
-                        filtered = filtered.filter(m =>
-                            m.title.toLowerCase().includes(searchLower) ||
-                            m.zoomId.includes(searchLower)
-                        );
-                    }
-
-                    if (currentFilter.linkStatus === 'has_link') {
-                        filtered = filtered.filter(m => m.joinLink && m.joinLink.trim() !== "");
-                    } else if (currentFilter.linkStatus === 'no_link') {
-                        filtered = filtered.filter(m => !m.joinLink || m.joinLink.trim() === "");
-                    }
-
-                    if (filtered.length === 0) {
-                        tableBody.innerHTML = `
+                    html += `
                         <tr>
-                            <td colspan="7" class="empty-state">
-                                <i class="bi bi-camera-video-off"></i>
-                                <h5>No Meetings Found</h5>
-                                <p>Click "Add Zoom Meeting" to create a new meeting</p>
-                            </td>
-                        </tr>
-                    `;
-                        return;
-                    }
-
-                    let html = '';
-                    filtered.forEach((m, idx) => {
-                        const safeTitle = escapeHtml(m.title);
-                        const safeZoomId = escapeHtml(m.zoomId);
-                        const safeDateTime = escapeHtml(m.dateTime);
-                        const safePasscode = escapeHtml(m.passcode);
-                        const hasLink = m.joinLink && m.joinLink.trim() !== "";
-                        const linkDisplay = hasLink ?
-                            '<span class="link-badge has-link"><i class="bi bi-link-45deg"></i> Available</span>' :
-                            '<span class="link-badge no-link"><i class="bi bi-unlink"></i> No link</span>';
-
-                        html += `
-                        <tr>
-                            <td>${idx + 1}</td>
+                            <td>${index + 1}</td>
                             <td><strong>${safeTitle}</strong></td>
                             <td><code>${safeZoomId}</code></td>
                             <td><i class="bi bi-calendar3"></i> ${safeDateTime}</td>
                             <td><span class="badge bg-secondary">${safePasscode}</span></td>
                             <td>${linkDisplay}</td>
                             <td class="action-buttons">
-                                <button class="btn-icon btn-join" onclick="window.joinHandler(${m.uniqueId})" title="Join Meeting">
+                                <button class="btn-icon btn-join" onclick="window.joinHandler('${safeId}')" title="Join Meeting">
                                     <i class="bi bi-play-fill"></i>
                                 </button>
-                                <button class="btn-icon btn-edit" onclick="window.editHandler(${m.uniqueId})" title="Edit Meeting">
+                                <button class="btn-icon btn-edit" onclick="window.editHandler('${safeId}')" title="Edit Meeting">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                <button class="btn-icon btn-delete" onclick="window.deleteHandler(${m.uniqueId})" title="Delete">
+                                <button class="btn-icon btn-delete" onclick="window.deleteHandler('${safeId}')" title="Delete">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </td>
                         </tr>
                     `;
+                });
+                tableBody.innerHTML = html;
+            }
+
+            async function refreshMeetings() {
+                try {
+                    const response = await fetch('/zoom-meetings', {
+                        headers: { Accept: 'application/json' }
                     });
-                    tableBody.innerHTML = html;
-                }
-
-                window.joinHandler = function (uniqueId) {
-                    const meeting = meetings.find(m => m.uniqueId === uniqueId);
-                    if (meeting) joinMeeting(meeting);
-                    else showToast("Meeting not found", 1000);
-                };
-
-                window.editHandler = function (uniqueId) {
-                    const meeting = meetings.find(m => m.uniqueId === uniqueId);
-                    if (meeting) openEditModal(meeting);
-                    else showToast("Meeting not found", 1000);
-                };
-
-                window.deleteHandler = function (uniqueId) {
-                    deleteMeeting(uniqueId);
-                };
-
-                function updateFilters() {
+                    const payload = await response.json();
+                    if (!response.ok || !payload.success) {
+                        throw new Error(payload.message || 'Failed to fetch meetings');
+                    }
+                    meetings = Array.isArray(payload.meetings) ? payload.meetings : [];
                     renderTable();
+                    updateStats();
+                } catch (error) {
+                    console.error('Zoom meetings fetch error:', error);
+                    meetings = [];
+                    renderEmptyState('Unable to load meetings', 'Please refresh the page and try again.');
+                    updateStats();
+                    showToast('Failed to load meetings', 2200);
                 }
+            }
 
-                searchInput.addEventListener('input', (e) => {
-                    currentFilter.search = e.target.value;
-                    updateFilters();
+            async function createMeeting(payload) {
+                const response = await fetch('/zoom-meetings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-
-                linkFilter.addEventListener('change', (e) => {
-                    currentFilter.linkStatus = e.target.value;
-                    updateFilters();
-                });
-
-                resetBtn.addEventListener('click', () => {
-                    searchInput.value = '';
-                    linkFilter.value = '';
-                    currentFilter = { search: '', linkStatus: '' };
-                    updateFilters();
-                    showToast("Filters reset", 1200);
-                });
-
-                openModalBtn.addEventListener('click', () => {
-                    document.getElementById('modalTitle').value = '';
-                    document.getElementById('modalMeetingId').value = '';
-                    document.getElementById('modalPasscode').value = '';
-                    document.getElementById('modalDateTime').value = '';
-                    document.getElementById('modalJoinLink').value = '';
-                    addModal.show();
-                });
-
-                confirmAddBtn.addEventListener('click', () => {
-                    const title = document.getElementById('modalTitle').value;
-                    const meetingId = document.getElementById('modalMeetingId').value;
-                    const passcode = document.getElementById('modalPasscode').value;
-                    const dateTime = document.getElementById('modalDateTime').value;
-                    const joinLink = document.getElementById('modalJoinLink').value;
-
-                    if (addMeeting(title, meetingId, passcode, dateTime, joinLink)) {
-                        addModal.hide();
-                    }
-                });
-
-                confirmEditBtn.addEventListener('click', () => {
-                    const title = document.getElementById('editTitle').value;
-                    const meetingId = document.getElementById('editMeetingIdField').value;
-                    const passcode = document.getElementById('editPasscode').value;
-                    const dateTime = document.getElementById('editDateTime').value;
-                    const joinLink = document.getElementById('editJoinLink').value;
-
-                    if (title.trim() === "" && meetingId.trim() === "") {
-                        showToast("⚠️ Please enter at least Meeting Title or Zoom ID", 2000);
-                        return;
-                    }
-
-                    if (updateMeeting(currentEditId, title, meetingId, passcode, dateTime, joinLink)) {
-                        editModal.hide();
-                    }
-                });
-
-                // Initial render with sample data
-                if (meetings.length === 0) {
-                    const sampleData = [
-                        { uniqueId: Date.now() + 1, title: "Product Strategy Weekly", zoomId: "876 1234 5678", passcode: "zoom2025", dateTime: "Today, 3:00 PM", joinLink: "", createdAt: new Date().toISOString() },
-                        { uniqueId: Date.now() + 2, title: "Design Review with Clients", zoomId: "456 789 1230", passcode: "design123", dateTime: "Tomorrow, 11:30 AM", joinLink: "https://zoom.us/j/4567891230", createdAt: new Date().toISOString() },
-                        { uniqueId: Date.now() + 3, title: "Frontend Team Sync", zoomId: "321 654 9870", passcode: "—", dateTime: "Apr 10, 2:00 PM", joinLink: "", createdAt: new Date().toISOString() }
-                    ];
-                    meetings = sampleData;
-                    saveMeetings(meetings);
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Failed to add meeting');
                 }
+            }
 
+            async function updateMeeting(id, payload) {
+                const response = await fetch(`/zoom-meetings/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Failed to update meeting');
+                }
+            }
+
+            async function removeMeeting(id) {
+                const response = await fetch(`/zoom-meetings/${id}`, {
+                    method: 'DELETE',
+                    headers: { Accept: 'application/json' }
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Failed to delete meeting');
+                }
+            }
+
+            function openEditModal(meeting) {
+                currentEditId = String(meeting._id || '');
+                document.getElementById('editTitle').value = meeting.title || '';
+                document.getElementById('editMeetingIdField').value = meeting.zoomId || '';
+                document.getElementById('editPasscode').value = normalizePasscode(meeting.passcode);
+                document.getElementById('editDateTime').value = meeting.dateTime === 'Not scheduled' ? '' : (meeting.dateTime || '');
+                document.getElementById('editJoinLink').value = meeting.joinLink || '';
+                editModal.show();
+            }
+
+            function joinMeeting(meeting) {
+                if (hasJoinLink(meeting) &&
+                    (meeting.joinLink.startsWith('http://') || meeting.joinLink.startsWith('https://'))) {
+                    window.open(meeting.joinLink, '_blank');
+                    showToast(`Opening Zoom: ${meeting.title}`, 1800);
+                    return;
+                }
+                const passcode = normalizePasscode(meeting.passcode);
+                const passMsg = passcode ? `\nPasscode: ${passcode}` : '';
+                alert(`Join link not available.\nMeeting: ${meeting.title}\nMeeting ID: ${meeting.zoomId}${passMsg}`);
+                showToast(`Join link missing for ${meeting.title}`, 1800);
+            }
+
+            function resetAddForm() {
+                document.getElementById('modalTitle').value = '';
+                document.getElementById('modalMeetingId').value = '';
+                document.getElementById('modalPasscode').value = '';
+                document.getElementById('modalDateTime').value = '';
+                document.getElementById('modalJoinLink').value = '';
+            }
+
+            function findMeetingById(id) {
+                return meetings.find((meeting) => String(meeting._id) === String(id));
+            }
+
+            window.joinHandler = function (meetingId) {
+                const meeting = findMeetingById(meetingId);
+                if (meeting) joinMeeting(meeting);
+                else showToast('Meeting not found', 1000);
+            };
+
+            window.editHandler = function (meetingId) {
+                const meeting = findMeetingById(meetingId);
+                if (meeting) openEditModal(meeting);
+                else showToast('Meeting not found', 1000);
+            };
+
+            window.deleteHandler = async function (meetingId) {
+                const meeting = findMeetingById(meetingId);
+                if (!meeting) { showToast('Meeting not found', 1000); return; }
+                if (!confirm(`Delete "${meeting.title}"?`)) return;
+                try {
+                    await removeMeeting(meetingId);
+                    await refreshMeetings();
+                    showToast('Meeting deleted successfully');
+                } catch (error) {
+                    console.error('Delete meeting error:', error);
+                    showToast(error.message || 'Failed to delete meeting', 2200);
+                }
+            };
+
+            searchInput.addEventListener('input', function (event) {
+                currentFilter.search = event.target.value;
                 renderTable();
-                updateStats();
-            })();
-        </script>
+            });
+
+            linkFilter.addEventListener('change', function (event) {
+                currentFilter.linkStatus = event.target.value;
+                renderTable();
+            });
+
+            resetBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                linkFilter.value = '';
+                currentFilter = { search: '', linkStatus: '' };
+                renderTable();
+                showToast('Filters reset', 1200);
+            });
+
+            openModalBtn.addEventListener('click', function () {
+                resetAddForm();
+                addModal.show();
+            });
+
+            confirmAddBtn.addEventListener('click', async function () {
+                const payload = {
+                    title: document.getElementById('modalTitle').value.trim(),
+                    zoomId: document.getElementById('modalMeetingId').value.trim(),
+                    passcode: document.getElementById('modalPasscode').value.trim(),
+                    dateTime: document.getElementById('modalDateTime').value.trim(),
+                    joinLink: document.getElementById('modalJoinLink').value.trim()
+                };
+                if (!payload.title && !payload.zoomId) {
+                    showToast('Please enter at least Meeting Title or Zoom ID', 2200);
+                    return;
+                }
+                try {
+                    confirmAddBtn.disabled = true;
+                    await createMeeting(payload);
+                    addModal.hide();
+                    resetAddForm();
+                    await refreshMeetings();
+                    showToast('Meeting added successfully');
+                } catch (error) {
+                    console.error('Add meeting error:', error);
+                    showToast(error.message || 'Failed to add meeting', 2200);
+                } finally {
+                    confirmAddBtn.disabled = false;
+                }
+            });
+
+            confirmEditBtn.addEventListener('click', async function () {
+                const payload = {
+                    title: document.getElementById('editTitle').value.trim(),
+                    zoomId: document.getElementById('editMeetingIdField').value.trim(),
+                    passcode: document.getElementById('editPasscode').value.trim(),
+                    dateTime: document.getElementById('editDateTime').value.trim(),
+                    joinLink: document.getElementById('editJoinLink').value.trim()
+                };
+                if (!payload.title && !payload.zoomId) {
+                    showToast('Please enter at least Meeting Title or Zoom ID', 2200);
+                    return;
+                }
+                try {
+                    confirmEditBtn.disabled = true;
+                    await updateMeeting(currentEditId, payload);
+                    editModal.hide();
+                    await refreshMeetings();
+                    showToast('Meeting updated successfully');
+                } catch (error) {
+                    console.error('Update meeting error:', error);
+                    showToast(error.message || 'Failed to update meeting', 2200);
+                } finally {
+                    confirmEditBtn.disabled = false;
+                }
+            });
+
+            refreshMeetings();
+        })();
+    </script>
 </body>
 
 </html>

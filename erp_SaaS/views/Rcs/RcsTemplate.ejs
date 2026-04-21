@@ -1,8 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Send SMS - RCS Campaign</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SMS Management | Bulk Campaign</title>
+    <!-- Bootstrap Icons & CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -10,382 +31,505 @@
         }
 
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-body);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        .main-wrapper {
+            display: flex;
+            width: 100%;
             min-height: 100vh;
-            padding: 20px;
         }
 
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
+        .content-wrapper {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+            transition: all 0.3s ease;
         }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        @media (max-width: 992px) {
+            .content-wrapper {
+                margin-left: 0;
+                padding: 15px;
+            }
+        }
+
+        /* Premium Header */
+        .page-header {
+            background: white;
             padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-main);
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 5px 0 0;
+        }
+
+        /* Campaign Card */
+        .campaign-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .campaign-card-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            padding: 30px;
+            color: white;
             text-align: center;
         }
 
-        .header h1 {
-            font-size: 26px;
-            margin-bottom: 5px;
-        }
-
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .content {
-            padding: 35px;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            font-size: 14px;
-            font-weight: 600;
+        .campaign-card-header i {
+            font-size: 40px;
+            margin-bottom: 15px;
             display: block;
+        }
+
+        .campaign-card-header h3 {
+            font-size: 24px;
+            font-weight: 700;
             margin-bottom: 8px;
-            color: #333;
+        }
+
+        .campaign-card-body {
+            padding: 40px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-main);
+            margin-bottom: 8px;
         }
 
         .required:after {
             content: " *";
-            color: red;
+            color: var(--error);
         }
 
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+        .form-control, .form-select {
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
             font-size: 14px;
-            transition: all 0.3s;
         }
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .row {
+        /* Action Row */
+        .action-row {
             display: flex;
             gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .btn-action {
+            display: inline-flex;
             align-items: center;
-        }
-
-        .row select {
-            flex: 1;
-        }
-
-        .help-btn, .import-btn {
-            padding: 12px 20px;
-            background: #f0f0f0;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 10px;
             font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .help-btn:hover, .import-btn:hover {
-            background: #e0e0e0;
-            transform: translateY(-1px);
-        }
-
-        .import-btn {
-            background: #4CAF50;
-            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
             border: none;
         }
 
-        .import-btn:hover {
-            background: #45a049;
-        }
+        .btn-help { background: #f1f5f9; color: var(--text-muted); }
+        .btn-help:hover { background: #e2e8f0; color: var(--text-main); }
 
-        .radio-group {
+        .btn-import { background: #dcfce7; color: #166534; }
+        .btn-import:hover { background: #bbf7d0; transform: translateY(-1px); }
+
+        .btn-example { background: #fef9c3; color: #854d0e; }
+        .btn-example:hover { background: #fef08a; transform: translateY(-1px); }
+
+        /* Custom Radio */
+        .type-selector {
             display: flex;
-            gap: 25px;
-            margin-top: 8px;
+            gap: 20px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
         }
 
-        .radio-group label {
-            display: inline-flex;
+        .type-option {
+            display: flex;
             align-items: center;
-            font-weight: normal;
-            margin-bottom: 0;
+            gap: 8px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
         }
 
-        .radio-group input[type="radio"] {
-            width: auto;
-            margin-right: 8px;
+        /* Editor Toolbar */
+        .editor-container {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
         }
 
-        .toolbar {
-            border: 2px solid #e0e0e0;
-            border-top: none;
+        .editor-textarea {
+            border: none !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            border-radius: 0 !important;
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .editor-toolbar {
+            background: #f8fafc;
             padding: 10px;
-            background: #f9f9f9;
-            border-radius: 0 0 8px 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
-        .toolbar button {
+        .tool-btn {
             background: white;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
             cursor: pointer;
-            font-size: 18px;
-            margin-right: 8px;
-            padding: 6px 12px;
-            border-radius: 6px;
             transition: all 0.2s;
         }
 
-        .toolbar button:hover {
-            background: #667eea;
-            color: white;
-            transform: scale(1.05);
+        .tool-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #eff6ff;
         }
 
-        .counter {
+        .char-counter {
+            padding: 8px 12px;
             font-size: 12px;
+            color: var(--text-muted);
             text-align: right;
-            color: #666;
-            margin-top: 8px;
+            background: white;
         }
 
-        .buttons {
+        /* Footer Buttons */
+        .campaign-footer {
             display: flex;
             gap: 15px;
             margin-top: 30px;
         }
 
-        .btn {
+        .btn-submit {
             flex: 1;
-            padding: 14px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 600;
             transition: all 0.3s;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .btn-send-now {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
         }
 
-        .btn-now {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .btn-send-now:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
         }
 
         .btn-schedule {
-            background: #ff9800;
+            background: #f59e0b;
             color: white;
         }
 
-        .loading {
-            display: none;
+        .btn-schedule:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Alerts & Loading */
+        .toast-msg {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 25px 40px;
+            top: 25px;
+            right: 25px;
+            padding: 15px 25px;
             border-radius: 12px;
-            z-index: 1000;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 25px;
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             display: none;
-            animation: slideDown 0.3s ease;
+            animation: slideIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
+        .bg-toast-success { background: #10b981; }
+        .bg-toast-error { background: #ef4444; }
 
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .schedule-picker {
+        .loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
             display: none;
-            margin-top: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .schedule-box {
+            background: #fefce8;
+            border: 1px solid #fef08a;
             padding: 20px;
-            background: #f9f9f9;
-            border-radius: 8px;
-        }
-
-        .schedule-picker.active {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        #fileInput {
+            border-radius: 16px;
+            margin-top: 20px;
             display: none;
+            animation: fadeIn 0.3s ease;
         }
 
-        .template-info {
-            background: #e8f5e9;
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .template-badge {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
             padding: 12px;
-            border-radius: 8px;
-            margin-top: 10px;
+            border-radius: 10px;
             font-size: 13px;
-            border-left: 4px solid #4CAF50;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        @media (max-width: 768px) {
-            .content {
-                padding: 20px;
-            }
-            .buttons {
-                flex-direction: column;
-            }
-            .row {
-                flex-wrap: wrap;
-            }
+        /* Dark Mode Support */
+        [data-theme="dark"] .page-header,
+        [data-theme="dark"] .campaign-card,
+        [data-theme="dark"] .editor-toolbar,
+        [data-theme="dark"] .char-counter,
+        [data-theme="dark"] .tool-btn {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .form-control, [data-theme="dark"] .form-select {
+            background: #0f172a;
+            color: white;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .type-selector {
+            background: #0f172a;
+            border-color: #334155;
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📱 Bulk SMS Campaign</h1>
-            <p>Send messages with DLT Template ID support</p>
-        </div>
+    <!-- Header Include -->
+    <%- include('../../partials/admin/header.ejs') %>
 
-        <div class="content">
-            <div id="alert" class="alert"></div>
+    <div class="main-wrapper">
+        <!-- Sidebar Include -->
+        <%- include('../../partials/admin/left.ejs') %>
 
-            <form id="smsForm">
-                <div class="form-group">
-                    <div class="row">
-                        <select id="smsType" required>
-                            <option value="">Select SMS Type</option>
-                            <option value="promotional">📢 Promotional - Route 1</option>
-                            <option value="transactional">🔔 Transactional - Route 2 (DLT Required)</option>
-                            <option value="otp">🔐 OTP Service - Route 2 (DLT Required)</option>
-                            <option value="dnd">📞 Trans DND - Route 4 (DLT Required)</option>
-                        </select>
-                        <button type="button" class="help-btn" onclick="showHelp()">❓ Help</button>
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div>
+                        <h2><i class="bi bi-chat-left-dots-fill" style="color: var(--primary);"></i> SMS Management</h2>
+                        <p>Launch high-impact bulk SMS campaigns with DLT compliance</p>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="required">Sender ID</label>
-                    <input type="text" id="senderId" maxlength="11" placeholder="Enter 6-11 character Sender ID" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="required">Mobile Numbers</label>
-                    <div class="row">
-                        <button type="button" class="import-btn" onclick="document.getElementById('fileInput').click()">
-                            📁 Import CSV
-                        </button>
-                        <button type="button" class="import-btn" onclick="showExample()">
-                            📋 Example
-                        </button>
+                <!-- Campaign Form Card -->
+                <div class="campaign-card">
+                    <div class="campaign-card-header">
+                        <i class="bi bi-broadcast"></i>
+                        <h3>Bulk SMS Campaign</h3>
+                        <p>Reach your customers instantly with Route 2 DLT support</p>
                     </div>
-                    <input type="file" id="fileInput" accept=".csv">
-                    <textarea id="mobileNumbers" placeholder="Enter mobile numbers (comma separated or one per line)&#10;Example:&#10;9999999999,8888888888,7777777777&#10;OR&#10;9999999999&#10;8888888888&#10;7777777777" required></textarea>
-                    <div class="counter" id="numberCount">0 numbers entered</div>
-                </div>
 
-                <div class="form-group">
-                    <label class="required">Message Type</label>
-                    <div class="radio-group">
-                        <label>
-                            <input type="radio" name="messageType" value="text" checked> 🇬🇧 English
-                        </label>
-                        <label>
-                            <input type="radio" name="messageType" value="unicode"> 🌐 Unicode (Hindi/Other)
-                        </label>
+                    <div class="campaign-card-body">
+                        <form id="smsForm">
+                            <!-- SMS Type -->
+                            <div class="mb-4">
+                                <label class="form-label required">SMS Service Route</label>
+                                <div class="action-row">
+                                    <select class="form-select" id="smsType" required>
+                                        <option value="">Select Routing Type</option>
+                                        <option value="promotional">📢 Promotional - Marketing (Route 1)</option>
+                                        <option value="transactional">🔔 Transactional - Alerts (Route 2)</option>
+                                        <option value="otp">🔐 OTP Service - Secure (Route 2)</option>
+                                        <option value="dnd">📞 Trans DND - Priority (Route 4)</option>
+                                    </select>
+                                    <button type="button" class="btn-action btn-help" onclick="showHelp()">
+                                        <i class="bi bi-question-circle"></i> Guide
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Sender ID -->
+                            <div class="mb-4">
+                                <label class="form-label required">Sender ID (DLT Header)</label>
+                                <input type="text" class="form-control" id="senderId" maxlength="11"
+                                    placeholder="Enter 6-11 character Sender ID" required>
+                            </div>
+
+                            <!-- Mobile Numbers -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label required m-0">Destination Mobile Numbers</label>
+                                    <div class="action-row m-0">
+                                        <button type="button" class="btn-action btn-import"
+                                            onclick="document.getElementById('fileInput').click()">
+                                            <i class="bi bi-file-earmark-arrow-up"></i> Import CSV
+                                        </button>
+                                        <button type="button" class="btn-action btn-example" onclick="showExample()">
+                                            <i class="bi bi-clipboard-check"></i> Example
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="file" id="fileInput" accept=".csv" class="d-none">
+                                <textarea id="mobileNumbers" class="form-control" rows="5"
+                                    placeholder="Enter mobile numbers (9999999999) - Comma or Line separated"
+                                    required></textarea>
+                                <div class="text-end mt-1">
+                                    <small class="text-muted" id="numberCount">0 numbers entered</small>
+                                </div>
+                            </div>
+
+                            <!-- Message Language -->
+                            <div class="mb-4">
+                                <label class="form-label required">Message Encoding</label>
+                                <div class="type-selector">
+                                    <label class="type-option">
+                                        <input type="radio" name="messageType" value="text" checked>
+                                        <span>English (GSM 7-bit)</span>
+                                    </label>
+                                    <label class="type-option">
+                                        <input type="radio" name="messageType" value="unicode">
+                                        <span>Unicode (Multi-lingual)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Message Content -->
+                            <div class="mb-4">
+                                <label class="form-label required">Message Content</label>
+                                <div class="editor-container">
+                                    <textarea id="message" class="form-control editor-textarea"
+                                        placeholder="Type your campaign message here..."></textarea>
+                                    <div class="editor-toolbar">
+                                        <button type="button" class="tool-btn" onclick="insertEmoji('😊')">😊</button>
+                                        <button type="button" class="tool-btn" onclick="insertEmoji('❤️')">❤️</button>
+                                        <button type="button" class="tool-btn" onclick="insertEmoji('👍')">👍</button>
+                                        <button type="button" class="tool-btn" onclick="insertText('[NAME]')">[NAME]</button>
+                                        <button type="button" class="tool-btn" onclick="insertText('[ORDER_ID]')">[ORD_ID]</button>
+                                        <button type="button" class="tool-btn" onclick="insertText('[OTP]')">[OTP]</button>
+                                    </div>
+                                    <div class="char-counter" id="charCount">0 characters / 1 credit</div>
+                                </div>
+
+                                <div id="templateInfo" class="template-badge" style="display: none;">
+                                    <i class="bi bi-shield-check"></i>
+                                    <div>
+                                        <strong>DLT Template ID:</strong> <span id="activeTemplateId">Configured</span>
+                                        <br><small>Verified template will be used for compliant delivery.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer Actions -->
+                            <div class="campaign-footer">
+                                <button type="button" class="btn-submit btn-send-now" onclick="sendSMS('now')">
+                                    <i class="bi bi-send-fill"></i> Blast Campaign
+                                </button>
+                                <button type="button" class="btn-submit btn-schedule" onclick="showSchedule()">
+                                    <i class="bi bi-calendar-event"></i> Schedule Later
+                                </button>
+                            </div>
+
+                            <!-- Schedule Box -->
+                            <div id="scheduleBox" class="schedule-box">
+                                <label class="form-label">Set Launch Date & Time</label>
+                                <div class="row align-items-center">
+                                    <div class="col-8">
+                                        <input type="datetime-local" id="scheduleTime" class="form-control">
+                                    </div>
+                                    <div class="col-4">
+                                        <button type="button" class="btn-submit btn-schedule w-100"
+                                            onclick="sendSMS('schedule')">
+                                            Confirm
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label class="required">Message</label>
-                    <textarea id="message" placeholder="Type your message here..."></textarea>
-                    <div class="toolbar">
-                        <button type="button" onclick="insertEmoji('😊')">😊</button>
-                        <button type="button" onclick="insertEmoji('❤️')">❤️</button>
-                        <button type="button" onclick="insertEmoji('👍')">👍</button>
-                        <button type="button" onclick="insertText('[NAME]')">[NAME]</button>
-                        <button type="button" onclick="insertText('[ORDER_ID]')">[ORDER_ID]</button>
-                        <button type="button" onclick="insertText('[OTP]')">[OTP]</button>
-                    </div>
-                    <div class="counter" id="charCount">0 characters / 0 credits</div>
-                </div>
-
-                <div id="templateInfo" class="template-info" style="display: none;">
-                    🔑 <strong>DLT Template ID in use:</strong> <span id="activeTemplateId">Loading...</span>
-                    <br><small>This Template ID will be sent with your message as per TRAI guidelines</small>
-                </div>
-
-                <div class="buttons">
-                    <button type="button" class="btn btn-now" onclick="sendSMS('now')">
-                        ✈ Send Now
-                    </button>
-                    <button type="button" class="btn btn-schedule" onclick="showSchedule()">
-                        📅 Schedule
-                    </button>
-                </div>
-
-                <div id="schedulePicker" class="schedule-picker">
-                    <div class="form-group">
-                        <label>Schedule Date & Time</label>
-                        <input type="datetime-local" id="scheduleTime">
-                        <button type="button" class="btn btn-schedule" onclick="sendSMS('schedule')" style="margin-top: 15px;">
-                            ✅ Confirm Schedule
-                        </button>
-                    </div>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
-    <div class="loading" id="loading">
-        <div>⏳ Sending SMS... Please wait...</div>
+    <!-- Feedback Toast -->
+    <div id="toast" class="toast-msg"></div>
+
+    <!-- Spinner Overlay -->
+    <div class="loader-overlay" id="loading">
+        <div class="spinner"></div>
+        <p class="mt-3 fw-bold">Processing SMS Campaign...</p>
     </div>
 
     <script>
@@ -397,66 +541,55 @@
                 const response = await fetch('/api/get-settings');
                 const data = await response.json();
                 currentSettings = data;
-                
+
                 if (data.senderId) {
                     document.getElementById('senderId').value = data.senderId;
                 }
-                
+
                 // Show template info
                 if (data.templateId) {
-                    document.getElementById('templateInfo').style.display = 'block';
+                    document.getElementById('templateInfo').style.display = 'flex';
                     document.getElementById('activeTemplateId').textContent = data.templateId;
-                } else {
-                    document.getElementById('activeTemplateId').textContent = 'Not configured! Please add in Settings';
                 }
-                
-                console.log('Settings loaded:', data);
+
             } catch (error) {
                 console.error('Error loading settings:', error);
             }
         }
 
-        function showAlert(message, type) {
-            const alert = document.getElementById('alert');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            alert.style.display = 'block';
-            
+        function showNotification(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast-msg bg-toast-${type}`;
+            toast.style.display = 'block';
+
             setTimeout(() => {
-                alert.style.display = 'none';
+                toast.style.display = 'none';
             }, 5000);
         }
 
         function updateCounter() {
             const message = document.getElementById('message').value;
             const charCount = message.length;
-            let credits = Math.ceil(charCount / 160);
-            if (credits === 0) credits = 1;
-            
+            let credits = Math.ceil(charCount / 160) || 1;
             document.getElementById('charCount').textContent = `${charCount} characters / ${credits} credit(s)`;
         }
 
         function updateNumberCount() {
-            const numbers = document.getElementById('mobileNumbers').value;
-            let count = 0;
-            
-            if (numbers.includes('\n')) {
-                count = numbers.split('\n').filter(n => n.trim()).length;
-            } else if (numbers.includes(',')) {
-                count = numbers.split(',').filter(n => n.trim()).length;
-            } else if (numbers.trim()) {
-                count = 1;
+            const numbers = document.getElementById('mobileNumbers').value.trim();
+            if (!numbers) {
+                document.getElementById('numberCount').textContent = `0 numbers entered`;
+                return;
             }
-            
+            const count = numbers.split(/[,\n]/).filter(n => n.trim()).length;
             document.getElementById('numberCount').textContent = `${count} number(s) entered`;
         }
 
         function insertEmoji(emoji) {
             const textarea = document.getElementById('message');
             const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
             const text = textarea.value;
-            textarea.value = text.substring(0, start) + emoji + text.substring(end);
+            textarea.value = text.substring(0, start) + emoji + text.substring(textarea.selectionEnd);
             textarea.focus();
             updateCounter();
         }
@@ -464,169 +597,122 @@
         function insertText(text) {
             const textarea = document.getElementById('message');
             const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const currentText = textarea.value;
-            textarea.value = currentText.substring(0, start) + text + currentText.substring(end);
+            textarea.value = textarea.value.substring(0, start) + text + textarea.value.substring(textarea.selectionEnd);
             textarea.focus();
             updateCounter();
         }
 
         // CSV Import
-        document.getElementById('fileInput').addEventListener('change', async function(e) {
+        document.getElementById('fileInput').addEventListener('change', async function (e) {
             const file = e.target.files[0];
             if (!file) return;
-            
+
             const formData = new FormData();
             formData.append('file', file);
-            
+
             try {
-                const response = await fetch('/api/import-csv', {
-                    method: 'POST',
-                    body: formData
-                });
-                
+                document.getElementById('loading').style.display = 'flex';
+                const response = await fetch('/api/import-csv', { method: 'POST', body: formData });
                 const data = await response.json();
+                
                 if (data.success) {
                     document.getElementById('mobileNumbers').value = data.numbers;
                     updateNumberCount();
-                    showAlert('✅ CSV imported successfully! ' + data.count + ' numbers loaded', 'success');
+                    showNotification(`imported ${data.count} numbers successfully.`);
                 } else {
-                    showAlert('❌ ' + data.message, 'error');
+                    showNotification(data.message, 'error');
                 }
             } catch (error) {
-                showAlert('Error importing CSV', 'error');
+                showNotification('Error importing CSV', 'error');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
-            
             e.target.value = '';
         });
 
         function showExample() {
-            document.getElementById('mobileNumbers').value = '9999999999,8888888888,7777777777';
+            document.getElementById('mobileNumbers').value = '919999999999,918888888888\n917777777777';
             updateNumberCount();
         }
 
         function showSchedule() {
-            const picker = document.getElementById('schedulePicker');
-            picker.classList.toggle('active');
+            const box = document.getElementById('scheduleBox');
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
         }
 
         async function sendSMS(type) {
-            const senderId = document.getElementById('senderId').value;
-            const mobileNumbers = document.getElementById('mobileNumbers').value;
-            const message = document.getElementById('message').value;
-            const messageType = document.querySelector('input[name="messageType"]:checked').value;
-            const smsType = document.getElementById('smsType').value;
-            
-            // Validation
-            if (!smsType) {
-                showAlert('Please select SMS Type', 'error');
+            const payload = {
+                senderId: document.getElementById('senderId').value.trim(),
+                mobileNumbers: document.getElementById('mobileNumbers').value.trim(),
+                message: document.getElementById('message').value.trim(),
+                messageType: document.querySelector('input[name="messageType"]:checked').value,
+                smsType: document.getElementById('smsType').value,
+                templateId: currentSettings.templateId
+            };
+
+            if (!payload.smsType || !payload.senderId || !payload.mobileNumbers || !payload.message) {
+                showNotification('All fields are required!', 'error');
                 return;
             }
-            
-            if (!senderId) {
-                showAlert('Please enter Sender ID', 'error');
+
+            const requiresDLT = ['transactional', 'otp', 'dnd'].includes(payload.smsType);
+            if (requiresDLT && !payload.templateId) {
+                showNotification('DLT Template ID is missing in Gateway Settings!', 'error');
                 return;
             }
-            
-            if (!mobileNumbers.trim()) {
-                showAlert('Please enter mobile numbers', 'error');
-                return;
-            }
-            
-            if (!message.trim()) {
-                showAlert('Please enter message', 'error');
-                return;
-            }
-            
-            // Check DLT requirement
-            const requiresDLT = smsType === 'transactional' || smsType === 'otp' || smsType === 'dnd';
-            if (requiresDLT && !currentSettings.templateId) {
-                showAlert('⚠️ DLT Template ID is required for ' + smsType.toUpperCase() + ' messages!\n\nPlease configure Template ID in Gateway Settings first.', 'error');
-                return;
-            }
-            
+
             const loading = document.getElementById('loading');
-            loading.style.display = 'block';
-            
+            loading.style.display = 'flex';
+
             try {
                 let url = '/api/send-sms';
-                let data = {
-                    senderId,
-                    mobileNumbers,
-                    message,
-                    messageType,
-                    templateId: currentSettings.templateId  // Send template ID
-                };
-                
                 if (type === 'schedule') {
-                    const scheduleTime = document.getElementById('scheduleTime').value;
-                    if (!scheduleTime) {
-                        showAlert('Please select schedule time', 'error');
+                    payload.scheduleTime = document.getElementById('scheduleTime').value;
+                    if (!payload.scheduleTime) {
+                        showNotification('Select schedule time', 'error');
                         loading.style.display = 'none';
                         return;
                     }
                     url = '/api/schedule-sms';
-                    data.scheduleTime = scheduleTime;
                 }
-                
+
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-                
+
                 const result = await response.json();
-                
                 if (result.success) {
-                    showAlert(result.message, 'success');
+                    showNotification(result.message);
                     if (type === 'now') {
-                        // Clear form but keep sender ID
                         document.getElementById('mobileNumbers').value = '';
                         document.getElementById('message').value = '';
                         updateCounter();
                         updateNumberCount();
-                    } else {
-                        document.getElementById('schedulePicker').classList.remove('active');
-                        document.getElementById('scheduleTime').value = '';
                     }
                 } else {
-                    showAlert(result.message, 'error');
+                    showNotification(result.message, 'error');
                 }
             } catch (error) {
-                showAlert('Network error: ' + error.message, 'error');
+                showNotification('Network error: ' + error.message, 'error');
             } finally {
                 loading.style.display = 'none';
             }
         }
 
         function showHelp() {
-            alert('📢 SMS Type Guide:\n\n' +
-                  '• Promotional - For marketing/bulk messages (Route 1)\n' +
-                  '• Transactional - For alerts, notifications (Route 2) - DLT REQUIRED\n' +
-                  '• OTP Service - For OTP messages (Route 2) - DLT REQUIRED\n' +
-                  '• Trans DND - For DND numbers (Route 4) - DLT REQUIRED\n\n' +
-                  '⚠️ Important: Transactional/OTP messages MUST have a valid DLT Template ID configured in Settings.\n\n' +
-                  '📝 Character limit: 160 characters = 1 SMS credit');
+            alert('📱 SMS Route Guide:\n\n' +
+                '• Promotional: Marketing (9 AM - 9 PM) - Route 1\n' +
+                '• Transactional: Notifications/Alerts - Route 2 (DLT REQUIRED)\n' +
+                '• OTP: Verification codes - Route 2 (DLT REQUIRED)\n\n' +
+                'Note: Standard credit is 160 GSM chars.');
         }
 
-        // Event listeners
         document.getElementById('message').addEventListener('input', updateCounter);
         document.getElementById('mobileNumbers').addEventListener('input', updateNumberCount);
-        
-        // SMS type change handler
-        document.getElementById('smsType').addEventListener('change', function() {
-            const requiresDLT = this.value === 'transactional' || this.value === 'otp' || this.value === 'dnd';
-            if (requiresDLT && !currentSettings.templateId) {
-                showAlert('⚠️ Warning: ' + this.options[this.selectedIndex].text + ' requires DLT Template ID. Please configure it in Settings.', 'error');
-            }
-        });
-        
-        // Initialize
         loadSettings();
-        updateCounter();
-        updateNumberCount();
     </script>
 </body>
+
 </html>

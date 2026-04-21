@@ -62,7 +62,7 @@ const eventSchema = new mongoose.Schema({
     },
     isPublic: {
         type: Boolean,
-        default: true
+        default: false
     },
     reminderSent: {
         type: Boolean,
@@ -96,11 +96,7 @@ eventSchema.methods.isUpcoming = function() {
 // Static method to get events by date range
 eventSchema.statics.getByDateRange = function(startDate, endDate, userId) {
     return this.find({
-        $or: [
-            { createdBy: userId },
-            { attendees: userId },
-            { isPublic: true }
-        ],
+        createdBy: userId,
         start: { $gte: startDate },
         end: { $lte: endDate }
     }).sort({ start: 1 });
@@ -109,11 +105,7 @@ eventSchema.statics.getByDateRange = function(startDate, endDate, userId) {
 // Static method to get upcoming events
 eventSchema.statics.getUpcoming = function(userId, limit = 10) {
     return this.find({
-        $or: [
-            { createdBy: userId },
-            { attendees: userId },
-            { isPublic: true }
-        ],
+        createdBy: userId,
         start: { $gte: new Date() },
         status: { $nin: ['completed', 'cancelled'] }
     })
@@ -133,16 +125,16 @@ eventSchema.statics.getStats = async function(userId) {
         pending,
         cancelled
     ] = await Promise.all([
-        this.countDocuments({ $or: [{ createdBy: userId }, { isPublic: true }] }),
+        this.countDocuments({ createdBy: userId }),
         this.countDocuments({
-            $or: [{ createdBy: userId }, { isPublic: true }],
+            createdBy: userId,
             start: { $gte: now },
             status: { $nin: ['completed', 'cancelled'] }
         }),
-        this.countDocuments({ $or: [{ createdBy: userId }, { isPublic: true }], status: 'active' }),
-        this.countDocuments({ $or: [{ createdBy: userId }, { isPublic: true }], status: 'completed' }),
-        this.countDocuments({ $or: [{ createdBy: userId }, { isPublic: true }], status: 'pending' }),
-        this.countDocuments({ $or: [{ createdBy: userId }, { isPublic: true }], status: 'cancelled' })
+        this.countDocuments({ createdBy: userId, status: 'active' }),
+        this.countDocuments({ createdBy: userId, status: 'completed' }),
+        this.countDocuments({ createdBy: userId, status: 'pending' }),
+        this.countDocuments({ createdBy: userId, status: 'cancelled' })
     ]);
     
     return { total, upcoming, active, completed, pending, cancelled };

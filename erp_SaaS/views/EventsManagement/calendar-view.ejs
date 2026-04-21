@@ -864,7 +864,25 @@
             
             eventsData.push(newEvent);
             saveToLocalStorage();
-            calendar.refetchEvents();
+            
+            // Add event directly to calendar with proper formatting
+            calendar.addEvent({
+                id: newEvent.id,
+                title: newEvent.title,
+                start: newEvent.start,
+                end: newEvent.end,
+                backgroundColor: getEventStatusColor(newEvent.status),
+                borderColor: getEventStatusColor(newEvent.status),
+                extendedProps: {
+                    type: newEvent.type,
+                    status: newEvent.status,
+                    location: newEvent.location,
+                    description: newEvent.description,
+                    capacity: newEvent.capacity,
+                    registered: newEvent.registered
+                }
+            });
+            
             showToast(`Event "${newEvent.title}" created successfully!`);
             return newEvent;
         }
@@ -875,7 +893,28 @@
             if (index !== -1) {
                 eventsData[index] = { ...eventsData[index], ...updatedData };
                 saveToLocalStorage();
-                calendar.refetchEvents();
+                
+                // Remove and re-add all events
+                calendar.removeAllEvents();
+                eventsData.forEach(event => {
+                    calendar.addEvent({
+                        id: event.id,
+                        title: event.title,
+                        start: event.start,
+                        end: event.end,
+                        backgroundColor: getEventStatusColor(event.status),
+                        borderColor: getEventStatusColor(event.status),
+                        extendedProps: {
+                            type: event.type,
+                            status: event.status,
+                            location: event.location,
+                            description: event.description,
+                            capacity: event.capacity,
+                            registered: event.registered
+                        }
+                    });
+                });
+                
                 showToast('Event updated successfully');
                 return true;
             }
@@ -887,7 +926,13 @@
             if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
                 eventsData = eventsData.filter(e => e.id !== eventId);
                 saveToLocalStorage();
-                calendar.refetchEvents();
+                
+                // Remove the event from calendar
+                const event = calendar.getEventById(eventId);
+                if (event) {
+                    event.remove();
+                }
+                
                 showToast('Event deleted successfully');
                 return true;
             }
@@ -929,10 +974,20 @@
 
         document.getElementById('addEventForm').addEventListener('submit', (e) => {
             e.preventDefault();
+            
+            const title = document.getElementById('eventTitle').value.trim();
+            const start = document.getElementById('eventStart').value;
+            const end = document.getElementById('eventEnd').value;
+            
+            if (!title || !start) {
+                showToast('Please fill all required fields', true);
+                return;
+            }
+            
             const newEvent = {
-                title: document.getElementById('eventTitle').value,
-                start: document.getElementById('eventStart').value,
-                end: document.getElementById('eventEnd').value,
+                title: title,
+                start: start,
+                end: end || null,
                 type: document.getElementById('eventType').value,
                 status: document.getElementById('eventStatus').value,
                 location: document.getElementById('eventLocation').value,
@@ -940,14 +995,23 @@
                 capacity: parseInt(document.getElementById('eventCapacity').value) || 100
             };
             
-            if (!newEvent.title || !newEvent.start) {
-                showToast('Please fill all required fields', true);
-                return;
+            try {
+                addEvent(newEvent);
+                
+                // Close modal after event is added
+                const modalEl = document.getElementById('addEventModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Reset form
+                e.target.reset();
+                
+            } catch (error) {
+                console.error('Error adding event:', error);
+                showToast('Error creating event. Please try again.', true);
             }
-            
-            addEvent(newEvent);
-            bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
-            e.target.reset();
         });
 
         document.getElementById('editEventFromDetail').addEventListener('click', () => {

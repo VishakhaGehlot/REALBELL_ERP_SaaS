@@ -15,7 +15,18 @@ const FeatureSchema=mongoose.Schema({
      },
      img:{
         type:String
+     },
+     createdByUserId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "auth",
+        default: null
+     },
+     createdByEmail:{
+        type:String,
+        default:""
      }
+},{
+     timestamps:true
 })
 
 module.exports=mongoose.model("feature",FeatureSchema)

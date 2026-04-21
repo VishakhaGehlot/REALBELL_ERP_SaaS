@@ -16,7 +16,17 @@ const crmLeadSchema = new mongoose.Schema(
             default: "New"
         },
         assignedTo: { type: String, default: "" }, // Could be a sales user ID
-        score: { type: Number, default: 0 } // Lead scoring logic value
+        score: { type: Number, default: 0 }, // Lead scoring logic value
+        createdByUserId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "auth",
+            default: null
+        },
+        createdByEmail: {
+            type: String,
+            default: "",
+            trim: true
+        }
     },
     { timestamps: true }
 );

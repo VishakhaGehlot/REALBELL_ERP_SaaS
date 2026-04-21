@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const nodemailer = require('nodemailer');
+const { requireAuth } = require('../middleware/roleAuth');
+const { requireModuleAccess } = require('../middleware/permissionAuth');
 
 // Store active SMTP connections
 let activeTransporters = new Map();
@@ -43,7 +45,7 @@ function escapeHtml(text) {
 // ======================
 // SMTP SETTINGS PAGE
 // ======================
-router.get('/smtp', (req, res) => {
+router.get('/smtp', requireAuth, requireModuleAccess('emailNotification', 'view'), (req, res) => {
     // Get user info from session or request
     const loginname = req.session.user ? req.session.user.name : (req.user ? req.user.name : 'Admin');
     
@@ -60,7 +62,7 @@ router.get('/smtp', (req, res) => {
 // ======================
 // CONFIGURE SMTP (API)
 // ======================
-router.post('/configure-smtp', async (req, res) => {
+router.post('/configure-smtp', requireAuth, requireModuleAccess('emailNotification', 'edit'), async (req, res) => {
     try {
         // Check if req.body exists and has data
         if (!req.body || Object.keys(req.body).length === 0) {
@@ -119,7 +121,7 @@ router.post('/configure-smtp', async (req, res) => {
 // ======================
 // SEND EMAIL FORM PAGE
 // ======================
-router.get('/send-email', (req, res) => {
+router.get('/send-email', requireAuth, requireModuleAccess('emailNotification', 'view'), (req, res) => {
     if (!req.session.smtpConfig) {
         return res.redirect('/smtp');
     }
@@ -140,7 +142,7 @@ router.get('/send-email', (req, res) => {
 // ======================
 // SEND EMAIL (API)
 // ======================
-router.post('/send-email', async (req, res) => {
+router.post('/send-email', requireAuth, requireModuleAccess('emailNotification', 'edit'), async (req, res) => {
     try {
         if (!req.session.smtpConfig) {
             return res.json({ 
@@ -218,7 +220,7 @@ router.post('/send-email', async (req, res) => {
 // ======================
 // TEST CONNECTION
 // ======================
-router.post('/test-connection', async (req, res) => {
+router.post('/test-connection', requireAuth, requireModuleAccess('emailNotification', 'view'), async (req, res) => {
     try {
         // Check if req.body exists
         if (!req.body || Object.keys(req.body).length === 0) {
@@ -267,7 +269,7 @@ router.post('/test-connection', async (req, res) => {
 // ======================
 // CHECK SMTP STATUS
 // ======================
-router.get('/status', (req, res) => {
+router.get('/status', requireAuth, requireModuleAccess('emailNotification', 'view'), (req, res) => {
     const sessionId = req.sessionID;
     const transporter = activeTransporters.get(sessionId);
     

@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const authTable = require('../models/auth')
 const bcrypt = require('bcrypt')
+const { requireAuth } = require('../middleware/roleAuth')
 
 // Helper function to format date
 function formatDate(dateString) {
@@ -14,10 +15,7 @@ function formatDate(dateString) {
 }
 
 // ================= PROFILE PAGE =================
-router.get("/profile", async (req, res) => {
-    if (!req.session.isAuth) {
-        return res.redirect('/login')
-    }
+router.get("/profile", requireAuth, async (req, res) => {
     
     try {
         const user = await authTable.findOne({ email: req.session.email })
@@ -52,11 +50,7 @@ router.get("/profile", async (req, res) => {
 })
 
 // ================= EDIT PROFILE PAGE =================
-router.get("/editprofile", async (req, res) => {
-    if (!req.session.isAuth) {
-        return res.redirect('/login')
-    }
-    
+router.get("/editprofile", requireAuth, async (req, res) => {
     try {
         const user = await authTable.findOne({ email: req.session.email })
         
@@ -85,11 +79,7 @@ router.get("/editprofile", async (req, res) => {
 })
 
 // ================= UPDATE PROFILE =================
-router.post("/editprofile", async (req, res) => {
-    if (!req.session.isAuth) {
-        return res.redirect('/login')
-    }
-    
+router.post("/editprofile", requireAuth, async (req, res) => {
     try {
         const { firstName, lastName, mobile, dob } = req.body
         
@@ -121,11 +111,7 @@ router.post("/editprofile", async (req, res) => {
 })
 
 // ================= CHANGE PASSWORD PAGE (GET) =================
-router.get("/change-password", async (req, res) => {
-    if (!req.session.isAuth) {
-        return res.redirect('/login')
-    }
-    
+router.get("/change-password", requireAuth, async (req, res) => {
     res.render("Profile/changepassword", { 
         message: req.query.message || null,
         messageType: req.query.messageType || null
@@ -133,11 +119,7 @@ router.get("/change-password", async (req, res) => {
 })
 
 // ================= CHANGE PASSWORD (POST) =================
-router.post("/change-password", async (req, res) => {
-    if (!req.session.isAuth) {
-        return res.json({ success: false, message: "Please login first" })
-    }
-    
+router.post("/change-password", requireAuth, async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body
         

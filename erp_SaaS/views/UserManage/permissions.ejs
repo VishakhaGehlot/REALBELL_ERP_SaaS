@@ -294,6 +294,25 @@
     .perm-row:hover { background: #fafafa; }
     .perm-row:last-child { border-bottom: none; }
     .perm-row .perm-cell { text-align: center; }
+    .perm-row.locked-row {
+        opacity: 0.72;
+        background: #f8fafc;
+    }
+    .perm-row.locked-row:hover {
+        background: #f8fafc;
+    }
+    .lock-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 11px;
+        font-weight: 700;
+    }
     
     /* Scrollable content */
     .permissions-scroll {
@@ -334,6 +353,9 @@
     [data-theme="dark"] .perm-header-row { background: #0f172a; border-color: #334155; color: #94a3b8; }
     [data-theme="dark"] .perm-row { border-color: #334155; }
     [data-theme="dark"] .perm-row:hover { background: #334155; }
+    [data-theme="dark"] .perm-row.locked-row,
+    [data-theme="dark"] .perm-row.locked-row:hover { background: #172033; }
+    [data-theme="dark"] .lock-badge { background: #1e3a8a; color: #bfdbfe; }
     [data-theme="dark"] .alert-success { background: rgba(34, 197, 94, 0.15); border-color: rgba(74, 222, 128, 0.3); color: #4ade80; }
     
     @media (max-width: 1200px) { 
@@ -420,6 +442,7 @@
 
                     <!-- Role Contents -->
                     <% roles.forEach((role) => { %>
+                        <% const roleModuleCount = permissionKeys.filter((moduleKey) => isModuleAllowedForRole(role, moduleKey)).length; %>
                         <div class="role-content" id="content-<%= role %>">
                             <div class="perm-header">
                                 <div>
@@ -437,9 +460,9 @@
                                         <% } %>
                                         <%= role %> Permissions
                                     </h2>
-                                    <p>Configure module access and actions for <%= role %> role</p>
+                                    <p>Configure module access and actions for <%= role %> role. Enabled modules will appear only on that role's own dashboard.</p>
                                 </div>
-                                <span class="module-badge"><%= permissionKeys.length %> Modules</span>
+                                <span class="module-badge"><%= roleModuleCount %> Active Modules</span>
                             </div>
                             
                             <div class="permissions-scroll">
@@ -451,6 +474,7 @@
                                     <span>Delete</span>
                                 </div>
                                 <% permissionKeys.forEach((moduleKey) => { %>
+                                    <% const moduleAllowedForRole = isModuleAllowedForRole(role, moduleKey); %>
                                     <div class="perm-row">
                                         <div class="module-info">
                                             <div class="module-icon-table">

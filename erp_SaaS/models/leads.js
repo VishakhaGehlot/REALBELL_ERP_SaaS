@@ -15,6 +15,15 @@ const LeadsSchema=mongoose.Schema({
      },
      img:{
         type:String
+     },
+     createdByUserId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "auth",
+        default: null
+     },
+     createdByEmail:{
+        type:String,
+        default:""
      }
 })
 

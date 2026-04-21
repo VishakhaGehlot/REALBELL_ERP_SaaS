@@ -10,10 +10,8 @@ const Employee = require('../models/HRM/Employees')
 const Product = require('../models/product')
 const PosOrder = require('../models/PosOrder')
 const userPlan = require('../models/userPlan')
-const BusinessLead = require('../models/BusinessLead')
-const DealPipeline = require('../models/DealPipeline')
-const Lead = require('../models/CRM/Lead')
-const Deal = require('../models/CRM/Deal')
+const CrmLead = require('../models/CrmLead')
+const CrmDeal = require('../models/CrmDeal')
 const ProjectBoard = require('../models/ProjectBoard')
 const AccountingEntry = require('../models/AccountingEntry')
 const EventSchedule = require('../models/EventSchedule')
@@ -62,6 +60,28 @@ function buildRecentItem(title, subtitle, status, createdAt, link) {
     return { title, subtitle, status, createdAt, link }
 }
 
+function buildUserOwnedFilter(user, { idFields = [], emailFields = [] } = {}) {
+    const clauses = []
+    const userId = user && user._id ? user._id : null
+    const exactEmail = String(user && user.email ? user.email : '').trim()
+    const normalizedEmail = exactEmail.toLowerCase()
+    const emailValues = Array.from(new Set([exactEmail, normalizedEmail].filter(Boolean)))
+
+    if (userId) {
+        for (const field of idFields) {
+            clauses.push({ [field]: userId })
+        }
+    }
+
+    for (const field of emailFields) {
+        for (const value of emailValues) {
+            clauses.push({ [field]: value })
+        }
+    }
+
+    return clauses.length ? { $or: clauses } : {}
+}
+
 async function buildCompanyDashboard(user, permissions) {
     const userEmail = String(user.email || '').toLowerCase()
     const moduleCards = []
@@ -71,7 +91,9 @@ async function buildCompanyDashboard(user, permissions) {
         const subscriptionFilter = {
             $or: [
                 { email: user.email },
-                { businessEmail: user.email }
+                { email: userEmail },
+                { businessEmail: user.email },
+                { businessEmail: userEmail }
             ]
         }
         const [plans, activePlans, paidPlans, latestPlan] = await Promise.all([
@@ -104,7 +126,10 @@ async function buildCompanyDashboard(user, permissions) {
     }
 
     if (hasAnyPermission(permissions, 'crm')) {
-        const crmFilter = { ownerEmail: userEmail }
+        const crmFilter = buildUserOwnedFilter(user, {
+            idFields: ['ownerUserId'],
+            emailFields: ['ownerEmail']
+        })
         const [contacts, pendingContacts, activeContacts, latestContact] = await Promise.all([
             CRM.countDocuments(crmFilter),
             CRM.countDocuments({ ...crmFilter, status: 'Pending' }),
@@ -136,19 +161,17 @@ async function buildCompanyDashboard(user, permissions) {
 
     // Lead Management Stats
     if (hasAnyPermission(permissions, 'leadManagement')) {
-        const leadFilter = { 
-            $or: [
-                { createdBy: user._id },
-                { assignedTo: user._id }
-            ]
-        }
+        const leadFilter = buildUserOwnedFilter(user, {
+            idFields: ['createdByUserId'],
+            emailFields: ['createdByEmail']
+        })
         const [totalLeads, newLeads, contactedLeads, qualifiedLeads, convertedLeads, latestLead] = await Promise.all([
-            Lead.countDocuments(leadFilter),
-            Lead.countDocuments({ ...leadFilter, status: 'New' }),
-            Lead.countDocuments({ ...leadFilter, status: 'Contacted' }),
-            Lead.countDocuments({ ...leadFilter, status: 'Qualified' }),
-            Lead.countDocuments({ ...leadFilter, status: 'Converted' }),
-            Lead.findOne(leadFilter).sort({ createdAt: -1 }).lean()
+            CrmLead.countDocuments(leadFilter),
+            CrmLead.countDocuments({ ...leadFilter, status: 'New' }),
+            CrmLead.countDocuments({ ...leadFilter, status: 'Contacted' }),
+            CrmLead.countDocuments({ ...leadFilter, status: 'Qualified' }),
+            CrmLead.countDocuments({ ...leadFilter, status: 'Converted' }),
+            CrmLead.findOne(leadFilter).sort({ createdAt: -1 }).lean()
         ])
 
         moduleCards.push({
@@ -175,24 +198,22 @@ async function buildCompanyDashboard(user, permissions) {
 
     // Deal Pipeline Stats
     if (hasAnyPermission(permissions, 'dealManagement')) {
-        const dealFilter = { 
-            $or: [
-                { createdBy: user._id },
-                { owner: user._id }
-            ]
-        }
+        const dealFilter = buildUserOwnedFilter(user, {
+            idFields: ['createdByUserId'],
+            emailFields: ['createdByEmail']
+        })
         const [totalDeals, discoveryDeals, proposalDeals, negotiationDeals, wonDeals, lostDeals, dealsValue, latestDeal] = await Promise.all([
-            Deal.countDocuments(dealFilter),
-            Deal.countDocuments({ ...dealFilter, stage: 'Discovery' }),
-            Deal.countDocuments({ ...dealFilter, stage: 'Proposal' }),
-            Deal.countDocuments({ ...dealFilter, stage: 'Negotiation' }),
-            Deal.countDocuments({ ...dealFilter, stage: 'Closed Won' }),
-            Deal.countDocuments({ ...dealFilter, stage: 'Closed Lost' }),
-            Deal.aggregate([
+            CrmDeal.countDocuments(dealFilter),
+            CrmDeal.countDocuments({ ...dealFilter, stage: 'Discovery' }),
+            CrmDeal.countDocuments({ ...dealFilter, stage: 'Proposal' }),
+            CrmDeal.countDocuments({ ...dealFilter, stage: 'Negotiation' }),
+            CrmDeal.countDocuments({ ...dealFilter, stage: 'Closed Won' }),
+            CrmDeal.countDocuments({ ...dealFilter, stage: 'Closed Lost' }),
+            CrmDeal.aggregate([
                 { $match: { ...dealFilter, stage: { $nin: ['Closed Won', 'Closed Lost'] } } },
-                { $group: { _id: null, total: { $sum: '$expectedRevenue' } } }
+                { $group: { _id: null, total: { $sum: '$value' } } }
             ]),
-            Deal.findOne(dealFilter).sort({ createdAt: -1 }).lean()
+            CrmDeal.findOne(dealFilter).sort({ createdAt: -1 }).lean()
         ])
 
         const pipelineValue = dealsValue[0]?.total || 0
@@ -203,7 +224,7 @@ async function buildCompanyDashboard(user, permissions) {
             label: 'CRM Deals',
             icon: 'bi-trophy',
             total: totalDeals,
-            primaryText: `₹${Number(pipelineValue).toLocaleString('en-IN')} pipeline`,
+            primaryText: `Rs ${Number(pipelineValue).toLocaleString('en-IN')} pipeline`,
             secondaryText: `${activeDeals} active, ${wonDeals} won`,
             alertCount: negotiationDeals + proposalDeals,
             link: '/crm/deals'
@@ -212,7 +233,7 @@ async function buildCompanyDashboard(user, permissions) {
         if (latestDeal) {
             recentActivity.push(buildRecentItem(
                 `Deal: ${latestDeal.title || 'New Deal'}`,
-                `Value: ₹${Number(latestDeal.value || 0).toLocaleString('en-IN')}`,
+                `Value: Rs ${Number(latestDeal.value || 0).toLocaleString('en-IN')}`,
                 latestDeal.stage || 'Discovery',
                 latestDeal.createdAt,
                 '/crm/deals'
@@ -223,8 +244,12 @@ async function buildCompanyDashboard(user, permissions) {
     if (hasAnyPermission(permissions, 'hrm')) {
         const employeeFilter = {
             $or: [
-                { createdByEmail: userEmail },
-                { email: user.email }
+                { email: user.email },
+                { email: userEmail },
+                ...((buildUserOwnedFilter(user, {
+                    idFields: ['createdByUserId'],
+                    emailFields: ['createdByEmail']
+                }).$or) || [])
             ]
         }
         const [employees, activeEmployees, leaveEmployees, latestEmployee] = await Promise.all([
@@ -257,21 +282,24 @@ async function buildCompanyDashboard(user, permissions) {
     }
 
     if (hasAnyPermission(permissions, 'queryManagement')) {
+        const queryFilter = buildUserOwnedFilter(user, {
+            idFields: ['handledByUserId'],
+            emailFields: ['handledByEmail']
+        })
         const [queries, repliedQueries, latestQuery] = await Promise.all([
-            queryTable.countDocuments(),
-            queryTable.countDocuments({ replied: true }),
-            queryTable.findOne().sort({ createdDate: -1 }).lean()
+            queryTable.countDocuments(queryFilter),
+            queryTable.countDocuments({ ...queryFilter, replied: true }),
+            queryTable.findOne(queryFilter).sort({ handledAt: -1, createdDate: -1 }).lean()
         ])
-        const pendingQueries = Math.max(queries - repliedQueries, 0)
 
         moduleCards.push({
             moduleKey: 'queryManagement',
             label: MODULE_LABELS.queryManagement,
             icon: 'bi-chat-dots',
             total: queries,
-            primaryText: `${repliedQueries} replied`,
-            secondaryText: `${pendingQueries} waiting response`,
-            alertCount: pendingQueries,
+            primaryText: `${repliedQueries} replied by you`,
+            secondaryText: 'Only your handled queries are tracked',
+            alertCount: 0,
             link: '/querytable'
         })
 
@@ -280,19 +308,31 @@ async function buildCompanyDashboard(user, permissions) {
                 `New query from ${(latestQuery.firstName || '')} ${(latestQuery.lastName || '')}`.trim() || 'New query',
                 (latestQuery.message || '').slice(0, 80) || latestQuery.email || 'Customer query received',
                 latestQuery.replied ? 'Replied' : 'Pending',
-                latestQuery.createdDate,
+                latestQuery.handledAt || latestQuery.createdDate,
                 '/querytable'
             ))
         }
     }
 
     if (hasAnyPermission(permissions, 'frontendManagement')) {
-        const [faqCount, featureCount, solutionCount] = await Promise.all([
-            faqTable.countDocuments(),
-            featureTable.countDocuments(),
-            solutionTable.countDocuments()
+        const frontendFilter = buildUserOwnedFilter(user, {
+            idFields: ['createdByUserId'],
+            emailFields: ['createdByEmail']
+        })
+        const [faqCount, featureCount, solutionCount, latestFaq, latestFeature, latestSolution] = await Promise.all([
+            faqTable.countDocuments(frontendFilter),
+            featureTable.countDocuments(frontendFilter),
+            solutionTable.countDocuments(frontendFilter),
+            faqTable.findOne(frontendFilter).sort({ updatedAt: -1, createdAt: -1 }).lean(),
+            featureTable.findOne(frontendFilter).sort({ updatedAt: -1, createdAt: -1 }).lean(),
+            solutionTable.findOne(frontendFilter).sort({ updatedAt: -1, createdAt: -1 }).lean()
         ])
         const totalContent = faqCount + featureCount + solutionCount
+        const latestContent = [
+            latestFaq ? { type: 'FAQ', title: latestFaq.title, status: latestFaq.status, createdAt: latestFaq.updatedAt || latestFaq.createdAt, link: '/faqtable' } : null,
+            latestFeature ? { type: 'Feature', title: latestFeature.title, status: latestFeature.status, createdAt: latestFeature.updatedAt || latestFeature.createdAt, link: '/featuretable' } : null,
+            latestSolution ? { type: 'Solution', title: latestSolution.title, status: latestSolution.status, createdAt: latestSolution.updatedAt || latestSolution.createdAt, link: '/solutiontable' } : null
+        ].filter(Boolean).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))[0]
 
         moduleCards.push({
             moduleKey: 'frontendManagement',
@@ -304,13 +344,28 @@ async function buildCompanyDashboard(user, permissions) {
             alertCount: 0,
             link: '/faqtable'
         })
+
+        if (latestContent) {
+            recentActivity.push(buildRecentItem(
+                `${latestContent.type}: ${latestContent.title || 'Content updated'}`,
+                'Frontend content managed by you',
+                latestContent.status || 'Pending',
+                latestContent.createdAt,
+                latestContent.link
+            ))
+        }
     }
 
     if (hasAnyPermission(permissions, 'productManagement')) {
-        const [products, activeProducts, lowStockProducts] = await Promise.all([
-            Product.countDocuments(),
-            Product.countDocuments({ activeStatus: 'Active' }),
-            Product.countDocuments({ status: { $in: ['Low Stock', 'Out of Stock', 'Limited Stock'] } })
+        const productFilter = buildUserOwnedFilter(user, {
+            idFields: ['createdByUserId'],
+            emailFields: ['createdByEmail']
+        })
+        const [products, activeProducts, lowStockProducts, latestProduct] = await Promise.all([
+            Product.countDocuments(productFilter),
+            Product.countDocuments({ ...productFilter, activeStatus: 'Active' }),
+            Product.countDocuments({ ...productFilter, status: { $in: ['Low Stock', 'Out of Stock', 'Limited Stock'] } }),
+            Product.findOne(productFilter).sort({ createdAt: -1 }).lean()
         ])
 
         moduleCards.push({
@@ -323,6 +378,16 @@ async function buildCompanyDashboard(user, permissions) {
             alertCount: lowStockProducts,
             link: '/producttable'
         })
+
+        if (latestProduct) {
+            recentActivity.push(buildRecentItem(
+                `Product: ${latestProduct.name || 'Product updated'}`,
+                `Stock: ${latestProduct.stock || 0} | Status: ${latestProduct.activeStatus || latestProduct.status || 'Pending'}`,
+                latestProduct.activeStatus || latestProduct.status || 'Pending',
+                latestProduct.createdAt,
+                '/producttable'
+            ))
+        }
     }
 
     if (hasAnyPermission(permissions, 'accounting')) {
@@ -437,60 +502,6 @@ async function buildCompanyDashboard(user, permissions) {
         }
     }
 
-    if (hasAnyPermission(permissions, 'leadManagement')) {
-        const leadFilter = { createdBy: user.email }
-        const [leads, openLeads, latestLead] = await Promise.all([
-            BusinessLead.countDocuments(leadFilter),
-            BusinessLead.countDocuments({ ...leadFilter, status: { $in: ['Open', 'Contacted'] } }),
-            BusinessLead.findOne(leadFilter).sort({ createdAt: -1 }).lean()
-        ])
-
-        moduleCards.push({
-            moduleKey: 'leadManagement',
-            label: MODULE_LABELS.leadManagement,
-            icon: 'bi-funnel-fill',
-            total: leads,
-            primaryText: `${openLeads} active leads`,
-            secondaryText: `${Math.max(leads - openLeads, 0)} converted or dormant`,
-            alertCount: openLeads,
-            link: '/leads'
-        })
-
-        if (latestLead) {
-            recentActivity.push(buildRecentItem(
-                `Lead captured: ${latestLead.name || 'Lead'}`,
-                latestLead.company || latestLead.email || 'Lead pipeline updated',
-                latestLead.stage || latestLead.status || 'New',
-                latestLead.createdAt,
-                '/leads'
-            ))
-        }
-    }
-
-    if (hasAnyPermission(permissions, 'dealManagement')) {
-        const dealFilter = { createdBy: user.email }
-        const [deals, wonDeals, dealTotals] = await Promise.all([
-            DealPipeline.countDocuments(dealFilter),
-            DealPipeline.countDocuments({ ...dealFilter, stage: 'Closed Won' }),
-            DealPipeline.aggregate([
-                { $match: dealFilter },
-                { $group: { _id: null, value: { $sum: '$value' } } }
-            ])
-        ])
-        const dealValue = dealTotals[0] ? Number(dealTotals[0].value || 0) : 0
-
-        moduleCards.push({
-            moduleKey: 'dealManagement',
-            label: MODULE_LABELS.dealManagement,
-            icon: 'bi-trophy',
-            total: deals,
-            primaryText: `${wonDeals} closed won`,
-            secondaryText: `Rs ${dealValue.toLocaleString('en-IN')} pipeline value`,
-            alertCount: Math.max(deals - wonDeals, 0),
-            link: '/deals'
-        })
-    }
-
     if (hasAnyPermission(permissions, 'smsManagement')) {
         const smsFilter = { createdBy: user.email }
         const [campaigns, sentCampaigns, failedCampaigns] = await Promise.all([
@@ -563,10 +574,14 @@ async function buildCompanyDashboard(user, permissions) {
     }
 
     if (hasAnyPermission(permissions, 'zoomMeeting')) {
+        const meetingFilter = buildUserOwnedFilter(user, {
+            idFields: ['createdByUserId'],
+            emailFields: ['createdByEmail']
+        })
         const [meetings, upcomingMeetings, latestMeeting] = await Promise.all([
-            ZoomMeeting.countDocuments(),
-            ZoomMeeting.countDocuments({ status: 'upcoming' }),
-            ZoomMeeting.findOne().sort({ createdAt: -1 }).lean()
+            ZoomMeeting.countDocuments(meetingFilter),
+            ZoomMeeting.countDocuments({ ...meetingFilter, status: 'upcoming' }),
+            ZoomMeeting.findOne(meetingFilter).sort({ createdAt: -1 }).lean()
         ])
 
         moduleCards.push({
@@ -577,7 +592,7 @@ async function buildCompanyDashboard(user, permissions) {
             primaryText: `${upcomingMeetings} upcoming meetings`,
             secondaryText: `${Math.max(meetings - upcomingMeetings, 0)} completed or cancelled`,
             alertCount: upcomingMeetings,
-            link: '/meetings-list'
+            link: '/schedule-meeting'
         })
 
         if (latestMeeting) {
@@ -586,7 +601,7 @@ async function buildCompanyDashboard(user, permissions) {
                 latestMeeting.dateTime || latestMeeting.zoomId || 'Meeting updated',
                 latestMeeting.status || 'upcoming',
                 latestMeeting.updatedAt || latestMeeting.createdAt,
-                '/meetings-list'
+                '/schedule-meeting'
             ))
         }
     }
@@ -638,37 +653,33 @@ async function buildCompanyDashboard(user, permissions) {
     }
 }
 
-async function buildSuperAdminDashboard() {
+async function buildSuperAdminDashboard(user, permissions) {
+    const personalDashboard = await buildCompanyDashboard(user, permissions)
+    const personalPlanFilter = {
+        $or: [
+            { email: user.email },
+            { email: String(user.email || '').toLowerCase() },
+            { businessEmail: user.email },
+            { businessEmail: String(user.email || '').toLowerCase() }
+        ]
+    }
+    const personalQueryFilter = buildUserOwnedFilter(user, {
+        idFields: ['handledByUserId'],
+        emailFields: ['handledByEmail']
+    })
+
     const [
         allUsersRaw,
         plans,
-        totalQueries,
-        repliedQueries,
-        contactsCount,
-        employeeCount,
-        productCount,
-        posMetrics,
-        leadsCount,
-        dealsMetrics,
-        projectCount,
-        faqCount,
-        featureCount,
-        solutionCount
+        recentQueries
     ] = await Promise.all([
         authTable.find().sort({ _id: -1 }).lean(),
-        userPlan.find().sort({ createdAt: -1 }).limit(8).lean(),
-        queryTable.countDocuments(),
-        queryTable.countDocuments({ replied: true }),
-        CRM.countDocuments(),
-        Employee.countDocuments(),
-        Product.countDocuments(),
-        PosOrder.aggregate([{ $group: { _id: null, orders: { $sum: 1 }, revenue: { $sum: '$total' } } }]),
-        BusinessLead.countDocuments(),
-        DealPipeline.aggregate([{ $group: { _id: null, deals: { $sum: 1 }, value: { $sum: '$value' } } }]),
-        ProjectBoard.countDocuments(),
-        faqTable.countDocuments(),
-        featureTable.countDocuments(),
-        solutionTable.countDocuments()
+        userPlan.find(personalPlanFilter).sort({ createdAt: -1 }).limit(8).lean(),
+        queryTable
+            .find(personalQueryFilter, { firstName: 1, lastName: 1, message: 1, replied: 1, createdDate: 1 })
+            .sort({ handledAt: -1, createdDate: -1 })
+            .limit(6)
+            .lean()
     ])
 
     const allUsers = allUsersRaw.map((u) => ({
@@ -690,12 +701,6 @@ async function buildSuperAdminDashboard() {
         Suspended: allUsers.filter((u) => u.status === 'Suspended').length
     }
 
-    const pendingQueries = Math.max(totalQueries - repliedQueries, 0)
-    const activePlans = plans.filter((plan) => plan.subscriptionStatus === 'Active').length
-    const paidPlans = plans.filter((plan) => plan.paymentStatus === 'Paid').length
-    const posSummary = posMetrics[0] || { orders: 0, revenue: 0 }
-    const dealSummary = dealsMetrics[0] || { deals: 0, value: 0 }
-
     const recentUsers = allUsers.slice(0, 8).map((u) => ({
         name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'User',
         email: u.email || '-',
@@ -704,29 +709,15 @@ async function buildSuperAdminDashboard() {
         createdAt: u._id && typeof u._id.getTimestamp === 'function' ? u._id.getTimestamp() : new Date()
     }))
 
-    const recentQueries = await queryTable
-        .find({}, { firstName: 1, lastName: 1, message: 1, replied: 1, createdDate: 1 })
-        .sort({ createdDate: -1 })
-        .limit(6)
-        .lean()
-
     return {
-        stats: [
-            { label: 'Total Users', value: allUsers.length, helpText: `${statusBreakdown.Active} active accounts` },
-            { label: 'Companies', value: roleBreakdown.Company, helpText: 'Company-side logins on platform' },
-            { label: 'Active Plans', value: activePlans, helpText: `${paidPlans} paid subscriptions` },
-            { label: 'Pending Queries', value: pendingQueries, helpText: `${repliedQueries} queries already replied` }
-        ],
-        spotlightCards: [
-            { label: 'CRM Contacts', value: contactsCount, meta: 'Platform-wide customer records', icon: 'bi-people-fill', link: '/addcontacttable' },
-            { label: 'HR Employees', value: employeeCount, meta: 'Employees managed in HRM', icon: 'bi-person-badge', link: '/employees' },
-            { label: 'Products', value: productCount, meta: 'Products in catalog', icon: 'bi-box-seam', link: '/producttable' },
-            { label: 'POS Orders', value: posSummary.orders || 0, meta: `Rs ${Number(posSummary.revenue || 0).toLocaleString('en-IN')} revenue`, icon: 'bi-receipt', link: '/orders' },
-            { label: 'Leads', value: leadsCount, meta: 'Business leads in pipeline', icon: 'bi-funnel-fill', link: '/leads' },
-            { label: 'Deals', value: dealSummary.deals || 0, meta: `Rs ${Number(dealSummary.value || 0).toLocaleString('en-IN')} pipeline`, icon: 'bi-trophy', link: '/deals' },
-            { label: 'Projects', value: projectCount, meta: 'Projects being tracked', icon: 'bi-kanban', link: '/projects' },
-            { label: 'Frontend Content', value: faqCount + featureCount + solutionCount, meta: `${faqCount} FAQs and ${featureCount + solutionCount} sections`, icon: 'bi-window', link: '/faqtable' }
-        ],
+        stats: personalDashboard.summaryCards,
+        spotlightCards: (personalDashboard.moduleCards || []).slice(0, 8).map((card) => ({
+            label: card.label,
+            value: card.total,
+            meta: [card.primaryText, card.secondaryText].filter(Boolean).join(' | '),
+            icon: card.icon,
+            link: card.link
+        })),
         roleBreakdown,
         statusBreakdown,
         recentUsers,
@@ -866,9 +857,11 @@ router.get('/dashboard', requireAuth, async (req, res) => {
         }
 
         if (role === "SuperAdmin") {
-            const superAdminData = await buildSuperAdminDashboard()
+            const permissions = req.modulePermissions || await getPermissionsForRole(role)
+            const superAdminData = await buildSuperAdminDashboard(user, permissions)
             return res.render("Home/SuperAdminDashboard.ejs", {
                 ...userData,
+                modulePermissions: permissions,
                 ...superAdminData
             })
         }

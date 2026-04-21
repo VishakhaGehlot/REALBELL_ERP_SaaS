@@ -15,7 +15,17 @@ const crmDealSchema = new mongoose.Schema(
             required: true
         },
         expectedCloseDate: { type: Date, default: null },
-        owner: { type: String, default: "" } // Deal owner
+        owner: { type: String, default: "" }, // Deal owner
+        createdByUserId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "auth",
+            default: null
+        },
+        createdByEmail: {
+            type: String,
+            default: "",
+            trim: true
+        }
     },
     { timestamps: true }
 );

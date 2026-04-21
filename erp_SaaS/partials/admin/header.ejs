@@ -394,17 +394,27 @@
 
         [data-theme="dark"] .sidebar,
         [data-theme="dark"] .table-card,
+        [data-theme="dark"] .table-container,
         [data-theme="dark"] .card,
         [data-theme="dark"] .chart-card,
         [data-theme="dark"] .activity-card,
         [data-theme="dark"] .quick-actions,
         [data-theme="dark"] .filter-card,
+        [data-theme="dark"] .top-header,
+        [data-theme="dark"] .calendar-container,
         [data-theme="dark"] .profile-dropdown,
         [data-theme="dark"] .stat-card,
         [data-theme="dark"] .form-card,
         [data-theme="dark"] .current-values,
         [data-theme="dark"] .info-box,
-        [data-theme="dark"] .welcome-section {
+        [data-theme="dark"] .welcome-section,
+        [data-theme="dark"] .modal-content,
+        [data-theme="dark"] .modal-body,
+        [data-theme="dark"] .modal-footer,
+        [data-theme="dark"] .offcanvas,
+        [data-theme="dark"] .offcanvas-header,
+        [data-theme="dark"] .offcanvas-body,
+        [data-theme="dark"] .accordion-item {
             background: #111a2e !important;
             border-color: #253454 !important;
             color: #e5e7eb !important;
@@ -442,8 +452,18 @@
         [data-theme="dark"] .activity-time,
         [data-theme="dark"] .stat-label,
         [data-theme="dark"] .user-email,
+        [data-theme="dark"] .page-title p,
         [data-theme="dark"] .page-header p,
-        [data-theme="dark"] .form-text {
+        [data-theme="dark"] .form-text,
+        [data-theme="dark"] .text-muted,
+        [data-theme="dark"] .filter-group label,
+        [data-theme="dark"] .stat-header h6,
+        [data-theme="dark"] .stat-info h6,
+        [data-theme="dark"] .customer-email,
+        [data-theme="dark"] .event-meta,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_info,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_length label,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_filter label {
             color: #9fb0cb !important;
         }
 
@@ -456,11 +476,18 @@
         [data-theme="dark"] .search-box,
         [data-theme="dark"] .form-control,
         [data-theme="dark"] .form-select,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_filter input,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_length select,
         [data-theme="dark"] input,
         [data-theme="dark"] select,
         [data-theme="dark"] textarea {
             background: #16233d !important;
             border-color: #2a3c61 !important;
+            color: #e5e7eb !important;
+        }
+
+        [data-theme="dark"] select option {
+            background: #16233d !important;
             color: #e5e7eb !important;
         }
 
@@ -484,6 +511,33 @@
         [data-theme="dark"] .save-btn:hover,
         [data-theme="dark"] .action-btn.update:hover {
             background: #facc15 !important;
+        }
+
+        [data-theme="dark"] .reset-btn,
+        [data-theme="dark"] .btn-light,
+        [data-theme="dark"] .btn-outline-dark,
+        [data-theme="dark"] .btn-outline-secondary,
+        [data-theme="dark"] .page-link {
+            background: #16233d !important;
+            border-color: #2a3c61 !important;
+            color: #e5e7eb !important;
+        }
+
+        [data-theme="dark"] .reset-btn:hover,
+        [data-theme="dark"] .btn-light:hover,
+        [data-theme="dark"] .btn-outline-dark:hover,
+        [data-theme="dark"] .btn-outline-secondary:hover,
+        [data-theme="dark"] .page-link:hover {
+            background: #1d2d4b !important;
+            border-color: #3b82f6 !important;
+            color: #ffffff !important;
+        }
+
+        [data-theme="dark"] .page-item.active .page-link,
+        [data-theme="dark"] .pagination .active > .page-link {
+            background: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+            color: #ffffff !important;
         }
 
         [data-theme="dark"] .view-all,
@@ -514,6 +568,17 @@
 
         [data-theme="dark"] tr:hover td {
             background: #16233d !important;
+        }
+
+        [data-theme="dark"] .table-header h3,
+        [data-theme="dark"] .table-header span,
+        [data-theme="dark"] .stat-number,
+        [data-theme="dark"] .stat-value,
+        [data-theme="dark"] .value,
+        [data-theme="dark"] .amount,
+        [data-theme="dark"] .customer-name,
+        [data-theme="dark"] .event-title-cell {
+            color: #e5e7eb !important;
         }
 
         /* Dark mode for feature badges */
@@ -556,6 +621,30 @@
         [data-theme="dark"] .action-btn.delete {
             background: #ef4444 !important;
             color: white !important;
+        }
+
+        [data-theme="dark"] .badge.bg-light,
+        [data-theme="dark"] .bg-light.text-dark,
+        [data-theme="dark"] .text-bg-light {
+            background: #22324f !important;
+            color: #dbeafe !important;
+            border-color: #36507b !important;
+        }
+
+        [data-theme="dark"] .form-check-input {
+            background-color: #16233d !important;
+            border-color: #3b82f6 !important;
+        }
+
+        [data-theme="dark"] .form-check-input:checked {
+            background-color: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+        }
+
+        [data-theme="dark"] .dataTables_wrapper .paginate_button.disabled .page-link {
+            background: #111a2e !important;
+            border-color: #253454 !important;
+            color: #64748b !important;
         }
 
         /* Dark mode for content wrapper backgrounds */
@@ -738,6 +827,125 @@
         item.addEventListener('click', function() {
             closeDropdown();
         });
+    });
+
+    // Permission-aware UI trimming so hidden actions do not keep showing on old templates.
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentRole = <%- JSON.stringify(currentUserRole || '') %>;
+        if (String(currentRole).toLowerCase() === 'superadmin') {
+            return;
+        }
+
+        const permissions = <%- JSON.stringify(modulePermissions || {}) %>;
+        const path = String(window.location.pathname || '').toLowerCase();
+
+        const moduleMatchers = [
+            { key: 'subscription', test: /^\/(plan|addplan|editplan|deleteplan|planstatus|paymentstatus|payment-history|pricingform)(\/|$)/ },
+            { key: 'subscription', test: /^\/subscription(\/|$)/ },
+            { key: 'crm', test: /^\/addcontact/ },
+            { key: 'hrm', test: /^\/(employees|attendance|leave|payroll|addnewemployee|addattendence|addleave|addpayroll)(\/|$)/ },
+            { key: 'queryManagement', test: /^\/query/ },
+            { key: 'frontendManagement', test: /^\/(faq|account|manage|leadstable|leadsform|leadsedit|leadsstatus|leadsdelete|solution|finance|premium|premiums|feature|swiper|footer)(\/|$)/ },
+            { key: 'productManagement', test: /^\/(producttable|addproduct|editproduct|updatestatus|deleteproduct)(\/|$)/ }
+        ];
+
+        const moduleKey = (moduleMatchers.find((entry) => entry.test.test(path)) || {}).key;
+        if (!moduleKey || !permissions[moduleKey]) {
+            return;
+        }
+
+        const modulePermissions = permissions[moduleKey] || {};
+        const can = (action) => Boolean(modulePermissions[action]);
+        const hideElement = (element) => {
+            if (!element) return;
+            element.style.display = 'none';
+            element.setAttribute('data-permission-hidden', '1');
+        };
+
+        if (!can('add')) {
+            document.querySelectorAll('a[href], button').forEach((element) => {
+                const href = String(element.getAttribute('href') || '').toLowerCase();
+                const classes = String(element.className || '').toLowerCase();
+                const onclick = String(element.getAttribute('onclick') || '').toLowerCase();
+                if (
+                    href.includes('/add') ||
+                    href.includes('form') ||
+                    href.includes('new') ||
+                    href.includes('action=add') ||
+                    classes.includes('btn-add') ||
+                    classes.includes('add-btn') ||
+                    classes.includes('add-product-btn') ||
+                    onclick.includes('action=add')
+                ) {
+                    hideElement(element);
+                }
+            });
+        }
+
+        if (!can('edit')) {
+            document.querySelectorAll('a[href], button, select').forEach((element) => {
+                const href = String(element.getAttribute('href') || '').toLowerCase();
+                const classes = String(element.className || '').toLowerCase();
+                const onclick = String(element.getAttribute('onclick') || '').toLowerCase();
+
+                if (
+                    classes.includes('reply-btn') ||
+                    classes.includes('action-btn edit') ||
+                    classes.includes('btn-edit') ||
+                    classes.includes('active-status-select') ||
+                    href.includes('edit') ||
+                    href.includes('status') ||
+                    href.includes('update') ||
+                    href.includes('reply') ||
+                    href.includes('send') ||
+                    onclick.includes('reply') ||
+                    onclick.includes('update')
+                ) {
+                    hideElement(element);
+                }
+            });
+
+            document.querySelectorAll('a[href*="status"]').forEach((element) => {
+                element.removeAttribute('href');
+                element.style.pointerEvents = 'none';
+                element.style.cursor = 'default';
+            });
+        }
+
+        if (!can('delete')) {
+            document.querySelectorAll('a[href], button, form').forEach((element) => {
+                const href = String(element.getAttribute('href') || '').toLowerCase();
+                const action = String(element.getAttribute('action') || '').toLowerCase();
+                const classes = String(element.className || '').toLowerCase();
+                const onclick = String(element.getAttribute('onclick') || '').toLowerCase();
+
+                if (
+                    classes.includes('delete') ||
+                    href.includes('delete') ||
+                    action.includes('delete') ||
+                    onclick.includes('delete')
+                ) {
+                    hideElement(element);
+                }
+            });
+        }
+
+        if (!can('view')) {
+            document.querySelectorAll('button').forEach((element) => {
+                const onclick = String(element.getAttribute('onclick') || '').toLowerCase();
+                const classes = String(element.className || '').toLowerCase();
+                if (classes.includes('btn-view') || onclick.includes('view')) {
+                    hideElement(element);
+                }
+            });
+
+            document.querySelectorAll('a[href]').forEach((element) => {
+                const href = String(element.getAttribute('href') || '').toLowerCase();
+                if (href.includes('export')) {
+                    hideElement(element);
+                }
+            });
+        }
     });
 </script>
 

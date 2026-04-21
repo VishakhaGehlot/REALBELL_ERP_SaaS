@@ -36,6 +36,15 @@ const zoomMeetingSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
+    },
+    createdByUserId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "auth",
+        default: null
+    },
+    createdByEmail: {
+        type: String,
+        default: ""
     }
 });
 

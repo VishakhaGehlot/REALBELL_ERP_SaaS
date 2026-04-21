@@ -1,13 +1,27 @@
 const router = require("express").Router()
 const Invoice = require("../models/Invoice")
 const Product = require("../models/product")
-const { requireAuth, allowRoles } = require("../middleware/roleAuth")
+const { requireAuth } = require("../middleware/roleAuth")
 const { requireModuleAccess } = require("../middleware/permissionAuth")
+const { buildOwnedDocumentFilter } = require("../middleware/dataScope")
 
 const INVOICE_STATUS = ["Draft", "Sent", "Paid", "Partial", "Overdue", "Cancelled"]
 const PAYMENT_METHODS = ["Cash", "Card", "Bank Transfer", "UPI", "Cheque", "Other"]
 
 router.use(requireAuth)
+
+function buildInvoiceScopeFilter(req, baseFilter = {}) {
+    return buildOwnedDocumentFilter(req, {
+        emailFields: ["createdBy"]
+    }, baseFilter)
+}
+
+function buildProductScopeFilter(req, baseFilter = {}) {
+    return buildOwnedDocumentFilter(req, {
+        idFields: ["createdByUserId"],
+        emailFields: ["createdByEmail"]
+    }, baseFilter)
+}
 
 // List all invoices
 router.get("/invoices", requireModuleAccess("accounting", "view"), async (req, res) => {
@@ -23,7 +37,7 @@ router.get("/invoices", requireModuleAccess("accounting", "view"), async (req, r
             if (dateTo) filter.invoiceDate.$lte = new Date(dateTo)
         }
         
-        const invoices = await Invoice.find(filter).sort({ createdAt: -1 }).lean()
+        const invoices = await Invoice.find(buildInvoiceScopeFilter(req, filter)).sort({ createdAt: -1 }).lean()
         
         // Stats
         const stats = {
@@ -53,7 +67,7 @@ router.get("/invoices", requireModuleAccess("accounting", "view"), async (req, r
 // New invoice form
 router.get("/invoices/new", requireModuleAccess("accounting", "add"), async (req, res) => {
     try {
-        const products = await Product.find({ activeStatus: "Active" }).lean()
+        const products = await Product.find(buildProductScopeFilter(req, { activeStatus: "Active" })).lean()
         res.render("ERP/InvoiceForm.ejs", {
             invoice: null,
             products,
@@ -70,6 +84,7 @@ router.get("/invoices/new", requireModuleAccess("accounting", "add"), async (req
 // Create invoice
 router.post("/invoices", requireModuleAccess("accounting", "add"), async (req, res) => {
     try {
+        const currentUserEmail = String(req.session?.email || "").trim().toLowerCase()
         const { customerName, customerEmail, customerPhone, customerAddress, invoiceDate, dueDate, notes, termsAndConditions } = req.body
         
         // Parse items
@@ -109,7 +124,7 @@ router.post("/invoices", requireModuleAccess("accounting", "add"), async (req, r
             items,
             notes,
             termsAndConditions,
-            createdBy: req.session.email,
+            createdBy: currentUserEmail,
             paymentStatus: "Draft"
         })
         
@@ -124,7 +139,7 @@ router.post("/invoices", requireModuleAccess("accounting", "add"), async (req, r
 // View invoice
 router.get("/invoices/:id", requireModuleAccess("accounting", "view"), async (req, res) => {
     try {
-        const invoice = await Invoice.findById(req.params.id).lean()
+        const invoice = await Invoice.findOne(buildInvoiceScopeFilter(req, { _id: req.params.id })).lean()
         if (!invoice) return res.redirect("/invoices?message=Invoice not found")
         
         res.render("ERP/InvoiceView.ejs", {
@@ -141,10 +156,10 @@ router.get("/invoices/:id", requireModuleAccess("accounting", "view"), async (re
 // Edit invoice form
 router.get("/invoices/:id/edit", requireModuleAccess("accounting", "edit"), async (req, res) => {
     try {
-        const invoice = await Invoice.findById(req.params.id).lean()
+        const invoice = await Invoice.findOne(buildInvoiceScopeFilter(req, { _id: req.params.id })).lean()
         if (!invoice) return res.redirect("/invoices?message=Invoice not found")
         
-        const products = await Product.find({ activeStatus: "Active" }).lean()
+        const products = await Product.find(buildProductScopeFilter(req, { activeStatus: "Active" })).lean()
         
         res.render("ERP/InvoiceForm.ejs", {
             invoice,
@@ -162,7 +177,7 @@ router.get("/invoices/:id/edit", requireModuleAccess("accounting", "edit"), asyn
 // Update invoice
 router.post("/invoices/:id", requireModuleAccess("accounting", "edit"), async (req, res) => {
     try {
-        const invoice = await Invoice.findById(req.params.id)
+        const invoice = await Invoice.findOne(buildInvoiceScopeFilter(req, { _id: req.params.id }))
         if (!invoice) return res.redirect("/invoices?message=Invoice not found")
         
         // Update fields
@@ -174,7 +189,7 @@ router.post("/invoices/:id", requireModuleAccess("accounting", "edit"), async (r
         invoice.dueDate = req.body.dueDate ? new Date(req.body.dueDate) : null
         invoice.notes = req.body.notes
         invoice.termsAndConditions = req.body.termsAndConditions
-        invoice.updatedBy = req.session.email
+        invoice.updatedBy = String(req.session?.email || "").trim().toLowerCase()
         
         // Parse items
         const items = []
@@ -216,7 +231,7 @@ router.post("/invoices/:id", requireModuleAccess("accounting", "edit"), async (r
 router.post("/invoices/:id/payment", requireModuleAccess("accounting", "edit"), async (req, res) => {
     try {
         const { paymentStatus, paidAmount, paymentMethod } = req.body
-        const invoice = await Invoice.findById(req.params.id)
+        const invoice = await Invoice.findOne(buildInvoiceScopeFilter(req, { _id: req.params.id }))
         if (!invoice) return res.redirect("/invoices?message=Invoice not found")
         
         invoice.paymentStatus = paymentStatus
@@ -239,7 +254,7 @@ router.post("/invoices/:id/payment", requireModuleAccess("accounting", "edit"), 
 // Delete invoice
 router.post("/invoices/:id/delete", requireModuleAccess("accounting", "delete"), async (req, res) => {
     try {
-        await Invoice.findByIdAndDelete(req.params.id)
+        await Invoice.findOneAndDelete(buildInvoiceScopeFilter(req, { _id: req.params.id }))
         res.redirect("/invoices?message=Invoice deleted successfully")
     } catch (error) {
         console.error("Delete invoice error:", error)
@@ -250,7 +265,7 @@ router.post("/invoices/:id/delete", requireModuleAccess("accounting", "delete"),
 // Print invoice
 router.get("/invoices/:id/print", requireModuleAccess("accounting", "view"), async (req, res) => {
     try {
-        const invoice = await Invoice.findById(req.params.id).lean()
+        const invoice = await Invoice.findOne(buildInvoiceScopeFilter(req, { _id: req.params.id })).lean()
         if (!invoice) return res.redirect("/invoices?message=Invoice not found")
         
         res.render("ERP/InvoicePrint.ejs", {

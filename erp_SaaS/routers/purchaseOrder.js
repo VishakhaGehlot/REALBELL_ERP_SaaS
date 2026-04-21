@@ -4,12 +4,32 @@ const Vendor = require("../models/Vendor")
 const Product = require("../models/product")
 const { requireAuth } = require("../middleware/roleAuth")
 const { requireModuleAccess } = require("../middleware/permissionAuth")
+const { buildOwnedDocumentFilter } = require("../middleware/dataScope")
 
 const PO_STATUS = ["Draft", "Sent", "Acknowledged", "Partially Received", "Received", "Cancelled", "Closed"]
 const DELIVERY_STATUS = ["Pending", "In Transit", "Delivered", "Partial"]
 const PAYMENT_TERMS = ["Net 15", "Net 30", "Net 45", "Net 60", "Due on Receipt", "Advance", "COD"]
 
 router.use(requireAuth)
+
+function buildPurchaseOrderScopeFilter(req, baseFilter = {}) {
+    return buildOwnedDocumentFilter(req, {
+        emailFields: ["createdBy"]
+    }, baseFilter)
+}
+
+function buildVendorScopeFilter(req, baseFilter = {}) {
+    return buildOwnedDocumentFilter(req, {
+        emailFields: ["createdBy"]
+    }, baseFilter)
+}
+
+function buildProductScopeFilter(req, baseFilter = {}) {
+    return buildOwnedDocumentFilter(req, {
+        idFields: ["createdByUserId"],
+        emailFields: ["createdByEmail"]
+    }, baseFilter)
+}
 
 // List all purchase orders
 router.get("/purchase-orders", requireModuleAccess("productManagement", "view"), async (req, res) => {
@@ -25,7 +45,7 @@ router.get("/purchase-orders", requireModuleAccess("productManagement", "view"),
             if (dateTo) filter.poDate.$lte = new Date(dateTo)
         }
         
-        const purchaseOrders = await PurchaseOrder.find(filter).sort({ createdAt: -1 }).lean()
+        const purchaseOrders = await PurchaseOrder.find(buildPurchaseOrderScopeFilter(req, filter)).sort({ createdAt: -1 }).lean()
         
         // Stats
         const stats = {
@@ -55,8 +75,8 @@ router.get("/purchase-orders", requireModuleAccess("productManagement", "view"),
 router.get("/purchase-orders/new", requireModuleAccess("productManagement", "add"), async (req, res) => {
     try {
         const [vendors, products] = await Promise.all([
-            Vendor.find({ status: "Active" }).lean(),
-            Product.find({ activeStatus: "Active" }).lean()
+            Vendor.find(buildVendorScopeFilter(req, { status: "Active" })).lean(),
+            Product.find(buildProductScopeFilter(req, { activeStatus: "Active" })).lean()
         ])
         
         res.render("ERP/PurchaseOrderForm.ejs", {
@@ -76,6 +96,7 @@ router.get("/purchase-orders/new", requireModuleAccess("productManagement", "add
 // Create PO
 router.post("/purchase-orders", requireModuleAccess("productManagement", "add"), async (req, res) => {
     try {
+        const currentUserEmail = String(req.session?.email || "").trim().toLowerCase()
         const { vendorId, vendorName, vendorEmail, vendorPhone, vendorAddress, vendorGstNumber, poDate, expectedDeliveryDate, paymentTerms, notes, termsAndConditions } = req.body
         
         // Parse items
@@ -120,7 +141,7 @@ router.post("/purchase-orders", requireModuleAccess("productManagement", "add"),
             items,
             notes,
             termsAndConditions,
-            createdBy: req.session.email,
+            createdBy: currentUserEmail,
             status: "Draft"
         })
         
@@ -135,7 +156,7 @@ router.post("/purchase-orders", requireModuleAccess("productManagement", "add"),
 // View PO
 router.get("/purchase-orders/:id", requireModuleAccess("productManagement", "view"), async (req, res) => {
     try {
-        const purchaseOrder = await PurchaseOrder.findById(req.params.id).lean()
+        const purchaseOrder = await PurchaseOrder.findOne(buildPurchaseOrderScopeFilter(req, { _id: req.params.id })).lean()
         if (!purchaseOrder) return res.redirect("/purchase-orders?message=Purchase Order not found")
         
         res.render("ERP/PurchaseOrderView.ejs", {
@@ -153,9 +174,9 @@ router.get("/purchase-orders/:id", requireModuleAccess("productManagement", "vie
 router.get("/purchase-orders/:id/edit", requireModuleAccess("productManagement", "edit"), async (req, res) => {
     try {
         const [purchaseOrder, vendors, products] = await Promise.all([
-            PurchaseOrder.findById(req.params.id).lean(),
-            Vendor.find({ status: "Active" }).lean(),
-            Product.find({ activeStatus: "Active" }).lean()
+            PurchaseOrder.findOne(buildPurchaseOrderScopeFilter(req, { _id: req.params.id })).lean(),
+            Vendor.find(buildVendorScopeFilter(req, { status: "Active" })).lean(),
+            Product.find(buildProductScopeFilter(req, { activeStatus: "Active" })).lean()
         ])
         
         if (!purchaseOrder) return res.redirect("/purchase-orders?message=Purchase Order not found")
@@ -177,7 +198,7 @@ router.get("/purchase-orders/:id/edit", requireModuleAccess("productManagement",
 // Update PO
 router.post("/purchase-orders/:id", requireModuleAccess("productManagement", "edit"), async (req, res) => {
     try {
-        const po = await PurchaseOrder.findById(req.params.id)
+        const po = await PurchaseOrder.findOne(buildPurchaseOrderScopeFilter(req, { _id: req.params.id }))
         if (!po) return res.redirect("/purchase-orders?message=Purchase Order not found")
         
         // Update fields
@@ -192,7 +213,7 @@ router.post("/purchase-orders/:id", requireModuleAccess("productManagement", "ed
         po.paymentTerms = req.body.paymentTerms
         po.notes = req.body.notes
         po.termsAndConditions = req.body.termsAndConditions
-        po.updatedBy = req.session.email
+        po.updatedBy = String(req.session?.email || "").trim().toLowerCase()
         
         // Parse items
         const items = []
@@ -236,7 +257,7 @@ router.post("/purchase-orders/:id", requireModuleAccess("productManagement", "ed
 router.post("/purchase-orders/:id/status", requireModuleAccess("productManagement", "edit"), async (req, res) => {
     try {
         const { status, deliveryStatus } = req.body
-        const po = await PurchaseOrder.findById(req.params.id)
+        const po = await PurchaseOrder.findOne(buildPurchaseOrderScopeFilter(req, { _id: req.params.id }))
         if (!po) return res.redirect("/purchase-orders?message=Purchase Order not found")
         
         if (status) po.status = status
@@ -261,7 +282,7 @@ router.post("/purchase-orders/:id/status", requireModuleAccess("productManagemen
 // Receive items (GRN - Goods Receipt Note)
 router.post("/purchase-orders/:id/receive", requireModuleAccess("productManagement", "edit"), async (req, res) => {
     try {
-        const po = await PurchaseOrder.findById(req.params.id)
+        const po = await PurchaseOrder.findOne(buildPurchaseOrderScopeFilter(req, { _id: req.params.id }))
         if (!po) return res.redirect("/purchase-orders?message=Purchase Order not found")
         
         // Update received quantities
@@ -298,7 +319,7 @@ router.post("/purchase-orders/:id/receive", requireModuleAccess("productManageme
 // Delete PO
 router.post("/purchase-orders/:id/delete", requireModuleAccess("productManagement", "delete"), async (req, res) => {
     try {
-        await PurchaseOrder.findByIdAndDelete(req.params.id)
+        await PurchaseOrder.findOneAndDelete(buildPurchaseOrderScopeFilter(req, { _id: req.params.id }))
         res.redirect("/purchase-orders?message=Purchase Order deleted successfully")
     } catch (error) {
         console.error("Delete PO error:", error)
@@ -309,7 +330,7 @@ router.post("/purchase-orders/:id/delete", requireModuleAccess("productManagemen
 // Print PO
 router.get("/purchase-orders/:id/print", requireModuleAccess("productManagement", "view"), async (req, res) => {
     try {
-        const purchaseOrder = await PurchaseOrder.findById(req.params.id).lean()
+        const purchaseOrder = await PurchaseOrder.findOne(buildPurchaseOrderScopeFilter(req, { _id: req.params.id })).lean()
         if (!purchaseOrder) return res.redirect("/purchase-orders?message=Purchase Order not found")
         
         res.render("ERP/PurchaseOrderPrint.ejs", {

@@ -1,13 +1,27 @@
 const router=require('express').Router()
 const financetable=require('../models/finance')
 const { requireAuth } = require('../middleware/roleAuth')
-const { requireModuleAccess } = require('../middleware/permissionAuth')
+const { requireScopedModuleAccess } = require('../middleware/permissionAuth')
+const { buildOwnedDocumentFilter } = require('../middleware/dataScope')
 
 router.use(requireAuth)
-router.use(requireModuleAccess('frontendManagement'))
+router.use(requireScopedModuleAccess('frontendManagement', [
+    '/financetable',
+    '/financeform',
+    '/financedelete',
+    '/financeedit',
+    '/financestatus'
+]))
+
+function buildFinanceScopeFilter(req, baseFilter = {}) {
+    return buildOwnedDocumentFilter(req, {
+        idFields: ['createdByUserId'],
+        emailFields: ['createdByEmail']
+    }, baseFilter)
+}
 
 router.get('/financetable',async(req,res)=>{
-    const financedata=await financetable.find()
+    const financedata=await financetable.find(buildFinanceScopeFilter(req))
      const loginname=req.session.email
     res.render("Frontend/Finance/financetable.ejs",{financedata, loginname})
 })
@@ -20,19 +34,27 @@ router.get('/financeform',(req,res)=>{
 
 router.post('/financeform',async(req,res)=>{
     const {title,desc1,desc2,desc3,desc4}=req.body
-  const Record= await  new financetable({title,desc1,desc2,desc3,desc4})
+  const Record= await  new financetable({
+    title,
+    desc1,
+    desc2,
+    desc3,
+    desc4,
+    createdByUserId: req.session?.userId || null,
+    createdByEmail: String(req.session?.email || '').toLowerCase()
+  })
   Record.save()
   console.log(Record)
 })
 router.get('/financedelete/:id',async(req,res)=>{
     const id=req.params.id
-    await financetable.findByIdAndDelete(id)
+    await financetable.findOneAndDelete(buildFinanceScopeFilter(req,{ _id:id }))
     res.redirect("/financetable")
 })
 
 router.get('/financeedit/:id',async(req,res)=>{
     const id=req.params.id
-    const Record=await financetable.findById(id)
+    const Record=await financetable.findOne(buildFinanceScopeFilter(req,{ _id:id }))
          const loginname=req.session.email
 
     res.render("Frontend/Finance/financeedit.ejs",{Record,loginname})
@@ -40,7 +62,7 @@ router.get('/financeedit/:id',async(req,res)=>{
 router.post('/financeedit/:id',async(req,res)=>{
     const {title,desc1,desc2,desc3,desc4}=req.body
     const id=req.params.id
-    await financetable.findByIdAndUpdate(id,{title,desc1,desc2,desc3,desc4})
+    await financetable.findOneAndUpdate(buildFinanceScopeFilter(req,{ _id:id }),{title,desc1,desc2,desc3,desc4})
 })
 
 router.get('/financestatus/:id/:status',async(req,res)=>{
@@ -52,7 +74,7 @@ router.get('/financestatus/:id/:status',async(req,res)=>{
     }else{
         newStatus="Pending"
     }
-    await financetable.findByIdAndUpdate(id,{status:newStatus})
+    await financetable.findOneAndUpdate(buildFinanceScopeFilter(req,{ _id:id }),{status:newStatus})
     res.redirect('/financetable')
 
 })

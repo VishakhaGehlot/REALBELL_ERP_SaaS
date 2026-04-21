@@ -7,6 +7,8 @@ const subTable = require('../models/subscription');
 const registerTable = require('../models/userPlan');
 const paymentGatewaySettingTable = require('../models/paymentGatewaySetting');
 const logincheck = require('../middleware/logincheck');
+const { requireAuth } = require('../middleware/roleAuth');
+const { requireModuleAccess } = require('../middleware/permissionAuth');
 
 const CURRENCY = 'INR';
 
@@ -549,18 +551,18 @@ async function finalizeSubscriptionPayment({ registration, selectedPlan, payment
     return savedRecord;
 }
 
-router.get("/plan", async (req, res) => {
+router.get("/plan", requireAuth, requireModuleAccess('subscription', 'view'), async (req, res) => {
     const loginname = req.session.email;
     const Data = await subTable.find();
     res.render("subscription/plans.ejs", { Data, loginname });
 });
 
-router.get("/addplan", (req, res) => {
+router.get("/addplan", requireAuth, requireModuleAccess('subscription', 'add'), async (req, res) => {
     const loginname = req.session.email;
-    res.render("subscription/Addplan.ejs", { loginname });
+    res.render("subscription/Addplan.ejs", { loginname, plan: null, formAction: "/addplan", formMode: "create" });
 });
 
-router.post("/addplan", async (req, res) => {
+router.post("/addplan", requireAuth, requireModuleAccess('subscription', 'add'), async (req, res) => {
     const { title, price, features } = req.body;
     const featureArray = JSON.parse(features);
 
@@ -574,7 +576,40 @@ router.post("/addplan", async (req, res) => {
     res.redirect("/plan");
 });
 
-router.get("/planstatus/:id/:Status", async (req, res) => {
+router.get("/editplan/:id", requireAuth, requireModuleAccess('subscription', 'edit'), async (req, res) => {
+    const loginname = req.session.email;
+    const plan = await subTable.findById(req.params.id).lean();
+    if (!plan) {
+        return res.redirect("/plan");
+    }
+
+    res.render("subscription/Addplan.ejs", {
+        loginname,
+        plan,
+        formAction: `/editplan/${plan._id}`,
+        formMode: "edit"
+    });
+});
+
+router.post("/editplan/:id", requireAuth, requireModuleAccess('subscription', 'edit'), async (req, res) => {
+    const { title, price, features } = req.body;
+    const featureArray = JSON.parse(features);
+
+    await subTable.findByIdAndUpdate(req.params.id, {
+        title,
+        price,
+        features: featureArray
+    });
+
+    res.redirect("/plan");
+});
+
+router.get("/deleteplan/:id", requireAuth, requireModuleAccess('subscription', 'delete'), async (req, res) => {
+    await subTable.findByIdAndDelete(req.params.id);
+    res.redirect("/plan");
+});
+
+router.get("/planstatus/:id/:Status", requireAuth, requireModuleAccess('subscription', 'edit'), async (req, res) => {
     const id = req.params.id;
     const CurrentStatus = req.params.Status;
     const newStatus = CurrentStatus === "Pending" ? "Active" : "Pending";
@@ -582,14 +617,14 @@ router.get("/planstatus/:id/:Status", async (req, res) => {
     res.redirect("/plan");
 });
 
-router.get('/paymentStatus', async (req, res) => {
+router.get('/paymentStatus', requireAuth, requireModuleAccess('subscription', 'view'), async (req, res) => {
     const loginname = req.session.email;
     const records = await registerTable.find().sort({ createdAt: -1, _id: -1 });
     const userDetails = hidePendingWhenPaidExists(records);
     res.render('subscription/pendingSub.ejs', { userDetails, loginname });
 });
 
-router.get('/invoices', logincheck, async (req, res) => {
+router.get('/subscription/invoices', requireAuth, requireModuleAccess('subscription', 'view'), async (req, res) => {
     const loginname = req.session.email;
     const searchQuery = sanitizeText(req.query.q).toLowerCase();
     const subscriptionStatus = sanitizeText(req.query.status);
@@ -645,7 +680,7 @@ router.get('/invoices', logincheck, async (req, res) => {
     });
 });
 
-router.get('/payment-history', logincheck, async (req, res) => {
+router.get('/payment-history', requireAuth, requireModuleAccess('subscription', 'view'), async (req, res) => {
     const loginname = req.session.email;
     const searchQuery = sanitizeText(req.query.q).toLowerCase();
     const requestedStatus = sanitizeText(req.query.status);
@@ -722,7 +757,7 @@ router.get('/payment-history', logincheck, async (req, res) => {
     });
 });
 
-router.get('/pricingForm', async (req, res) => {
+router.get('/pricingForm', requireAuth, requireModuleAccess('subscription', 'view'), async (req, res) => {
     const loginname = req.session.email;
     const { plans, selectedPlan } = await buildPricingPageData(req.query);
     const razorpayConfig = await getRazorpayConfig();
@@ -737,7 +772,7 @@ router.get('/pricingForm', async (req, res) => {
     });
 });
 
-router.post('/pricingForm', async (req, res) => {
+router.post('/pricingForm', requireAuth, requireModuleAccess('subscription', 'view'), async (req, res) => {
     const { selectedPlan } = await buildPricingPageData(req.body);
     const planId = selectedPlan ? `?planId=${selectedPlan._id}&error=${encodeURIComponent('Please complete payment from the checkout button.')}` : `?error=${encodeURIComponent('Please complete payment from the checkout button.')}`;
     res.redirect(`/pricingForm${planId}`);
@@ -1154,7 +1189,7 @@ router.post('/subscription/verify-payment', async (req, res) => {
     }
 });
 
-router.get('/subscription/settings', logincheck, async (req, res) => {
+router.get('/subscription/settings', requireAuth, requireModuleAccess('subscription', 'edit'), async (req, res) => {
     const loginname = req.session.email;
     const razorpayConfig = await getRazorpayConfig();
 
@@ -1174,7 +1209,7 @@ router.get('/subscription/settings', logincheck, async (req, res) => {
     });
 });
 
-router.post('/subscription/settings', logincheck, async (req, res) => {
+router.post('/subscription/settings', requireAuth, requireModuleAccess('subscription', 'edit'), async (req, res) => {
     try {
         const submittedKeyId = normalizeCredential(req.body.keyId);
         const submittedKeySecret = normalizeCredential(req.body.keySecret);

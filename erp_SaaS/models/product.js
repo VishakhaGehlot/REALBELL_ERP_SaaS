@@ -39,6 +39,15 @@ const productSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    createdByUserId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "auth",
+        default: null
+    },
+    createdByEmail: {
+        type: String,
+        default: ""
+    },
 });
 
 module.exports = mongoose.model("product", productSchema);

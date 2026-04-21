@@ -12,7 +12,18 @@ const faqSchema=mongoose.Schema({
      status:{
           type:String,
           default:"Pending"
+     },
+     createdByUserId:{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "auth",
+          default: null
+     },
+     createdByEmail:{
+          type:String,
+          default:""
      }
+},{
+     timestamps:true
 })
 
 module.exports=mongoose.model("faq",faqSchema)

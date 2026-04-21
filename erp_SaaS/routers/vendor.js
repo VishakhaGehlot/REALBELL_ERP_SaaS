@@ -2,12 +2,19 @@ const router = require("express").Router()
 const Vendor = require("../models/Vendor")
 const { requireAuth } = require("../middleware/roleAuth")
 const { requireModuleAccess } = require("../middleware/permissionAuth")
+const { buildOwnedDocumentFilter } = require("../middleware/dataScope")
 
 const BUSINESS_TYPES = ["Manufacturer", "Distributor", "Wholesaler", "Retailer", "Service Provider", "Other"]
 const VENDOR_STATUS = ["Active", "Inactive", "Blacklisted"]
 const PAYMENT_TERMS = ["Net 15", "Net 30", "Net 45", "Net 60", "Due on Receipt", "Advance", "COD"]
 
 router.use(requireAuth)
+
+function buildVendorScopeFilter(req, baseFilter = {}) {
+    return buildOwnedDocumentFilter(req, {
+        emailFields: ["createdBy"]
+    }, baseFilter)
+}
 
 // List all vendors
 router.get("/vendors", requireModuleAccess("productManagement", "view"), async (req, res) => {
@@ -26,7 +33,7 @@ router.get("/vendors", requireModuleAccess("productManagement", "view"), async (
             ]
         }
         
-        const vendors = await Vendor.find(filter).sort({ createdAt: -1 }).lean()
+        const vendors = await Vendor.find(buildVendorScopeFilter(req, filter)).sort({ createdAt: -1 }).lean()
         
         const stats = {
             total: vendors.length,
@@ -69,6 +76,7 @@ router.get("/vendors/new", requireModuleAccess("productManagement", "add"), asyn
 // Create vendor
 router.post("/vendors", requireModuleAccess("productManagement", "add"), async (req, res) => {
     try {
+        const currentUserEmail = String(req.session?.email || "").trim().toLowerCase()
         const vendor = new Vendor({
             name: req.body.name,
             email: req.body.email,
@@ -93,7 +101,7 @@ router.post("/vendors", requireModuleAccess("productManagement", "add"), async (
             status: req.body.status || "Active",
             rating: parseInt(req.body.rating) || 3,
             notes: req.body.notes,
-            createdBy: req.session.email
+            createdBy: currentUserEmail
         })
         
         await vendor.save()
@@ -107,12 +115,14 @@ router.post("/vendors", requireModuleAccess("productManagement", "add"), async (
 // View vendor
 router.get("/vendors/:id", requireModuleAccess("productManagement", "view"), async (req, res) => {
     try {
-        const vendor = await Vendor.findById(req.params.id).lean()
+        const vendor = await Vendor.findOne(buildVendorScopeFilter(req, { _id: req.params.id })).lean()
         if (!vendor) return res.redirect("/vendors?message=Vendor not found")
         
         // Get purchase orders for this vendor
         const PurchaseOrder = require("../models/PurchaseOrder")
-        const purchaseOrders = await PurchaseOrder.find({ vendorId: vendor._id }).sort({ createdAt: -1 }).limit(5).lean()
+        const purchaseOrders = await PurchaseOrder.find(buildOwnedDocumentFilter(req, {
+            emailFields: ["createdBy"]
+        }, { vendorId: vendor._id })).sort({ createdAt: -1 }).limit(5).lean()
         
         res.render("ERP/VendorView.ejs", {
             vendor,
@@ -129,7 +139,7 @@ router.get("/vendors/:id", requireModuleAccess("productManagement", "view"), asy
 // Edit vendor form
 router.get("/vendors/:id/edit", requireModuleAccess("productManagement", "edit"), async (req, res) => {
     try {
-        const vendor = await Vendor.findById(req.params.id).lean()
+        const vendor = await Vendor.findOne(buildVendorScopeFilter(req, { _id: req.params.id })).lean()
         if (!vendor) return res.redirect("/vendors?message=Vendor not found")
         
         res.render("ERP/VendorForm.ejs", {
@@ -149,7 +159,7 @@ router.get("/vendors/:id/edit", requireModuleAccess("productManagement", "edit")
 // Update vendor
 router.post("/vendors/:id", requireModuleAccess("productManagement", "edit"), async (req, res) => {
     try {
-        const vendor = await Vendor.findById(req.params.id)
+        const vendor = await Vendor.findOne(buildVendorScopeFilter(req, { _id: req.params.id }))
         if (!vendor) return res.redirect("/vendors?message=Vendor not found")
         
         vendor.name = req.body.name
@@ -175,7 +185,7 @@ router.post("/vendors/:id", requireModuleAccess("productManagement", "edit"), as
         vendor.status = req.body.status || "Active"
         vendor.rating = parseInt(req.body.rating) || 3
         vendor.notes = req.body.notes
-        vendor.updatedBy = req.session.email
+        vendor.updatedBy = String(req.session?.email || "").trim().toLowerCase()
         
         await vendor.save()
         res.redirect(`/vendors/${vendor._id}?message=Vendor updated successfully`)
@@ -188,7 +198,7 @@ router.post("/vendors/:id", requireModuleAccess("productManagement", "edit"), as
 // Delete vendor
 router.post("/vendors/:id/delete", requireModuleAccess("productManagement", "delete"), async (req, res) => {
     try {
-        await Vendor.findByIdAndDelete(req.params.id)
+        await Vendor.findOneAndDelete(buildVendorScopeFilter(req, { _id: req.params.id }))
         res.redirect("/vendors?message=Vendor deleted successfully")
     } catch (error) {
         console.error("Delete vendor error:", error)

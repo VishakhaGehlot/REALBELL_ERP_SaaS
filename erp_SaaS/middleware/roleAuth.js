@@ -14,15 +14,22 @@ function normalizeRole(role) {
 
 async function resolveRequestRole(req) {
     let role = normalizeRole(req.session && req.session.userRole)
+    
+    console.log(`[Role Debug] Session role: ${req.session?.userRole}, Normalized: ${role}, Email: ${req.session?.email}`)
 
     if (!req.session || !req.session.email) {
+        console.log(`[Role Debug] No session/email, returning: ${role}`)
         return role
     }
 
     try {
         const dbUser = await authTable.findOne({ email: req.session.email }, { role: 1 }).lean()
+        console.log(`[Role Debug] DB user found:`, dbUser ? { role: dbUser.role } : null)
+        
         if (dbUser && dbUser.role) {
             const dbRole = normalizeRole(dbUser.role)
+            console.log(`[Role Debug] DB role normalized: ${dbRole}`)
+            
             if (req.session.userRole !== dbRole) {
                 req.session.userRole = dbRole
             }
@@ -31,7 +38,8 @@ async function resolveRequestRole(req) {
     } catch (error) {
         console.error("Role resolve error:", error)
     }
-
+    
+    console.log(`[Role Debug] Final resolved role: ${role}`)
     return role
 }
 

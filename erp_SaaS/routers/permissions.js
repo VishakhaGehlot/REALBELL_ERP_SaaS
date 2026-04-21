@@ -6,6 +6,7 @@ const {
     ACTION_KEYS,
     MODULE_LABELS,
     toPermissionRoleKey,
+    isModuleAllowedForRole,
     getPermissionsForRole
 } = require("../middleware/permissionAuth")
 
@@ -28,6 +29,7 @@ router.get("/permissions", async (req, res) => {
             permissionKeys: PERMISSION_KEYS,
             actionKeys: ACTION_KEYS,
             moduleLabels: MODULE_LABELS,
+            isModuleAllowedForRole,
             loginname: req.session.email,
             message: req.query.message || ""
         })
@@ -47,23 +49,48 @@ router.post("/permissions", async (req, res) => {
 
             for (const moduleKey of PERMISSION_KEYS) {
                 const modulePayload = rolePayload[moduleKey] || {}
+                const moduleAllowedForRole = isModuleAllowedForRole(role, moduleKey)
                 permissions[moduleKey] = {}
                 for (const action of ACTION_KEYS) {
-                    permissions[moduleKey][action] = Boolean(modulePayload[action])
+                    permissions[moduleKey][action] = moduleAllowedForRole && Boolean(modulePayload[action])
                 }
             }
 
+            const roleKey = toPermissionRoleKey(role)
+            console.log(`[Permissions Save] Saving permissions for role: ${role} -> key: ${roleKey}`)
+            
             await RolePermission.findOneAndUpdate(
-                { role: toPermissionRoleKey(role) },
-                { role: toPermissionRoleKey(role), permissions },
-                { upsert: true, setDefaultsOnInsert: true }
+                { role: roleKey },
+                { $set: { permissions } },
+                { upsert: true, setDefaultsOnInsert: true, new: true }
             )
+            
+            console.log(`[Permissions Save] Saved for ${roleKey}`)
         }
 
         return res.redirect("/permissions?message=Permissions updated successfully")
     } catch (error) {
         console.error("Permissions save error:", error)
         return res.redirect("/permissions?message=Failed to update permissions")
+    }
+})
+
+// Debug API to check permissions (for troubleshooting)
+router.get("/api/debug/permissions", requireAuth, async (req, res) => {
+    try {
+        const role = req.query.role || req.session.userRole || "Employee"
+        const rawDocs = await RolePermission.find().lean()
+        const computed = await getPermissionsForRole(role)
+        
+        res.json({
+            requestedRole: role,
+            sessionRole: req.session.userRole,
+            sessionEmail: req.session.email,
+            rawDatabaseDocs: rawDocs.map(d => ({ role: d.role, perms: d.permissions })),
+            computedPermissions: computed
+        })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
     }
 })
 

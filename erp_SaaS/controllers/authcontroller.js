@@ -1,4 +1,7 @@
-const authTable=require('../models/auth')
+const authTable = require('../models/auth')
+const bcrypt = require('bcrypt')
+const nodemailer = require('nodemailer')
+const { normalizeRole } = require('../middleware/roleAuth')
 
 
 exports.login=(req,res)=>{
@@ -45,19 +48,18 @@ exports.loginform= async (req, res) => {
             })
         }
 
+        // ✅ Set Session Variables
+        req.session.isAuth = true
+        req.session.email = Email.email
+        req.session.userId = String(Email._id)
+        req.session.userRole = normalizeRole(Email.role)
+        req.session.userName = `${Email.firstName || ""} ${Email.lastName || ""}`.trim()
+
         // ✅ Role Based Redirect
-        if (Email.role === "SuperAdmin") {
-            req.session.isAuth=true
-            req.session.email=Email.email
+        const role = req.session.userRole
+        if (role === "SuperAdmin" || role === "Company" || role === "Employee") {
             return res.redirect("/dashboard")
-        } 
-        else if (Email.role === "Admin") {
-            return res.redirect("/dashboard")
-        } 
-        else if (Email.role === "teacher") {
-            return res.redirect("/dashboard")   // typo fixed
-        } 
-        else {
+        } else {
             return res.redirect("/")
         }
 

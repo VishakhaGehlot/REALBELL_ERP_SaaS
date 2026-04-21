@@ -5,8 +5,6 @@ const { requireAuth } = require('../middleware/roleAuth');
 const { requireModuleAccess } = require('../middleware/permissionAuth');
 const { getUserScope } = require('../middleware/dataScope');
 
-router.use(requireAuth);
-
 function buildScopedCRMFilter(scope) {
     if (scope.fullAccess) return {}
     return {
@@ -33,14 +31,10 @@ const transporter = nodemailer.createTransport({
 // const requireLogin = (req, res, next) => {
 //     if (!req.session.user) {
 //         return res.redirect('/login');
-//     }
-//     next();
-// };
-
 // ========== CRM ROUTES ==========
 
 // 📌 Show All CRM Records
-router.get('/addcontacttable', requireModuleAccess('crm'), async (req, res) => {
+router.get('/addcontacttable', requireAuth, requireModuleAccess('crm', 'view'), async (req, res) => {
     try {
         const scope = await getUserScope(req)
         const data = await addcontactTable.find(buildScopedCRMFilter(scope)).sort({ createdAt: -1 });
@@ -53,13 +47,13 @@ router.get('/addcontacttable', requireModuleAccess('crm'), async (req, res) => {
 });
 
 // 📌 Show Add Form - NO SESSION CHECK
-router.get('/addcontactform', requireModuleAccess('crm', 'add'), (req, res) => {
+router.get('/addcontactform', requireAuth, requireModuleAccess('crm', 'add'), (req, res) => {
     const loginname = req.session.email || 'Admin';
     res.render("CRM/addcontactform.ejs", { error: null, success: null, loginname });
 });
 
 // 📌 Add New Record
-router.post('/addcontactform', requireModuleAccess('crm', 'add'), async (req, res) => {
+router.post('/addcontactform', requireAuth, requireModuleAccess('crm', 'add'), async (req, res) => {
     try {
         const { name, phoneno, whatsappno, email, note } = req.body;
         const loginname = req.session.email || 'Admin';
@@ -100,7 +94,7 @@ router.post('/addcontactform', requireModuleAccess('crm', 'add'), async (req, re
 });
 
 // 📌 Show Edit Form
-router.get('/addcontactedit/:id', requireModuleAccess('crm', 'edit'), async (req, res) => {
+router.get('/addcontactedit/:id', requireAuth, requireModuleAccess('crm', 'edit'), async (req, res) => {
     try {
         const scope = await getUserScope(req)
         const record = await addcontactTable.findOne({
@@ -174,7 +168,10 @@ router.post('/addcontactsend/:id', requireModuleAccess('crm', 'edit'), async (re
         
         if (message) {
             const existingNote = record.note ? record.note + '\n\n' : '';
-            await addcontactTable.findByIdAndUpdate(req.params.id, {
+            await addcontactTable.findOneAndUpdate({
+                _id: req.params.id,
+                ...buildScopedCRMFilter(scope)
+            }, {
                 note: existingNote + `[${new Date().toLocaleString()}] ${message}`
             });
         }
