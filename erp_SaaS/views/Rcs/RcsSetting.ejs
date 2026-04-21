@@ -1,8 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Send SMS - RCS Campaign</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCS Gateway Settings</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --bg-body: #f8fafc;
+            --bg-white: #ffffff;
+            --bg-offwhite: #f1f5f9;
+            --bg-card: #ffffff;
+            --text: #334155;
+            --text-light: #64748b;
+            --text-muted: #94a3b8;
+            --dark: #0f172a;
+            --border: #eef2f6;
+            --shadow: 0 8px 25px rgba(0,0,0,0.03);
+            --shadow-lg: 0 15px 35px rgba(102,126,234,0.1);
+            --header-height: 70px;
+            --sidebar-width: 280px;
+            --sidebar-mini-width: 80px;
+        }
+
+        body.dark {
+            --bg-body: #0f172a;
+            --bg-white: #1e293b;
+            --bg-offwhite: #334155;
+            --bg-card: #1e293b;
+            --text: #e2e8f0;
+            --text-light: #cbd5e1;
+            --text-muted: #94a3b8;
+            --dark: #f8fafc;
+            --border: #334155;
+            --shadow: 0 8px 25px rgba(0,0,0,0.2);
+            --shadow-lg: 0 15px 35px rgba(102,126,234,0.2);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -10,347 +54,309 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf4 100%);
-            min-height: 100vh;
+            overflow-x: hidden;
+            background: var(--bg-body);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.round-border .header-wrapper,
+        body.round-border .sidebar,
+        body.round-border .settings-card,
+        body.round-border .form-control,
+        body.round-border .note,
+        body.round-border .btn-action,
+        body.round-border .alert {
+            border-radius: 20px !important;
+        }
+
+        body.no-radius .header-wrapper,
+        body.no-radius .sidebar,
+        body.no-radius .settings-card,
+        body.no-radius .form-control,
+        body.no-radius .note,
+        body.no-radius .btn-action,
+        body.no-radius .alert {
+            border-radius: 0 !important;
+        }
+
+        .header-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            background: var(--bg-white);
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .main-wrapper {
+            margin-top: 70px;
+            display: flex;
+            width: 100%;
+            min-height: calc(100vh - 70px);
+            position: relative;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width, 280px);
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            height: calc(100vh - var(--header-height, 70px));
+            position: fixed;
+            left: 0;
+            top: 70px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1020;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
             overflow-x: hidden;
         }
 
-        /* Main layout wrapper */
-        .main-wrapper {
-            display: flex;
-            width: 100%;
-            min-height: 100vh;
+        .sidebar.mini {
+            width: var(--sidebar-mini-width, 80px);
         }
 
         .content-wrapper {
             flex: 1;
-            margin-left: 350px;
-            margin-top: 80px;
-            padding: 30px;
-            transition: all 0.3s ease;
+            margin-left: var(--sidebar-width, 280px);
+            padding: 25px;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-body);
+            min-height: calc(100vh - 70px);
+            width: calc(100% - var(--sidebar-width, 280px));
         }
 
-        .page-header {
-            margin-bottom: 30px;
+        .sidebar.mini ~ .content-wrapper {
+            margin-left: var(--sidebar-mini-width, 80px);
+            width: calc(100% - var(--sidebar-mini-width, 80px));
         }
 
-        .page-header h1 {
-            font-size: 32px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #738bf4 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width, 280px) !important;
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar.mini {
+                transform: translateX(-100%);
+                width: var(--sidebar-width, 280px) !important;
+            }
+
+            .sidebar.mini.open {
+                transform: translateX(0);
+            }
+
+            .content-wrapper {
+                margin-left: 0 !important;
+                width: 100% !important;
+                padding: 15px;
+            }
+
+            .sidebar.mini ~ .content-wrapper {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
         }
 
-        .page-header p {
-            color: #64748b;
-            font-size: 15px;
+        .settings-container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .main-card {
-            background: #fff;
-            border-radius: 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        .settings-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
             overflow: hidden;
-            border: 1px solid #f1f5f9;
+            box-shadow: var(--shadow);
         }
 
-        .card-section {
-            padding: 30px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .card-section:last-child {
-            border-bottom: none;
-        }
-
-        .section-title {
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #738bf4;
-            margin-bottom: 20px;
+        .card-head {
+            background: var(--primary-gradient);
+            color: #fff;
+            padding: 24px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        .section-title::before {
-            content: '';
-            width: 4px;
-            height: 16px;
-            background: linear-gradient(135deg, #738bf4 0%, #764ba2 100%);
-            border-radius: 2px;
+        .card-head h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .card-head small {
+            font-size: 14px;
+            opacity: 0.9;
+            display: block;
+            margin-top: 6px;
+        }
+
+        .head-actions a {
+            border: 1px solid rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 9px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            gap: 7px;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .head-actions a:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+        .card-body {
+            padding: 28px;
         }
 
         .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group:last-child {
-            margin-bottom: 0;
+            margin-bottom: 22px;
         }
 
         label {
-            font-size: 13px;
-            font-weight: 600;
             display: block;
-            margin-bottom: 10px;
-            color: #374151;
-            text-transform: capitalize;
-        }
-
-        .required:after {
-            content: " *";
-            color: #ef4444;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 14px;
+            margin-bottom: 8px;
             font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .required::after {
+            content: ' *';
+            color: var(--danger);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 14px;
+            background: var(--bg-white);
+            color: var(--text);
             transition: all 0.25s ease;
-            font-family: inherit;
-            background: #fafbfc;
-            color: #1f2937;
         }
 
-        input::placeholder, textarea::placeholder {
-            color: #9ca3af;
-        }
-
-        input:focus, select:focus, textarea:focus {
+        .form-control:focus {
             outline: none;
-            border-color: #738bf4;
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(115, 139, 244, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.12);
         }
 
-        select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            padding-right: 40px;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 120px;
+        .note {
+            background: rgba(59, 130, 246, 0.08);
+            border-left: 4px solid var(--info);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text);
             line-height: 1.6;
         }
 
-        .row {
+        .note b {
+            color: var(--primary-dark);
+        }
+
+        .note.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.25);
+            border-left-color: var(--warning);
+        }
+
+        .info-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .action-bar {
+            border-top: 1px solid var(--border);
+            background: var(--bg-offwhite);
+            padding: 20px 24px;
             display: flex;
             gap: 12px;
-            align-items: stretch;
+            flex-wrap: wrap;
         }
 
-        .row select {
-            flex: 1;
-        }
-
-        .btn {
-            padding: 14px 24px;
+        .btn-action {
             border: none;
             border-radius: 12px;
-            cursor: pointer;
+            padding: 12px 20px;
             font-size: 14px;
-            font-weight: 600;
-            transition: all 0.25s ease;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            white-space: nowrap;
         }
 
-        .btn:hover {
+        .btn-save {
+            background: var(--primary-gradient);
+            color: #fff;
+        }
+
+        .btn-test {
+            background: var(--warning);
+            color: #fff;
+        }
+
+        .btn-action:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            box-shadow: var(--shadow-lg);
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: #f3f4f6;
-            color: #4b5563;
-            border: 1px solid #e5e7eb;
-        }
-
-        .btn-secondary:hover {
-            background: #e5e7eb;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-success:hover {
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #738bf4 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(115, 139, 244, 0.3);
-        }
-
-        .btn-primary:hover {
-            box-shadow: 0 8px 25px rgba(115, 139, 244, 0.4);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-        }
-
-        .btn-warning:hover {
-            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 16px;
-            margin-top: 10px;
-        }
-
-        .action-buttons .btn {
-            flex: 1;
-            justify-content: center;
-            padding: 16px 24px;
-            font-size: 15px;
-        }
-
-        .help-btn, .import-btn {
-            padding: 12px 20px;
-            background: #f1f5f9;
-            border: 2px solid #e2e8f0;
+        .alert {
+            padding: 14px;
             border-radius: 12px;
-            cursor: pointer;
+            margin-bottom: 20px;
+            display: none;
             font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
+            border: 1px solid transparent;
         }
 
-        .help-btn:hover, .import-btn:hover {
-            background: #e2e8f0;
-            transform: translateY(-1px);
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+            border-color: rgba(16, 185, 129, 0.25);
         }
 
-        .import-btn {
-            background: #10b981;
-            color: white;
-            border: none;
-        }
-
-        .import-btn:hover {
-            background: #059669;
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 20px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        .radio-card {
-            display: flex;
-            align-items: center;
-            padding: 14px 20px;
-            background: #fafbfc;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .radio-card:hover {
-            border-color: #738bf4;
-            background: #f8f9ff;
-        }
-
-        .radio-card input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            margin-right: 10px;
-            accent-color: #738bf4;
-            cursor: pointer;
-        }
-
-        .radio-card label {
-            margin-bottom: 0;
-            font-weight: 500;
-            cursor: pointer;
-            text-transform: none;
-        }
-
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 16px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #f3f4f6 100%);
-            border-radius: 0 0 14px 14px;
-            border: 1.5px solid #e5e7eb;
-            border-top: none;
-        }
-
-        .toolbar button {
-            background: white;
-            border: 1px solid #e5e7eb;
-            cursor: pointer;
-            font-size: 16px;
-            padding: 8px 14px;
-            border-radius: 10px;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .toolbar button:hover {
-            background: #738bf4;
-            border-color: #738bf4;
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(115, 139, 244, 0.3);
-        }
-
-        .toolbar button.var-btn {
-            font-size: 12px;
-            font-weight: 600;
-            color: #738bf4;
-            background: rgba(115, 139, 244, 0.1);
-            border-color: rgba(115, 139, 244, 0.2);
-        }
-
-        .toolbar button.var-btn:hover {
-            background: #738bf4;
-            color: white;
-        }
-
-        .counter {
-            font-size: 12px;
-            font-weight: 500;
-            text-align: right;
-            color: #6b7280;
-            margin-top: 10px;
-            padding-right: 5px;
-        }
-
-        .counter strong {
-            color: #738bf4;
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #7f1d1d;
+            border-color: rgba(239, 68, 68, 0.25);
         }
 
         .loading {
@@ -359,276 +365,171 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(17, 24, 39, 0.95);
-            color: white;
-            padding: 30px 50px;
-            border-radius: 20px;
-            z-index: 1000;
-            font-size: 16px;
+            background: rgba(15, 23, 42, 0.95);
+            color: #fff;
+            padding: 20px 32px;
+            border-radius: 12px;
+            z-index: 2000;
+            font-size: 15px;
             text-align: center;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.3);
         }
 
-        .alert {
-            padding: 16px 20px;
-            border-radius: 14px;
-            margin-bottom: 24px;
-            display: none;
-            animation: slideDown 0.3s ease;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .alert-success {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            color: #065f46;
-            border: 1px solid #6ee7b7;
-        }
-
-        .alert-error {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            color: #991b1b;
-            border: 1px solid #fca5a5;
-        }
-
-        .schedule-picker {
-            display: none;
-            margin-top: 20px;
-            padding: 24px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #f3f4f6 100%);
-            border-radius: 16px;
-            border: 1.5px solid #e5e7eb;
-        }
-
-        .schedule-picker.active {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        #fileInput {
-            display: none;
-        }
-
-        .info-box {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            padding: 18px 20px;
-            border-radius: 14px;
-            margin-top: 16px;
-            font-size: 13px;
-            border: 1px solid #bfdbfe;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .info-box strong {
-            color: #1e40af;
-        }
-
-        .info-box small {
-            color: #3b82f6;
-            display: block;
-            margin-top: 4px;
-        }
-
-        @media (max-width: 991px) {
-            .content-wrapper {
-                margin-left: 0;
+        @media (max-width: 992px) {
+            .card-body {
                 padding: 20px;
             }
-            .page-header h1 {
-                font-size: 26px;
+
+            .action-bar {
+                padding: 16px;
             }
-            .card-section {
-                padding: 20px;
-            }
-            .action-buttons {
-                flex-direction: column;
-            }
-            .row {
-                flex-wrap: wrap;
-            }
-            .radio-group {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .radio-card {
+
+            .btn-action {
                 width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const savedBorder = localStorage.getItem('border') || 'round-border';
+            document.body.classList.add(savedTheme);
+            document.body.classList.add(savedBorder);
+        })();
+    </script>
 
-    <%- include('../../partials/admin/header.ejs') %>
-    
+    <% const pageTitle = 'RCS Gateway Settings'; %>
+
+    <div class="header-wrapper">
+        <%- include('../../partials/admin/header.ejs')%>
+    </div>
+
     <div class="main-wrapper">
-        <%- include('../../partials/admin/left.ejs') %>
+            <%- include('../../partials/admin/left.ejs')%>
 
-        <div class="content-wrapper">
-            <!-- Page Header -->
-            <div class="page-header">
-                <h1>📱 Bulk SMS Campaign</h1>
-                <p>Send professional messages with DLT Template ID support</p>
-            </div>
 
-            <!-- Main Card -->
-            <div class="main-card">
-                <div id="alert" class="alert"></div>
+        <div class="content-wrapper" id="contentWrapper">
+            <div class="settings-container">
+                <div class="settings-card">
+                    <div class="card-head">
+                        <div>
+                            <h1><i class="fas fa-gear"></i> SMS Gateway Settings</h1>
+                            <small>Configure API credentials and DLT Template ID</small>
+                        </div>
+                        <div class="head-actions">
+                            <a href="/rcscampaign"><i class="fas fa-paper-plane"></i> Open Campaign</a>
+                        </div>
+                    </div>
 
-                <form id="smsForm">
-                    <!-- SMS Configuration Section -->
-                    <div class="card-section">
-                        <div class="section-title">SMS Configuration</div>
-                        
-                        <div class="form-group">
-                            <label class="required">SMS Type</label>
-                            <div class="row">
-                                <select id="smsType" required>
-                                    <option value="">Select SMS Type</option>
-                                    <option value="promotional">📢 Promotional - Route 1</option>
-                                    <option value="transactional">🔔 Transactional - Route 2 (DLT Required)</option>
-                                    <option value="otp">🔐 OTP Service - Route 2 (DLT Required)</option>
-                                    <option value="dnd">📞 Trans DND - Route 4 (DLT Required)</option>
+                    <div class="card-body">
+                        <div id="alert" class="alert"></div>
+
+                        <form id="settingsForm" onsubmit="return false;">
+                            <div class="form-group">
+                                <label class="required" for="apiUrl">API URL</label>
+                                <input class="form-control" type="text" id="apiUrl" placeholder="https://msg.icloudsms.com/rest/services/sendSMS/sendGroupSms" required>
+                                <div class="note">
+                                    <b>Format options:</b><br>
+                                    - Placeholder style: https://api.com/send?to=[app_number]&amp;msg=[app_message]&amp;template=[dlt_template_id]<br>
+                                    - Standard style: https://msg.icloudsms.com/rest/services/sendSMS/sendGroupSms
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="required" for="apiKey">API Key / AUTH_KEY</label>
+                                <input class="form-control" type="text" id="apiKey" placeholder="Enter your API authentication key" required>
+                                <div class="note">Get this value from your SMS provider dashboard.</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="required" for="senderId">Default Sender ID</label>
+                                <input class="form-control" type="text" id="senderId" maxlength="11" placeholder="6-11 character sender ID" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="routeId">Route ID <span class="info-badge">Important</span></label>
+                                <select class="form-control" id="routeId">
+                                    <option value="1">1 - Promotional (Bulk/Commercial)</option>
+                                    <option value="2">2 - Transactional (OTP/Alerts)</option>
+                                    <option value="4">4 - Transactional DND</option>
                                 </select>
-                                <button type="button" class="btn btn-secondary" onclick="showHelp()">❓ Help</button>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="required">Sender ID</label>
-                            <input type="text" id="senderId" maxlength="11" placeholder="Enter 6-11 character Sender ID" required>
-                        </div>
-                    </div>
-
-                    <!-- Recipients Section -->
-                    <div class="card-section">
-                        <div class="section-title">Recipients</div>
-                        
-                        <div class="form-group">
-                            <label class="required">Mobile Numbers</label>
-                            <div class="row" style="margin-bottom: 12px;">
-                                <button type="button" class="btn btn-success" onclick="document.getElementById('fileInput').click()">
-                                    📁 Import CSV
-                                </button>
-                                <button type="button" class="btn btn-secondary" onclick="showExample()">
-                                    📋 Example
-                                </button>
-                            </div>
-                            <input type="file" id="fileInput" accept=".csv">
-                            <textarea id="mobileNumbers" placeholder="Enter mobile numbers (comma separated or one per line)&#10;Example:&#10;9999999999,8888888888,7777777777&#10;OR&#10;9999999999&#10;8888888888&#10;7777777777" required></textarea>
-                            <div class="counter" id="numberCount"><strong>0</strong> numbers entered</div>
-                        </div>
-                    </div>
-
-                    <!-- Message Content Section -->
-                    <div class="card-section">
-                        <div class="section-title">Message Content</div>
-                        
-                        <div class="form-group">
-                            <label class="required">Message Type</label>
-                            <div class="radio-group">
-                                <div class="radio-card">
-                                    <input type="radio" name="messageType" value="text" id="msgText" checked>
-                                    <label for="msgText">🇬🇧 English</label>
-                                </div>
-                                <div class="radio-card">
-                                    <input type="radio" name="messageType" value="unicode" id="msgUnicode">
-                                    <label for="msgUnicode">🌐 Unicode (Hindi/Other)</label>
+                                <div class="note warning">
+                                    <b>Route ID affects DLT requirements:</b><br>
+                                    - Route 1 (Promotional): Template ID optional<br>
+                                    - Route 2/4 (Transactional): DLT Template ID is mandatory
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label class="required">Message</label>
-                            <textarea id="message" placeholder="Type your message here..."></textarea>
-                            <div class="toolbar">
-                                <button type="button" onclick="insertEmoji('😊')">😊</button>
-                                <button type="button" onclick="insertEmoji('❤️')">❤️</button>
-                                <button type="button" onclick="insertEmoji('👍')">👍</button>
-                                <button type="button" onclick="insertEmoji('🎉')">🎉</button>
-                                <button type="button" class="var-btn" onclick="insertText('[NAME]')">[NAME]</button>
-                                <button type="button" class="var-btn" onclick="insertText('[ORDER_ID]')">[ORDER_ID]</button>
-                                <button type="button" class="var-btn" onclick="insertText('[OTP]')">[OTP]</button>
-                                <button type="button" class="var-btn" onclick="insertText('[AMOUNT]')">[AMOUNT]</button>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label for="templateId">DLT Template ID <span class="info-badge">Required for Transactional</span></label>
+                                <input class="form-control" type="text" id="templateId" placeholder="Enter 12-digit DLT Template ID">
+                                <div class="note">
+                                    <b>How to get DLT Template ID:</b><br>
+                                    1. Login to your SMS provider panel<br>
+                                    2. Open DLT Templates and Approved Templates section<br>
+                                    3. Copy the approved Template ID and paste it here
+                                </div>
                             </div>
-                            <div class="counter" id="charCount"><strong>0</strong> characters / <strong>0</strong> credits</div>
-                        </div>
-
-                        <div id="templateInfo" class="info-box" style="display: none;">
-                            <span style="font-size: 18px;">🔑</span>
-                            <div>
-                                <strong>DLT Template ID in use:</strong> <span id="activeTemplateId">Loading...</span>
-                                <small>This Template ID will be sent with your message as per TRAI guidelines</small>
-                            </div>
-                        </div>
+                        </form>
                     </div>
 
-                    <!-- Action Buttons Section -->
-                    <div class="card-section" style="background: linear-gradient(135deg, #f8f9fa 0%, #f3f4f6 100%);">
-                        <div class="action-buttons">
-                            <button type="button" class="btn btn-primary" onclick="sendSMS('now')">
-                                ✈ Send Now
-                            </button>
-                            <button type="button" class="btn btn-warning" onclick="showSchedule()">
-                                📅 Schedule for Later
-                            </button>
-                        </div>
-
-                        <div id="schedulePicker" class="schedule-picker">
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label>Schedule Date & Time</label>
-                                <input type="datetime-local" id="scheduleTime">
-                                <button type="button" class="btn btn-warning" onclick="sendSMS('schedule')" style="margin-top: 15px; width: 100%;">
-                                    ✅ Confirm Schedule
-                                </button>
-                            </div>
-                        </div>
+                    <div class="action-bar">
+                        <button class="btn-action btn-save" onclick="saveSettings()"><i class="fas fa-floppy-disk"></i> Save Settings</button>
+                        <button class="btn-action btn-test" onclick="testConnection()"><i class="fas fa-plug"></i> Test Connection</button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="loading" id="loading">
-        <div>⏳ Sending SMS... Please wait...</div>
+        <div><i class="fas fa-spinner fa-spin"></i> Processing request...</div>
     </div>
 
     <script>
-        let currentSettings = {};
+        function isCompactMode() {
+            return window.innerWidth <= 1024 && !document.body.classList.contains('desktop-mode-mobile');
+        }
 
-        // Load settings and sender ID
+        function syncSidebarState() {
+            const sidebar = document.getElementById('sidebar');
+            const contentWrapper = document.getElementById('contentWrapper');
+            if (!sidebar || !contentWrapper) return;
+
+            if (isCompactMode()) {
+                contentWrapper.style.marginLeft = '0';
+                contentWrapper.style.width = '100%';
+                return;
+            }
+
+            if (document.body.classList.contains('sidebar-collapsed')) {
+                contentWrapper.style.marginLeft = '0';
+                contentWrapper.style.width = '100%';
+                return;
+            }
+
+            const isMini = sidebar.classList.contains('mini');
+            contentWrapper.style.marginLeft = isMini
+                ? 'var(--sidebar-mini-width, 80px)'
+                : 'var(--sidebar-width, 280px)';
+            contentWrapper.style.width = isMini
+                ? 'calc(100% - var(--sidebar-mini-width, 80px))'
+                : 'calc(100% - var(--sidebar-width, 280px))';
+        }
+
         async function loadSettings() {
             try {
                 const response = await fetch('/api/get-settings');
                 const data = await response.json();
-                currentSettings = data;
-                
-                if (data.senderId) {
-                    document.getElementById('senderId').value = data.senderId;
-                }
-                
-                // Show template info
-                if (data.templateId) {
-                    document.getElementById('templateInfo').style.display = 'block';
-                    document.getElementById('activeTemplateId').textContent = data.templateId;
-                } else {
-                    document.getElementById('activeTemplateId').textContent = 'Not configured! Please add in Settings';
-                }
-                
-                console.log('Settings loaded:', data);
+
+                if (data.apiUrl) document.getElementById('apiUrl').value = data.apiUrl;
+                if (data.apiKey) document.getElementById('apiKey').value = data.apiKey;
+                if (data.senderId) document.getElementById('senderId').value = data.senderId;
+                if (data.templateId) document.getElementById('templateId').value = data.templateId;
+                if (data.routeId) document.getElementById('routeId').value = data.routeId;
             } catch (error) {
                 console.error('Error loading settings:', error);
             }
@@ -639,212 +540,132 @@
             alert.className = `alert alert-${type}`;
             alert.textContent = message;
             alert.style.display = 'block';
-            
+
             setTimeout(() => {
                 alert.style.display = 'none';
             }, 5000);
         }
 
-        function updateCounter() {
-            const message = document.getElementById('message').value;
-            const charCount = message.length;
-            let credits = Math.ceil(charCount / 160);
-            if (credits === 0) credits = 1;
-            
-            document.getElementById('charCount').textContent = `${charCount} characters / ${credits} credit(s)`;
-        }
+        async function saveSettings() {
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const senderId = document.getElementById('senderId').value.trim();
+            const templateId = document.getElementById('templateId').value.trim();
+            const routeId = document.getElementById('routeId').value;
 
-        function updateNumberCount() {
-            const numbers = document.getElementById('mobileNumbers').value;
-            let count = 0;
-            
-            if (numbers.includes('\n')) {
-                count = numbers.split('\n').filter(n => n.trim()).length;
-            } else if (numbers.includes(',')) {
-                count = numbers.split(',').filter(n => n.trim()).length;
-            } else if (numbers.trim()) {
-                count = 1;
-            }
-            
-            document.getElementById('numberCount').textContent = `${count} number(s) entered`;
-        }
-
-        function insertEmoji(emoji) {
-            const textarea = document.getElementById('message');
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const text = textarea.value;
-            textarea.value = text.substring(0, start) + emoji + text.substring(end);
-            textarea.focus();
-            updateCounter();
-        }
-
-        function insertText(text) {
-            const textarea = document.getElementById('message');
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const currentText = textarea.value;
-            textarea.value = currentText.substring(0, start) + text + currentText.substring(end);
-            textarea.focus();
-            updateCounter();
-        }
-
-        // CSV Import
-        document.getElementById('fileInput').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            try {
-                const response = await fetch('/api/import-csv', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    document.getElementById('mobileNumbers').value = data.numbers;
-                    updateNumberCount();
-                    showAlert('✅ CSV imported successfully! ' + data.count + ' numbers loaded', 'success');
-                } else {
-                    showAlert('❌ ' + data.message, 'error');
-                }
-            } catch (error) {
-                showAlert('Error importing CSV', 'error');
-            }
-            
-            e.target.value = '';
-        });
-
-        function showExample() {
-            document.getElementById('mobileNumbers').value = '9999999999,8888888888,7777777777';
-            updateNumberCount();
-        }
-
-        function showSchedule() {
-            const picker = document.getElementById('schedulePicker');
-            picker.classList.toggle('active');
-        }
-
-        async function sendSMS(type) {
-            const senderId = document.getElementById('senderId').value;
-            const mobileNumbers = document.getElementById('mobileNumbers').value;
-            const message = document.getElementById('message').value;
-            const messageType = document.querySelector('input[name="messageType"]:checked').value;
-            const smsType = document.getElementById('smsType').value;
-            
-            // Validation
-            if (!smsType) {
-                showAlert('Please select SMS Type', 'error');
+            if (!apiUrl) {
+                showAlert('Please enter API URL.', 'error');
                 return;
             }
-            
+            if (!apiKey) {
+                showAlert('Please enter API key.', 'error');
+                return;
+            }
             if (!senderId) {
-                showAlert('Please enter Sender ID', 'error');
+                showAlert('Please enter sender ID.', 'error');
                 return;
             }
-            
-            if (!mobileNumbers.trim()) {
-                showAlert('Please enter mobile numbers', 'error');
-                return;
+
+            if ((routeId === '2' || routeId === '4') && !templateId) {
+                const confirmSave = confirm('Transactional route selected but DLT Template ID is empty. Messages may fail. Save anyway?');
+                if (!confirmSave) return;
             }
-            
-            if (!message.trim()) {
-                showAlert('Please enter message', 'error');
-                return;
-            }
-            
-            // Check DLT requirement
-            const requiresDLT = smsType === 'transactional' || smsType === 'otp' || smsType === 'dnd';
-            if (requiresDLT && !currentSettings.templateId) {
-                showAlert('⚠️ DLT Template ID is required for ' + smsType.toUpperCase() + ' messages!\n\nPlease configure Template ID in Gateway Settings first.', 'error');
-                return;
-            }
-            
+
             const loading = document.getElementById('loading');
             loading.style.display = 'block';
-            
+
             try {
-                let url = '/api/send-sms';
-                let data = {
-                    senderId,
-                    mobileNumbers,
-                    message,
-                    messageType,
-                    templateId: currentSettings.templateId  // Send template ID
-                };
-                
-                if (type === 'schedule') {
-                    const scheduleTime = document.getElementById('scheduleTime').value;
-                    if (!scheduleTime) {
-                        showAlert('Please select schedule time', 'error');
-                        loading.style.display = 'none';
-                        return;
-                    }
-                    url = '/api/schedule-sms';
-                    data.scheduleTime = scheduleTime;
-                }
-                
-                const response = await fetch(url, {
+                const response = await fetch('/api/save-settings', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({
+                        apiUrl,
+                        apiKey,
+                        senderId,
+                        templateId,
+                        routeId
+                    })
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
-                    showAlert(result.message, 'success');
-                    if (type === 'now') {
-                        // Clear form but keep sender ID
-                        document.getElementById('mobileNumbers').value = '';
-                        document.getElementById('message').value = '';
-                        updateCounter();
-                        updateNumberCount();
-                    } else {
-                        document.getElementById('schedulePicker').classList.remove('active');
-                        document.getElementById('scheduleTime').value = '';
-                    }
+                    showAlert(`Settings saved successfully. Template ID: ${templateId || 'Not set'}`, 'success');
                 } else {
-                    showAlert(result.message, 'error');
+                    showAlert(result.message || 'Failed to save settings.', 'error');
                 }
             } catch (error) {
-                showAlert('Network error: ' + error.message, 'error');
+                showAlert(`Error: ${error.message}`, 'error');
             } finally {
                 loading.style.display = 'none';
             }
         }
 
-        function showHelp() {
-            alert('📢 SMS Type Guide:\n\n' +
-                  '• Promotional - For marketing/bulk messages (Route 1)\n' +
-                  '• Transactional - For alerts, notifications (Route 2) - DLT REQUIRED\n' +
-                  '• OTP Service - For OTP messages (Route 2) - DLT REQUIRED\n' +
-                  '• Trans DND - For DND numbers (Route 4) - DLT REQUIRED\n\n' +
-                  '⚠️ Important: Transactional/OTP messages MUST have a valid DLT Template ID configured in Settings.\n\n' +
-                  '📝 Character limit: 160 characters = 1 SMS credit');
+        async function testConnection() {
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const templateId = document.getElementById('templateId').value.trim();
+
+            if (!apiUrl) {
+                showAlert('Please enter API URL first.', 'error');
+                return;
+            }
+            if (!apiKey) {
+                showAlert('Please enter API key first.', 'error');
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/test-connection', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ apiUrl, apiKey, templateId })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                } else {
+                    showAlert(result.message || 'Connection test failed.', 'error');
+                }
+            } catch (error) {
+                showAlert(`Connection failed: ${error.message}`, 'error');
+            } finally {
+                loading.style.display = 'none';
+            }
         }
 
-        // Event listeners
-        document.getElementById('message').addEventListener('input', updateCounter);
-        document.getElementById('mobileNumbers').addEventListener('input', updateNumberCount);
-        
-        // SMS type change handler
-        document.getElementById('smsType').addEventListener('change', function() {
-            const requiresDLT = this.value === 'transactional' || this.value === 'otp' || this.value === 'dnd';
-            if (requiresDLT && !currentSettings.templateId) {
-                showAlert('⚠️ Warning: ' + this.options[this.selectedIndex].text + ' requires DLT Template ID. Please configure it in Settings.', 'error');
+        document.addEventListener('DOMContentLoaded', function() {
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'sidebarMini' || e.key === 'sidebar-update-time' || e.key === 'sidebarDesktopCollapsed') {
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar && !isCompactMode() && !document.body.classList.contains('desktop-mode-mobile')) {
+                        const savedState = localStorage.getItem('sidebarMini') === 'true';
+                        savedState ? sidebar.classList.add('mini') : sidebar.classList.remove('mini');
+                    }
+                    syncSidebarState();
+                }
+            });
+
+            window.addEventListener('resize', syncSidebarState);
+
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                const sidebarObserver = new MutationObserver(syncSidebarState);
+                sidebarObserver.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
             }
+
+            const bodyObserver = new MutationObserver(syncSidebarState);
+            bodyObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+            loadSettings();
+            setTimeout(syncSidebarState, 120);
         });
-        
-        // Initialize
-        loadSettings();
-        updateCounter();
-        updateNumberCount();
     </script>
 </body>
 </html>

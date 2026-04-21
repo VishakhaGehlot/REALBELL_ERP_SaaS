@@ -4,8 +4,6 @@ const multer = require('multer');
 const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
-const { requireAuth } = require('../middleware/roleAuth');
-const { requireModuleAccess } = require('../middleware/permissionAuth');
 
 // Configure multer for CSV upload
 const upload = multer({ dest: 'uploads/' });

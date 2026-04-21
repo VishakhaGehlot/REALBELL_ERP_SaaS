@@ -4,25 +4,29 @@ const mongoose = require('mongoose');
 const zoomMeetingSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true,
-        trim: true
+        required: [true, 'Meeting title is required'],
+        trim: true,
+        default: 'Untitled Meeting'
     },
     zoomId: {
         type: String,
-        required: true,
+        required: [true, 'Zoom ID is required'],
         trim: true
     },
     passcode: {
         type: String,
-        default: "—"
+        default: "—",
+        trim: true
     },
     dateTime: {
         type: String,
-        default: "Not scheduled"
+        default: "Not scheduled",
+        trim: true
     },
     joinLink: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     status: {
         type: String,
@@ -40,17 +44,28 @@ const zoomMeetingSchema = new mongoose.Schema({
     createdByUserId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "auth",
-        default: null
+        default: null,
+        index: true
     },
     createdByEmail: {
         type: String,
-        default: ""
+        default: "",
+        trim: true,
+        lowercase: true,
+        index: true
     }
+}, {
+    timestamps: true // This automatically handles createdAt and updatedAt
 });
 
-zoomMeetingSchema.pre('save', function(next) {
-    this.updatedAt = Date.now();
-    next();
-});
+// Remove the pre-save middleware since timestamps: true handles it
+// zoomMeetingSchema.pre('save', function(next) {
+//     this.updatedAt = Date.now();
+//     next();
+// });
+
+// Add index for better query performance
+zoomMeetingSchema.index({ createdAt: -1 });
+zoomMeetingSchema.index({ createdByUserId: 1, createdAt: -1 });
 
 module.exports = mongoose.model('ZoomMeeting', zoomMeetingSchema);
