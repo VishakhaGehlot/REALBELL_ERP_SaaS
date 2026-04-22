@@ -398,7 +398,7 @@
                         <i class="bi bi-umbrella"></i>
                         Apply for Leave
                     </h2>
-                    <p>Submit leave application for absent employees</p>
+                    <p>Submit leave application for eligible employees</p>
                 </div>
                 <a href="/leave" class="back-btn">
                     <i class="bi bi-arrow-left"></i>
@@ -417,8 +417,8 @@
                     <div class="info-box">
                         <i class="bi bi-info-circle"></i>
                         <p>
-                            Apply leave for employees who were absent, on half day, or already on leave.
-                            <small><i class="bi bi-exclamation-circle me-1"></i>Only absent employees are shown in the dropdown</small>
+                            Apply leave for employees who are already on leave, have approved leave, or are marked absent/half day for today.
+                            <small><i class="bi bi-exclamation-circle me-1"></i>Employees with no attendance entry for today are not shown automatically</small>
                         </p>
                     </div>
 
@@ -552,8 +552,8 @@
                         <div class="warning-box" style="text-align: center;">
                             <i class="bi bi-emoji-frown"></i>
                             <p>
-                                <strong>No absent employees found!</strong>
-                                <small>All employees are present today. Leave can only be applied for absent employees.</small>
+                                <strong>No eligible employees found!</strong>
+                                <small>Only on-leave, approved-leave, or today marked absent/half-day employees appear here.</small>
                             </p>
                             <a href="/attendance" class="add-btn" style="display: inline-flex; margin-top: 15px; background: #3b82f6;">
                                 <i class="bi bi-calendar-check"></i> View Attendance
